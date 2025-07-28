@@ -1,7 +1,10 @@
+// framework
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { Logger, RequestMethod } from '@nestjs/common';
 import { DocumentBuilder } from '@nestjs/swagger';
+import { Logger, RequestMethod } from '@nestjs/common';
+
+// own implementation
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const logger = new Logger(' ========== BACKEND ALTA DEMANDA ========= ')

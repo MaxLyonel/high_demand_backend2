@@ -2,7 +2,7 @@ import { EducationalInstitution as EducationalInstitutionModel } from "src/modul
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 
-@Entity({ name: 'institucioneducativa'})
+@Entity({ schema: 'public', name: 'institucioneducativa'})
 export class EducationalInstitutionEntity {
   @PrimaryColumn()
   id: number
@@ -10,28 +10,23 @@ export class EducationalInstitutionEntity {
   @Column({name: 'institucioneducativa'})
   name: string
 
-  @Column({ name: 'estado'})
+  @Column({ name: 'estadoinstitucion_tipo_id'})
   state: number
-
-  @Column({ name: 'persona_id'})
-  personId: number
 
 
   static toDomain(entity: EducationalInstitutionEntity): EducationalInstitutionModel {
     return EducationalInstitutionModel.create({
       id: entity.id,
       name: entity.name,
-      state: entity.state,
-      personId: entity.personId
+      state: entity.state
     })
   }
 
   static fromDomain(educationalInstitution: EducationalInstitutionModel): EducationalInstitutionEntity {
     const entity = new EducationalInstitutionEntity()
-    entity.id = educationalInstitution.id,
-    entity.name = educationalInstitution.name,
-    entity.state = educationalInstitution.state,
-    entity.personId = educationalInstitution.personId
+    entity.id = educationalInstitution.id
+    entity.name = educationalInstitution.name
+    entity.state = educationalInstitution.state
     return entity
   }
 }

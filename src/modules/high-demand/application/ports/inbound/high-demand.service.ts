@@ -10,4 +10,5 @@ export abstract class HighDemandService {
   abstract listHighDemands(): Promise<EducationalInstitution[]>;
   abstract modifyHighDemand(): Promise<any>;
   abstract changeHighDemandStatus(): Promise<any>;
+
 }

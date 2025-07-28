@@ -1,8 +1,13 @@
+// framwork
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
+
+// config
 import { envs } from "src/infrastructure/config";
+
+// own implementation
 import { AuthController } from "./infrastructure/adapters/primary/controllers/auth.controller";
 import { UserRepository } from "./application/ports/outbound/user.repository";
 import { UserRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/user.repository.impl";

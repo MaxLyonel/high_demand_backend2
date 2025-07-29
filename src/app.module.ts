@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
 import { DatabaseModule } from "./infrastructure/database/database.module";
 import { HighDemandModule } from "./modules/high-demand/high-demand.module";
-import { AuthModule } from "./modules/login/auth.module";
+import { AuthModule } from "./modules/access-control/auth.module";
+import { OperationsProgrammingModule } from "./modules/operations-programming/operations-programming.module";
 
 
 
@@ -9,7 +10,8 @@ import { AuthModule } from "./modules/login/auth.module";
   imports: [
     AuthModule,
     DatabaseModule,
-    HighDemandModule
+    HighDemandModule,
+    OperationsProgrammingModule
   ]
 })
 export class AppModule {}

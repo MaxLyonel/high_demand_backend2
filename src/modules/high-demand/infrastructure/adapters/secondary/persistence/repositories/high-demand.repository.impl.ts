@@ -1,19 +1,39 @@
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { HighDemandRepository } from "src/modules/high-demand/application/ports/outbound/high-demand.repository";
 import { HighDemandRegistration } from "src/modules/high-demand/domain/models/high-demand-registration.model";
+import { HighDemandRegistrationEntity } from "../entities/high-demand.entity";
+import { Repository } from "typeorm";
+import { RegistrationStatus } from "src/modules/high-demand/domain/enums/registration-status.enum";
 
+
+interface NewHighDemandRegistration {
+  educationalInstitutionId: number;
+  userId: number;
+  currentWorkflowState: string;
+  workflowId: number;
+  registrationStatus: RegistrationStatus;
+  inbox: boolean;
+  operativeId: number;
+}
 
 
 @Injectable()
 export class HighDemandRepositoryImpl implements HighDemandRepository {
 
-  constructor(){}
+  constructor(
+    @InjectRepository(HighDemandRegistrationEntity, 'alta_demanda')
+    private readonly highDemandRegistrationRepository: Repository<HighDemandRegistrationEntity>
+  ){}
 
-  findById(id: number): Promise<HighDemandRegistration> {
-    throw new Error("Method not implemented.");
+  async findById(id: number): Promise<HighDemandRegistration | null> {
+    const highDemandRegistrationEntity = await this.highDemandRegistrationRepository.findOne({ where: { id }})
+    if(!highDemandRegistrationEntity) return null
+    return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity)
   }
-  saveHighDemandRegistration(obj: any): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async saveHighDemandRegistration(obj: NewHighDemandRegistration): Promise<HighDemandRegistration> {
+    const newHighDemandRegistration = await this.highDemandRegistrationRepository.save(obj)
+    return newHighDemandRegistration
   }
   modifyHighDemanRegistration(obj: any): Promise<HighDemandRegistration> {
     throw new Error("Method not implemented.");

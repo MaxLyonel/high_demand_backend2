@@ -6,8 +6,8 @@ import { HighDemandRegistration } from "src/modules/high-demand/domain/models/hi
 
 
 export abstract class HighDemandRepository {
-  abstract findById(id: number): Promise<HighDemandRegistration>;
-  abstract saveHighDemandRegistration(obj: any): Promise<boolean>;
+  abstract findById(id: number): Promise<HighDemandRegistration | null>;
+  abstract saveHighDemandRegistration(obj: any): Promise<HighDemandRegistration>;
   abstract modifyHighDemanRegistration(obj: any): Promise<HighDemandRegistration>;
   abstract updateStatusHighDeman(id: number, newStatus: any): Promise<HighDemandRegistration>;
   abstract onATray(id: number): Promise<boolean>;

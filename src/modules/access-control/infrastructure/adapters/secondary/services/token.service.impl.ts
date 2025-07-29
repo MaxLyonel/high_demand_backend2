@@ -1,8 +1,8 @@
 import { JwtService } from "@nestjs/jwt";
 import { envs } from "src/infrastructure/config";
 import { Injectable } from "@nestjs/common";
-import { User } from "src/modules/login/domain/models/user.model";
-import { TokenService } from "src/modules/login/application/ports/outbound/token.service";
+import { User } from "src/modules/access-control/domain/models/user.model";
+import { TokenService } from "src/modules/access-control/application/ports/outbound/token.service";
 
 
 

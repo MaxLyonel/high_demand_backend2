@@ -1,14 +1,15 @@
 import { EducationalInstitutionCourse } from "src/modules/high-demand/domain/models/educational-institution-course.model";
 import { EducationalInstitution } from "src/modules/high-demand/domain/models/educational-institution.model";
+import { HighDemandRegistration } from "src/modules/high-demand/domain/models/high-demand-registration.model";
 
 
 
 export abstract class HighDemandService {
 
-  abstract saveHighDemandRegistration(sie: number): Promise<any>;
-  abstract cancelHighDemands(): Promise<any>;
+  abstract saveHighDemandRegistration(sie: number): Promise<HighDemandRegistration>;
+  abstract cancelHighDemands(): Promise<boolean>;
   abstract listHighDemands(): Promise<EducationalInstitution[]>;
-  abstract modifyHighDemand(): Promise<any>;
+  abstract modifyHighDemand(): Promise<HighDemandRegistration>;
   abstract changeHighDemandStatus(): Promise<any>;
 
 }

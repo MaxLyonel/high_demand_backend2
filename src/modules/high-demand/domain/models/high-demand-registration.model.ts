@@ -23,7 +23,8 @@ export class HighDemandRegistration {
     workflowId,
     registrationStatus,
     inbox,
-    operativeId
+    operativeId,
+    existingRegistrations
   }: {
     id: number,
     educationalInstitutionId: number,
@@ -32,8 +33,20 @@ export class HighDemandRegistration {
     workflowId: number,
     registrationStatus: RegistrationStatus,
     inbox: boolean,
-    operativeId: number
+    operativeId: number,
+    existingRegistrations: HighDemandRegistration[]
   }): HighDemandRegistration {
+
+    // Regla negocio: Una unidad educativa no puede estar doblemente registrada en una misma gestión
+    const alreadyRegistered = existingRegistrations.some(
+      (reg) => reg.educationalInstitutionId === educationalInstitutionId && reg.operativeId === operativeId
+    );
+
+    if(alreadyRegistered) {
+      throw new Error('La unidad educativa ya está registrada como alta demanda en esta gestión')
+    }
+
+
     return new HighDemandRegistration(
       id,
       educationalInstitutionId,

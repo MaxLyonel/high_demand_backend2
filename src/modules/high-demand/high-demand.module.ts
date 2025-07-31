@@ -15,13 +15,20 @@ import { EducationalInstitutionCourseImpl } from "./application/service/educatio
 import { EducationalInstitutionCourseEntity } from "./infrastructure/adapters/secondary/persistence/entities/educational-institution-course.entity";
 import { EducationalInstitutionCourseRepository } from "./application/ports/outbound/educational-institution-course.repository";
 import { EducationalInstitutionCourseRepositoryImpl } from './infrastructure/adapters/secondary/persistence/repositories/educational.institution-course.repository.impl';
+import { HighDemandService } from "./application/ports/inbound/high-demand.service";
+import { HighDemandRegistrationImpl } from "./application/service/high-demand.impl";
+import { HighDemandRepository } from "./application/ports/outbound/high-demand.repository";
+import { HighDemandRegistrationEntity } from "./infrastructure/adapters/secondary/persistence/entities/high-demand.entity";
+import { HighDemandController } from "./infrastructure/adapters/primary/controllers/high-demand.controller";
+import { HighDemandRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/high-demand.repository.impl";
 
 
 
 @Module({
   controllers: [
     EducationalInstitutionController,
-    EducationalInstitutionCourseController
+    EducationalInstitutionCourseController,
+    HighDemandController
   ],
   providers: [
     {
@@ -39,13 +46,22 @@ import { EducationalInstitutionCourseRepositoryImpl } from './infrastructure/ada
     {
       provide: EducationalInstitutionCourseService,
       useClass: EducationalInstitutionCourseImpl
+    },
+    {
+      provide: HighDemandService,
+      useClass: HighDemandRegistrationImpl
+    },
+    {
+      provide: HighDemandRepository,
+      useClass: HighDemandRepositoryImpl
     }
   ],
   imports: [
     TypeOrmModule.forFeature(
       [
         EducationalInstitutionEntity,
-        EducationalInstitutionCourseEntity
+        EducationalInstitutionCourseEntity,
+        HighDemandRegistrationEntity
       ], 'alta_demanda')
   ],
   exports: [EducationalInstitutionService]

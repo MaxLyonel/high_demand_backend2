@@ -8,6 +8,7 @@ import { RegistrationStatus } from "src/modules/high-demand/domain/enums/registr
 
 
 interface NewHighDemandRegistration {
+  id: number,
   educationalInstitutionId: number;
   userId: number;
   currentWorkflowState: string;
@@ -26,6 +27,21 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     private readonly highDemandRegistrationRepository: Repository<HighDemandRegistrationEntity>
   ){}
 
+  async findInscriptions(obj: NewHighDemandRegistration): Promise<HighDemandRegistration[]> {
+    const highDemandsRegisteredEntities = await this.highDemandRegistrationRepository.find({
+      where: {
+        educationalInstitutionId: obj.id,
+        operativeId: obj.operativeId
+      }
+    });
+
+    const existingRegistrations = highDemandsRegisteredEntities.map(e =>
+      HighDemandRegistrationEntity.toDomain(e)
+    )
+
+    return existingRegistrations
+  }
+
   async findById(id: number): Promise<HighDemandRegistration | null> {
     const highDemandRegistrationEntity = await this.highDemandRegistrationRepository.findOne({ where: { id }})
     if(!highDemandRegistrationEntity) return null
@@ -33,7 +49,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   }
   async saveHighDemandRegistration(obj: NewHighDemandRegistration): Promise<HighDemandRegistration> {
     const newHighDemandRegistration = await this.highDemandRegistrationRepository.save(obj)
-    return newHighDemandRegistration
+    return HighDemandRegistrationEntity.toDomain(newHighDemandRegistration)
   }
   modifyHighDemanRegistration(obj: any): Promise<HighDemandRegistration> {
     throw new Error("Method not implemented.");

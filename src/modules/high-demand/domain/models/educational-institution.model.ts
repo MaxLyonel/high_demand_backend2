@@ -1,3 +1,4 @@
+import { InstitutionStatus } from "../enums/institution-status.enum";
 
 
 
@@ -5,7 +6,7 @@ export class EducationalInstitution {
   constructor(
     public readonly id: number,
     public readonly name: string,
-    public readonly state: number
+    public readonly state: InstitutionStatus
   ) {}
 
   static create({
@@ -18,5 +19,9 @@ export class EducationalInstitution {
     state: number,
   }): EducationalInstitution {
     return new EducationalInstitution(id, name, state )
+  }
+
+  canBeRegisteredAsHighDemand(): boolean {
+    return this.state === InstitutionStatus.OPEN
   }
 }

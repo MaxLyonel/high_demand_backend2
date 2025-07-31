@@ -28,23 +28,35 @@ export class HighDemandRegistrationEntity {
   inbox: boolean
 
   @Column({ name: 'operativo_id'})
-  opeartiveId: number
+  operativeId: number
 
   @ManyToOne(() => EducationalInstitutionEntity)
   @JoinColumn({ name: 'institucioneducativa_id'})
   educationalInstitution: EducationalInstitutionEntity
 
   static toDomain(entity: HighDemandRegistrationEntity): HighDemandRegistrationModel {
-    return HighDemandRegistrationModel.create({
-      id: entity.id,
-      educationalInstitutionId: entity.educationalInstitutionId,
-      userId: entity.userId,
-      currentWorkflowState: entity.currentWorkflowState,
-      workflowId: entity.workflowId,
-      registrationStatus: entity.registrationStatus,
-      inbox: entity.inbox,
-      operativeId: entity.opeartiveId
-    })
+
+    return new HighDemandRegistrationModel(
+      entity.id,
+      entity.educationalInstitutionId,
+      entity.userId,
+      entity.currentWorkflowState,
+      entity.workflowId,
+      entity.registrationStatus,
+      entity.inbox,
+      entity.operativeId
+    )
+
+    // return HighDemandRegistrationModel.create({
+    //   id: entity.id,
+    //   educationalInstitutionId: entity.educationalInstitutionId,
+    //   userId: entity.userId,
+    //   currentWorkflowState: entity.currentWorkflowState,
+    //   workflowId: entity.workflowId,
+    //   registrationStatus: entity.registrationStatus,
+    //   inbox: entity.inbox,
+    //   operativeId: entity.opeartiveId
+    // })
   }
 
   static fromDomain(highDemanRegistration:HighDemandRegistrationModel): HighDemandRegistrationEntity {
@@ -56,7 +68,7 @@ export class HighDemandRegistrationEntity {
     entity.workflowId = highDemanRegistration.workflowId,
     entity.registrationStatus = highDemanRegistration.registrationStatus,
     entity.inbox = highDemanRegistration.inbox
-    entity.opeartiveId = highDemanRegistration.operativeId
+    entity.operativeId = highDemanRegistration.operativeId
     return entity
   }
 }

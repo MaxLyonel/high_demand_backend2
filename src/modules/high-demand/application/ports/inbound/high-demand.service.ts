@@ -6,7 +6,7 @@ import { HighDemandRegistration } from "src/modules/high-demand/domain/models/hi
 
 export abstract class HighDemandService {
 
-  abstract saveHighDemandRegistration(sie: number): Promise<HighDemandRegistration>;
+  abstract saveHighDemandRegistration(obj: HighDemandRegistration): Promise<HighDemandRegistration>;
   abstract cancelHighDemands(): Promise<boolean>;
   abstract listHighDemands(): Promise<EducationalInstitution[]>;
   abstract modifyHighDemand(): Promise<HighDemandRegistration>;

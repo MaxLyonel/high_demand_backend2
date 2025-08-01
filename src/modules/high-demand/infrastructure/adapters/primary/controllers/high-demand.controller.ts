@@ -1,5 +1,7 @@
+// framework nestjs
 import { Body, Controller, Post } from "@nestjs/common";
-import { HighDemandService } from "src/modules/high-demand/application/ports/inbound/high-demand.service";
+// own implementations
+import { HighDemandService } from "@high-demand/application/ports/inbound/high-demand.service"
 
 
 @Controller('high-demand')

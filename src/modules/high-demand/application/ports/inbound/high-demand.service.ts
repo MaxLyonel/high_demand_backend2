@@ -1,8 +1,5 @@
-import { EducationalInstitutionCourse } from "src/modules/high-demand/domain/models/educational-institution-course.model";
-import { EducationalInstitution } from "src/modules/high-demand/domain/models/educational-institution.model";
-import { HighDemandRegistration } from "src/modules/high-demand/domain/models/high-demand-registration.model";
-
-
+import { EducationalInstitution } from "@high-demand/domain/models/educational-institution.model"
+import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
 
 export abstract class HighDemandService {
 

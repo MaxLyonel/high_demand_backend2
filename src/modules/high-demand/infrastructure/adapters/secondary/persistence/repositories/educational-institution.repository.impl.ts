@@ -1,9 +1,12 @@
+// framework nestjs
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { EducationalInstitutionEntity } from "../entities/educational-institution.entity";
+// external dependencies
 import { Repository } from "typeorm";
-import { EducationalInstitution } from "src/modules/high-demand/domain/models/educational-institution.model";
-import { EducationalInstitutionRepository } from "src/modules/high-demand/application/ports/outbound/educational-institution.repository";
+import { InjectRepository } from "@nestjs/typeorm";
+// own implementations
+import { EducationalInstitutionEntity } from "../entities/educational-institution.entity";
+import { EducationalInstitution } from "@high-demand/domain/models/educational-institution.model"
+import { EducationalInstitutionRepository } from "@high-demand/application/ports/outbound/educational-institution.repository"
 
 
 

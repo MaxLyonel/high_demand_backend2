@@ -30,7 +30,6 @@ const { error, value } = envsSchema.validate({
   ...process.env,
 })
 
-console.log(error)
 if(error) {
   throw new Error(`Config validation error: ${error.message}`)
 }

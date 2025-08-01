@@ -1,5 +1,7 @@
-import { EducationalInstitution as EducationalInstitutionModel } from "src/modules/high-demand/domain/models/educational-institution.model";
+// external dependencies
 import { Column, Entity, PrimaryColumn } from "typeorm";
+// own implementations
+import { EducationalInstitution as EducationalInstitutionModel } from "@high-demand/domain/models/educational-institution.model"
 
 
 @Entity({ schema: 'public', name: 'institucioneducativa'})

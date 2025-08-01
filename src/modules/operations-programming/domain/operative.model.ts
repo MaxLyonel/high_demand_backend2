@@ -1,6 +1,3 @@
-
-
-
 export class Operative {
   constructor (
     public readonly id: number,

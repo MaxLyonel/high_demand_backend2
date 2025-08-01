@@ -1,6 +1,4 @@
-import { Operative } from "src/modules/operations-programming/domain/operative.model";
-
-
+import { Operative } from "../../../../operations-programming/domain/operative.model"
 
 export abstract class OperationsProgrammingService {
 

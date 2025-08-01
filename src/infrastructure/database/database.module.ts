@@ -1,5 +1,8 @@
+// framework nestjs
 import { Global, Module } from "@nestjs/common";
+// external dependencies
 import { TypeOrmModule } from "@nestjs/typeorm";
+// own implementations
 import { dataSourceHD } from "./data-source";
 
 

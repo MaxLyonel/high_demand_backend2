@@ -1,5 +1,7 @@
+// external dependencies
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { User as UserModel } from '../../../../../domain/models/user.model';
+// own implementations
+import { User as UserModel } from '@access-control/domain/models/user.model';
 
 @Entity({name: 'usuario'})
 export class UserEntity {

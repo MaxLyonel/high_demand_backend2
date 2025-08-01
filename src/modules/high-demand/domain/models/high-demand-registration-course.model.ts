@@ -1,8 +1,3 @@
-
-
-
-
-
 export class HighDemandRegistrationCourse {
   constructor(
     public readonly id: number,

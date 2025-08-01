@@ -1,8 +1,8 @@
 // framework
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder } from '@nestjs/swagger';
 import { Logger, RequestMethod } from '@nestjs/common';
-
+// external dependencies
+import { DocumentBuilder } from '@nestjs/swagger';
 // own implementation
 import { AppModule } from './app.module';
 

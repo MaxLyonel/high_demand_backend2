@@ -1,10 +1,9 @@
+// framework nestjs
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { HighDemandRegistrationEntity } from "./high-demand.entity";
+// own implementations
 import { EducationalInstitutionCourseEntity } from "./educational-institution-course.entity";
-import { HighDemandRegistrationCourse as HighDemandRegistrationCourseModel} from "src/modules/high-demand/domain/models/high-demand-registration-course.model";
-
-
-
+import { HighDemandRegistrationCourse as HighDemandRegistrationCourseModel } from "@high-demand/domain/models/high-demand-registration-course.model"
+import { HighDemandRegistrationEntity } from "./high-demand.entity";
 
 
 @Entity({ schema: 'alta_demanda', name: 'alta_demanda_curso'})

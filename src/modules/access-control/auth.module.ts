@@ -1,25 +1,21 @@
-// framwork
+// framework nestjs
 import { Module } from "@nestjs/common";
+// external dependencies
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
-
-// config
-import { envs } from "src/infrastructure/config";
-
 // own implementation
 import { AuthController } from "./infrastructure/adapters/primary/controllers/auth.controller";
-import { UserRepository } from "./application/ports/outbound/user.repository";
-import { UserRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/user.repository.impl";
 import { AuthService } from "./application/ports/inbound/auth.service";
 import { AuthServiceImpl } from "./application/services/auth.service.impl";
-import { LocalStrategy } from "./infrastructure/adapters/primary/strategies/local.strategy";
+import { envs } from "@infrastructure-general/config"
 import { JwtStrategy } from "./infrastructure/adapters/primary/strategies/jwt.strategy";
-import { UserEntity } from "./infrastructure/adapters/secondary/persistence/entities/user.entity";
-import { TokenServiceImpl } from "./infrastructure/adapters/secondary/services/token.service.impl";
+import { LocalStrategy } from "./infrastructure/adapters/primary/strategies/local.strategy";
 import { TokenService } from "./application/ports/outbound/token.service";
-
-
+import { TokenServiceImpl } from "./infrastructure/adapters/secondary/services/token.service.impl";
+import { UserEntity } from "./infrastructure/adapters/secondary/persistence/entities/user.entity";
+import { UserRepository } from "./application/ports/outbound/user.repository";
+import { UserRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/user.repository.impl";
 
 
 @Module({

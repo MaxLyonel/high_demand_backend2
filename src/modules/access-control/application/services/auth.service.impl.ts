@@ -1,8 +1,11 @@
+// framework nestjs
+import { Injectable } from "@nestjs/common";
+// subject depedencies
 import { createHash } from "crypto";
-import { User } from "../../domain/models/user.model";
+// own implementations
+import { User } from "@access-control/domain/models/user.model";
 import { UserRepository } from "../ports/outbound/user.repository";
 import { AuthService } from "../ports/inbound/auth.service";
-import { Injectable } from "@nestjs/common";
 import { TokenService } from "../ports/outbound/token.service";
 
 

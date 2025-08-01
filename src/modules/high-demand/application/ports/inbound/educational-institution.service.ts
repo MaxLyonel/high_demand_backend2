@@ -1,5 +1,4 @@
-import { EducationalInstitution } from '../../../domain/models/educational-institution.model';
-
+import { EducationalInstitution } from '@high-demand/domain/models/educational-institution.model';
 
 
 export abstract class EducationalInstitutionService {

@@ -1,9 +1,11 @@
+// framework nestjs
 import { Injectable } from "@nestjs/common";
-import { HighDemandService } from "../ports/inbound/high-demand.service";
-import { HighDemandRepository } from "../ports/outbound/high-demand.repository";
+// own implementations
 import { EducationalInstitution } from "../../domain/models/educational-institution.model";
 import { HighDemandRegistration } from "../../domain/models/high-demand-registration.model";
-import { HighDemandRegistrationEntity } from "../../infrastructure/adapters/secondary/persistence/entities/high-demand.entity";
+import { HighDemandRegistrationEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand.entity";
+import { HighDemandRepository } from "../ports/outbound/high-demand.repository";
+import { HighDemandService } from "../ports/inbound/high-demand.service";
 
 
 @Injectable()
@@ -14,7 +16,6 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
   async saveHighDemandRegistration(obj: HighDemandRegistration): Promise<HighDemandRegistration> {
     // Paso 1: buscar registros previos de esa institución en ese operativo
-    console.log("ingresa acas", obj)
     const existingRegistrations = await this.highDemandRepository.findInscriptions(obj)
 
     // Paso 2: aplicar la lógica del dominio

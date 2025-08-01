@@ -1,5 +1,7 @@
+// framework nestjs
 import { Controller, Get, Param } from "@nestjs/common";
-import { EducationalInstitutionService } from "src/modules/high-demand/application/ports/inbound/educational-institution.service";
+// own implementations
+import { EducationalInstitutionService } from "@high-demand/application/ports/inbound/educational-institution.service"
 
 @Controller('educational-institution')
 export class EducationalInstitutionController {

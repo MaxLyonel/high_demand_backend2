@@ -1,10 +1,13 @@
+// framework nestjs
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { HighDemandRepository } from "src/modules/high-demand/application/ports/outbound/high-demand.repository";
-import { HighDemandRegistration } from "src/modules/high-demand/domain/models/high-demand-registration.model";
-import { HighDemandRegistrationEntity } from "../entities/high-demand.entity";
+// external independencies
 import { Repository } from "typeorm";
-import { RegistrationStatus } from "src/modules/high-demand/domain/enums/registration-status.enum";
+import { InjectRepository } from "@nestjs/typeorm";
+// own implementations
+import { HighDemandRepository } from "@high-demand/application/ports/outbound/high-demand.repository"
+import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
+import { HighDemandRegistrationEntity } from "../entities/high-demand.entity";
+import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum"
 
 
 interface NewHighDemandRegistration {

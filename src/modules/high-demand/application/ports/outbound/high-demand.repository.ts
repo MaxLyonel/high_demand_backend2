@@ -1,8 +1,4 @@
-import { HighDemandRegistration } from "src/modules/high-demand/domain/models/high-demand-registration.model";
-
-
-
-
+import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
 
 
 export abstract class HighDemandRepository {

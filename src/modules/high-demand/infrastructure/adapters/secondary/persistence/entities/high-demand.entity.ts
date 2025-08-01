@@ -1,7 +1,7 @@
-import { HighDemandRegistration as HighDemandRegistrationModel } from "src/modules/high-demand/domain/models/high-demand-registration.model";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { EducationalInstitutionEntity } from "./educational-institution.entity";
-import { RegistrationStatus } from "src/modules/high-demand/domain/enums/registration-status.enum";
+import { HighDemandRegistration as HighDemandRegistrationModel } from "@high-demand/domain/models/high-demand-registration.model"
+import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum"
 
 
 @Entity({ schema: 'alta_demanda', name: 'inscripcion_alta_demanda'})

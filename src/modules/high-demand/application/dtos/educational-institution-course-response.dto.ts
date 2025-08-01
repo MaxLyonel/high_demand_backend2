@@ -1,6 +1,3 @@
-
-
-
 export class EducationalInstitutionCourseResponse {
   id: number;
   educationalInstitutionId: number;

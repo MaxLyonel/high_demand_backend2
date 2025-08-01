@@ -1,7 +1,6 @@
 import { InstitutionStatus } from "../enums/institution-status.enum";
 
 
-
 export class EducationalInstitution {
   constructor(
     public readonly id: number,

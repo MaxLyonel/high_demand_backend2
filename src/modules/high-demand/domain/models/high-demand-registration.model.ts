@@ -1,8 +1,6 @@
 import { RegistrationStatus } from "../enums/registration-status.enum"
 
 
-
-
 export class HighDemandRegistration {
   constructor(
     public readonly id: number,

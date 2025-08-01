@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
-import { LoginDto } from "src/modules/access-control/application/dtos/login.dto";
-import { AuthService } from "src/modules/access-control/application/ports/inbound/auth.service";
+
+import { LoginDto } from "@access-control/application/dtos/login.dto";
+import { AuthService } from "@access-control/application/ports/inbound/auth.service"
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 

@@ -1,7 +1,9 @@
-import { EducationalInstitutionCourse as EducationalInstitutionCourseModel } from "src/modules/high-demand/domain/models/educational-institution-course.model";
+// external dependencies
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { LevelTypeEntity } from "./leve-type.entity";
+// Own implementations
+import { EducationalInstitutionCourse as EducationalInstitutionCourseModel } from "@high-demand/domain/models/educational-institution-course.model"
 import { GradeTypeEntity } from "./grade-type.entity";
+import { LevelTypeEntity } from "./leve-type.entity";
 import { ParallelTypeEntity } from "./parallel-type.entity";
 
 

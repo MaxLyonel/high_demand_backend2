@@ -16,6 +16,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@access-control/*": ["src/modules/access-control/*"],
+      "@infrastructure-general/*": ["src/infrastructure/*"],
+      "@high-demand/*": ["src/modules/high-demand/*"]
+    }
   }
 }

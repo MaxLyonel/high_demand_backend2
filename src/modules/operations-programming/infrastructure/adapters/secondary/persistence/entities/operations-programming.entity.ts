@@ -1,4 +1,5 @@
-import { Operative } from "src/modules/operations-programming/domain/operative.model";
+// import { Operative } from "src/modules/operations-programming/domain/operative.model";
+import { Operative } from "../../../../../../operations-programming/domain/operative.model"
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 

@@ -6,6 +6,8 @@ import { DocumentBuilder } from '@nestjs/swagger';
 // own implementation
 import { AppModule } from './app.module';
 
+require('module-alias/register');
+
 async function bootstrap() {
   const logger = new Logger(' ========== BACKEND ALTA DEMANDA ========= ')
   const app = await NestFactory.create(AppModule, { cors: true });

@@ -2,19 +2,25 @@ export class HighDemandRegistrationCourse {
   constructor(
     public readonly id: number,
     public readonly highDemandRegistrationId: number,
-    public readonly educationalInstitutionCourseId: number,
+    public readonly levelId: number,
+    public readonly gradeId: number,
+    public readonly parallelId: number,
     public readonly totalQuota: number
   ) {}
 
   static create({
     id,
     highDemandRegistrationId,
-    educationalInstitutionCourseId,
+    levelId,
+    gradeId,
+    parallelId,
     totalQuota
   }: {
     id: number,
     highDemandRegistrationId: number,
-    educationalInstitutionCourseId: number,
+    levelId,
+    gradeId,
+    parallelId,
     totalQuota: number
   }): HighDemandRegistrationCourse {
 
@@ -28,7 +34,9 @@ export class HighDemandRegistrationCourse {
     return new HighDemandRegistrationCourse(
       id,
       highDemandRegistrationId,
-      educationalInstitutionCourseId,
+      levelId,
+      gradeId,
+      parallelId,
       totalQuota
     )
   }

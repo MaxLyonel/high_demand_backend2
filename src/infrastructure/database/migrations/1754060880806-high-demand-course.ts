@@ -7,7 +7,9 @@ export class HighDemandCourse1754060880806 implements MigrationInterface {
             CREATE TABLE alta_demanda.alta_demanda_curso (
                 id SERIAL PRIMARY KEY,
                 inscripcion_alta_demanda_id BIGINT REFERENCES alta_demanda.inscripcion_alta_demanda(id),
-                institucion_educativa_curso_id BIGINT REFERENCES institucioneducativa_curso(id),
+                nivel_id BIGINT REFERENCES nivel_tipo(id),
+                grado_id BIGINT REFERENCES grado_tipo(id),
+                paralelo_id varchar  REFERENCES paralelo_tipo(id),
                 plazas_totales INT
             );
         `);

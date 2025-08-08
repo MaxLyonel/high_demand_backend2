@@ -23,6 +23,7 @@ export class EducationalInstitutionCourseRepositoryImpl implements EducationalIn
       where: { educationalInstitutionId, gestionTypeId },
       relations: ["levelType", "gradeType", "parallelType"],
     });
+    console.log("cursos estructura: ", entities)
 
     const dtos = entities.map((entity) => this.toDTO(entity));
     return this.groupByLevelGradeParallel(dtos);

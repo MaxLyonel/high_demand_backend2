@@ -15,6 +15,15 @@ export class EducationalInstitutionEntity {
   @Column({ name: 'estadoinstitucion_tipo_id'})
   state: number
 
+  @Column({ name: 'le_juridicciongeografica_id'})
+  jurisdiction: number
+
+  @Column({ name: 'dependencia_tipo_id'})
+  dependencyType: number
+
+  @Column({ name: 'institucioneducativa_tipo_id'})
+  educationalInstitutionTypeId: number
+
 
   static toDomain(entity: EducationalInstitutionEntity): EducationalInstitutionModel {
     return EducationalInstitutionModel.create({

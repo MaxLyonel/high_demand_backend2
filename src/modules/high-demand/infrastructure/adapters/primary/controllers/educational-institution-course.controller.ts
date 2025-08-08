@@ -9,7 +9,7 @@ export class EducationalInstitutionCourseController {
     private readonly educationalInstitutionCourseService: EducationalInstitutionCourseService
   ) {}
 
-  @Get('all-courses')
+  @Get('course-structure')
   getCourseList(@Query() query) {
     const { sie, gestionTypeId } = query
     return this.educationalInstitutionCourseService.courseList(sie, gestionTypeId)

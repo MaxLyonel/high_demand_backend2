@@ -1,7 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { EducationalInstitutionEntity } from "./educational-institution.entity";
 import { HighDemandRegistration as HighDemandRegistrationModel } from "@high-demand/domain/models/high-demand-registration.model"
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum"
+import { HighDemandRegistrationCourse } from '../../../../../domain/models/high-demand-registration-course.model';
+import { HighDemandRegistrationCourseEntity } from "./high-demand-course.entity";
 
 
 @Entity({ schema: 'alta_demanda', name: 'inscripcion_alta_demanda'})
@@ -34,8 +36,14 @@ export class HighDemandRegistrationEntity {
   @JoinColumn({ name: 'institucioneducativa_id'})
   educationalInstitution: EducationalInstitutionEntity
 
-  static toDomain(entity: HighDemandRegistrationEntity): HighDemandRegistrationModel {
+  @OneToMany(
+    () => HighDemandRegistrationCourseEntity,
+    course => course.highDemandRegistration,
+    { cascade: true }
+  )
+  highDemandCourses: HighDemandRegistrationCourseEntity[];
 
+  static toDomain(entity: HighDemandRegistrationEntity): HighDemandRegistrationModel {
     return new HighDemandRegistrationModel(
       entity.id,
       entity.educationalInstitutionId,
@@ -44,19 +52,13 @@ export class HighDemandRegistrationEntity {
       entity.workflowId,
       entity.registrationStatus,
       entity.inbox,
-      entity.operativeId
-    )
-
-    // return HighDemandRegistrationModel.create({
-    //   id: entity.id,
-    //   educationalInstitutionId: entity.educationalInstitutionId,
-    //   userId: entity.userId,
-    //   currentWorkflowState: entity.currentWorkflowState,
-    //   workflowId: entity.workflowId,
-    //   registrationStatus: entity.registrationStatus,
-    //   inbox: entity.inbox,
-    //   operativeId: entity.opeartiveId
-    // })
+      entity.operativeId,
+      entity.highDemandCourses
+        ? entity.highDemandCourses.map(course =>
+            HighDemandRegistrationCourse.toDomain(course) // convierte cada curso al modelo de dominio
+          )
+        : []
+    );
   }
 
   static fromDomain(highDemanRegistration:HighDemandRegistrationModel): HighDemandRegistrationEntity {

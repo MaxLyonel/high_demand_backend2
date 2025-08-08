@@ -4,8 +4,8 @@ import { Injectable } from "@nestjs/common";
 import { EducationalInstitution } from "../../domain/models/educational-institution.model";
 import { HighDemandRegistration } from "../../domain/models/high-demand-registration.model";
 import { HighDemandRegistrationEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand.entity";
-import { HighDemandRepository } from "../ports/outbound/high-demand.repository";
-import { HighDemandService } from "../ports/inbound/high-demand.service";
+import { HighDemandRepository } from "../../domain/ports/outbound/high-demand.repository";
+import { HighDemandService } from "../../domain/ports/inbound/high-demand.service";
 
 
 @Injectable()

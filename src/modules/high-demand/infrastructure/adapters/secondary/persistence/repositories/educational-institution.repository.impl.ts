@@ -5,7 +5,7 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 // own implementations
 import { EducationalInstitutionEntity } from "../entities/educational-institution.entity";
-import { EducationalInstitutionRepository } from "@high-demand/application/ports/outbound/educational-institution.repository"
+import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository"
 import { mapToDto } from "@high-demand/application/mappers/educational-institution.dto";
 import { EducationalInstitutionDto } from "@high-demand/application/dtos/educational-institution-info-response.dto";
 

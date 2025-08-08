@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { EducationalInstitutionCourseRepository } from "@high-demand/application/ports/outbound/educational-institution-course.repository";
+import { EducationalInstitutionCourseRepository } from "@high-demand/domain/ports/outbound/educational-institution-course.repository";
 import { EducationalInstitutionCourseEntity } from "../entities/educational-institution-course.entity";
 import {
   EducationalInstitutionCourseResponse,

@@ -4,7 +4,7 @@ import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 // own implementations
-import { HighDemandCourseRepository } from "@high-demand/application/ports/outbound/high-demand-course.repository"
+import { HighDemandCourseRepository } from "@high-demand/domain/ports/outbound/high-demand-course.repository"
 import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-demand-registration-course.model"
 import { HighDemandRegistrationCourseEntity } from '../entities/high-demand-course.entity';
 
@@ -17,21 +17,12 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
     private readonly highDemandRegistrationCourseEntity: Repository<HighDemandRegistrationCourseEntity>
   ) {}
 
-  saveHighDemandCourse(obj: any): Promise<HighDemandRegistrationCourse> {
-    throw new Error("Method not implemented.");
+  async saveHighDemandCourse(obj: any): Promise<HighDemandRegistrationCourse> {
+    const newHighDemandCourse = await this.highDemandRegistrationCourseEntity.save(obj)
+    return HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse)
   }
 
   async findById(id: number): Promise<HighDemandRegistrationCourse> {
-    // const highDemandRegistrationCourses = await this.highDemandRegistrationCourseEntity.find({
-    //   where: {
-    //     highDemandRegistrationId: id
-    //   }
-    // })
-    // const list = highDemandRegistrationCourses.map(e =>
-    //   HighDemandRegistrationCourseEntity.toDomain(e)
-    // )
-
-    // return list;
     throw new Error("Method not implemented.");
   }
 

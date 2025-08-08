@@ -1,4 +1,5 @@
 import { RegistrationStatus } from "../enums/registration-status.enum"
+import { HighDemandRegistrationCourse } from "./high-demand-registration-course.model";
 
 
 export class HighDemandRegistration {
@@ -10,7 +11,8 @@ export class HighDemandRegistration {
     public readonly workflowId: number, // lfujo que sigue
     public readonly registrationStatus: RegistrationStatus,
     public readonly inbox: boolean, // esta en su bandeja?
-    public readonly operativeId: number
+    public readonly operativeId: number,
+    public readonly courses: HighDemandRegistrationCourse[] // Tiene varios cursos asignados
   ) {}
 
   static create({
@@ -22,7 +24,8 @@ export class HighDemandRegistration {
     registrationStatus,
     inbox,
     operativeId,
-    existingRegistrations
+    existingRegistrations,
+    courses
   }: {
     id: number,
     educationalInstitutionId: number,
@@ -32,7 +35,8 @@ export class HighDemandRegistration {
     registrationStatus: RegistrationStatus,
     inbox: boolean,
     operativeId: number,
-    existingRegistrations: HighDemandRegistration[]
+    existingRegistrations: HighDemandRegistration[],
+    courses: HighDemandRegistrationCourse[]
   }): HighDemandRegistration {
 
     // Regla negocio: Una unidad educativa no puede estar doblemente registrada en una misma gestión
@@ -53,7 +57,8 @@ export class HighDemandRegistration {
       workflowId,
       registrationStatus,
       inbox,
-      operativeId
+      operativeId,
+      courses
     )
   }
 }

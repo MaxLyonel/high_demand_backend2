@@ -1,9 +1,11 @@
 // framework nestjs
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 // own implementations
-import { EducationalInstitutionCourseEntity } from "./educational-institution-course.entity";
 import { HighDemandRegistrationCourse as HighDemandRegistrationCourseModel } from "@high-demand/domain/models/high-demand-registration-course.model"
 import { HighDemandRegistrationEntity } from "./high-demand.entity";
+import { LevelTypeEntity } from "./leve-type.entity";
+import { GradeTypeEntity } from "./grade-type.entity";
+import { ParallelTypeEntity } from "./parallel-type.entity";
 
 
 @Entity({ schema: 'alta_demanda', name: 'alta_demanda_curso'})
@@ -14,8 +16,14 @@ export class HighDemandRegistrationCourseEntity {
   @Column({ name: 'alta_demanda_inscripcion_id'})
   highDemandRegistrationId: number
 
-  @Column({ name: 'institucion_curso_id'})
-  educationalInstitutionCourseId: number
+  @Column({ name: 'nivel_id'})
+  levelId: number
+
+  @Column({ name: 'grado_id'})
+  gradeId: number
+
+  @Column({ name: 'paralelo_id'})
+  parallelId: number
 
   @Column({ name: 'plazas_totales'})
   totalQuota: number
@@ -24,26 +32,37 @@ export class HighDemandRegistrationCourseEntity {
   @JoinColumn({ name: 'alta_demanda_inscripcion_id'})
   highDemandRegistration: HighDemandRegistrationEntity
 
-  @ManyToOne(() => EducationalInstitutionCourseEntity)
-  @JoinColumn({ name: 'institucion_curso_id'})
-  educationalInstitutionCourse: EducationalInstitutionCourseEntity
+  @ManyToOne(() => LevelTypeEntity)
+  @JoinColumn({ name: 'nivel_id'})
+  level: LevelTypeEntity
 
+  @ManyToOne(() => GradeTypeEntity)
+  @JoinColumn({ name: 'grado_id'})
+  grade: GradeTypeEntity
+
+  @ManyToOne(() => ParallelTypeEntity)
+  @JoinColumn({ name: 'paralelo_id'})
+  parallel: ParallelTypeEntity
 
   static toDomain(entity: HighDemandRegistrationCourseEntity): HighDemandRegistrationCourseModel {
     return HighDemandRegistrationCourseModel.create({
       id: entity.id,
       highDemandRegistrationId: entity.highDemandRegistrationId,
-      educationalInstitutionCourseId: entity.educationalInstitutionCourseId,
+      levelId: entity.levelId,
+      gradeId: entity.gradeId,
+      parallelId: entity.parallelId,
       totalQuota: entity.totalQuota
     })
   }
 
   static fromDomain(highDemandRegistrationCourse: HighDemandRegistrationCourseModel): HighDemandRegistrationCourseEntity {
     const entity = new HighDemandRegistrationCourseEntity()
-    entity.id = highDemandRegistrationCourse.id
-    entity.highDemandRegistrationId = highDemandRegistrationCourse.educationalInstitutionCourseId,
-    entity.educationalInstitutionCourseId = highDemandRegistrationCourse.educationalInstitutionCourseId,
-    entity.totalQuota = highDemandRegistrationCourse.totalQuota
+    entity.id = highDemandRegistrationCourse.id;
+    entity.highDemandRegistrationId = highDemandRegistrationCourse.highDemandRegistrationId;
+    entity.levelId = highDemandRegistrationCourse.levelId;
+    entity.gradeId = highDemandRegistrationCourse.gradeId;
+    entity.parallelId = highDemandRegistrationCourse.parallelId;
+    entity.totalQuota = highDemandRegistrationCourse.totalQuota;
     return entity
   }
 }

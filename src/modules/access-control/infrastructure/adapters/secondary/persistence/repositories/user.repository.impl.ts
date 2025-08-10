@@ -17,13 +17,13 @@ export class UserRepositoryImpl implements UserRepository {
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
-    const userEntity = await this.userRepository.findOne({ where: { username }})
+    const userEntity = await this.userRepository.findOne({ where: { username }, relations: ['roles']})
     if(!userEntity) return null;
     return UserEntity.toDomain(userEntity)
   }
 
   async findById(id: number): Promise<User | null> {
-    const userEntity = await this.userRepository.findOne( { where: { id }})
+    const userEntity = await this.userRepository.findOne( { where: { id }, relations: ['roles']})
     if(!userEntity) return null;
     return UserEntity.toDomain(userEntity)
   }

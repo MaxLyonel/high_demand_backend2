@@ -17,7 +17,13 @@ export class TokenServiceImpl implements TokenService {
 
 
   generateToken(user: User): string {
-    return this.jwtService.sign({ userId: user.id}, { expiresIn: this.expiresIn })
+    return this.jwtService.sign(
+      {
+        userId: user.id,
+        username: user.username,
+        personId: user.personId,
+        roles: user.roles
+      }, { expiresIn: this.expiresIn })
   }
 
   verifyToken(token: string): { userId: string } {

@@ -4,7 +4,7 @@ export class Conditions1754747760053 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            CREATE TYPE operador_enum AS ENUM ('=', '!=', '>', '<', '>=', '<=', 'in');
+            CREATE TYPE alta_demanda.operador_enum AS ENUM ('=', '!=', '>', '<', '>=', '<=', 'in');
         `);
 
         await queryRunner.query(`
@@ -12,7 +12,9 @@ export class Conditions1754747760053 implements MigrationInterface {
                 id SERIAL PRIMARY KEY,
                 campo VARCHAR,
                 valor VARCHAR,
-                OPERADOR operador_enum NOT NULL
+                operador alta_demanda.operador_enum NOT NULL,
+                permiso_id INTEGER NOT NULL,
+                CONSTRAINT fk_permiso FOREIGN KEY (permiso_id) REFERENCES alta_demanda.permisos(id) ON DELETE CASCADE
             )
         `)
     }

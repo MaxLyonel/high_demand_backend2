@@ -1,7 +1,8 @@
 // external dependencies
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 // own implementations
 import { User as UserModel } from '@access-control/domain/models/user.model';
+import { RolTypeEntity } from "./rol-type.entity";
 
 @Entity({name: 'usuario'})
 export class UserEntity {
@@ -20,13 +21,22 @@ export class UserEntity {
   @Column({name: 'esactivo'})
   isActive: boolean
 
+  @ManyToMany(() => RolTypeEntity, (rol) => rol.users, { eager: true })
+  @JoinTable({
+    name: 'usuario_rol',
+    joinColumn: { name: 'usuario_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'rol_tipo_id', referencedColumnName: 'id' },
+  })
+  roles: RolTypeEntity[];
+
   static toDomain(entity: UserEntity): UserModel {
     return UserModel.create({
       id: entity.id,
       username: entity.username,
       password: entity.password,
       personId: entity.personId,
-      isActive: entity.isActive
+      isActive: entity.isActive,
+      roles: entity.roles
     });
   }
 
@@ -36,7 +46,8 @@ export class UserEntity {
     entity.username = user.username,
     entity.password = user.password,
     entity.personId = user.personId,
-    entity.isActive = user.isActive
+    entity.isActive = user.isActive,
+    entity.roles = user.roles
     return entity;
   }
 }

@@ -16,10 +16,20 @@ import { TokenServiceImpl } from "./infrastructure/adapters/secondary/services/t
 import { UserEntity } from "./infrastructure/adapters/secondary/persistence/entities/user.entity";
 import { UserRepository } from "./application/ports/outbound/user.repository";
 import { UserRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/user.repository.impl";
+import { PermissionRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/permission.repository.impl";
+import { PermissionRepository } from "./application/ports/outbound/permission.repository";
+import { ActionEntity } from "./infrastructure/adapters/secondary/persistence/entities/action.entity";
+import { ConditionEntity } from "./infrastructure/adapters/secondary/persistence/entities/condition.entity";
+import { PermissionEntity } from "./infrastructure/adapters/secondary/persistence/entities/permission.entity";
+import { ResourceEntity } from "./infrastructure/adapters/secondary/persistence/entities/resource.entity";
+import { RolPermissionEntity } from "./infrastructure/adapters/secondary/persistence/entities/rol-permission.entity";
+import { RolTypeEntity } from "./infrastructure/adapters/secondary/persistence/entities/rol-type.entity";
+import { AbilityFactory } from "./application/services/ability.factory";
+import { UserController } from "./infrastructure/adapters/primary/controllers/user.controller";
 
 
 @Module({
-  controllers: [AuthController],
+  controllers: [AuthController, UserController],
   providers: [
     {
       provide: UserRepository,
@@ -33,8 +43,13 @@ import { UserRepositoryImpl } from "./infrastructure/adapters/secondary/persiste
       provide: TokenService,
       useClass: TokenServiceImpl
     },
+    {
+      provide: PermissionRepository,
+      useClass: PermissionRepositoryImpl
+    },
     LocalStrategy,
-    JwtStrategy
+    JwtStrategy,
+    AbilityFactory
   ],
   imports: [
     PassportModule,
@@ -42,8 +57,16 @@ import { UserRepositoryImpl } from "./infrastructure/adapters/secondary/persiste
       secret: envs.jwtSecret,
       signOptions: { expiresIn: envs.expiresIn },
     }),
-    TypeOrmModule.forFeature([UserEntity], 'alta_demanda'),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      ActionEntity,
+      ConditionEntity,
+      PermissionEntity,
+      ResourceEntity,
+      RolPermissionEntity,
+      RolTypeEntity
+    ], 'alta_demanda'),
   ],
-  exports: [AuthService, TokenService]
+  exports: [AuthService, TokenService, PermissionRepository]
 })
 export class AuthModule {}

@@ -11,7 +11,7 @@ export class Permissions1754746912111 implements MigrationInterface {
                 activo BOOLEAN DEFAULT TRUE,
                 descripcion VARCHAR,
                 creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                actualizdo_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 eliminado_en TIMESTAMP NULL,
                 CONSTRAINT fk_accion FOREIGN KEY (accion_id) REFERENCES alta_demanda.acciones(id) ON DELETE CASCADE,
                 CONSTRAINT fk_recurso FOREIGN KEY (recurso_id) REFERENCES alta_demanda.recursos(id) ON DELETE CASCADE

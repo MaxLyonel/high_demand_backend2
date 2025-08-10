@@ -4,7 +4,8 @@ export class User {
     public readonly username: string,
     public readonly password: string,
     public readonly isActive: boolean,
-    public readonly personId: number
+    public readonly personId: number,
+    public readonly roles: any
   ) {}
 
   static create({
@@ -12,14 +13,16 @@ export class User {
     username,
     password,
     isActive,
-    personId
+    personId,
+    roles
   }: {
     id: number,
     username: string,
     password: string,
     isActive: boolean,
-    personId: number
+    personId: number,
+    roles: any
   }): User {
-    return new User(id, username, password, isActive, personId)
+    return new User(id, username, password, isActive, personId, roles)
   }
 }

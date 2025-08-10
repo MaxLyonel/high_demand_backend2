@@ -26,6 +26,7 @@ import { RolPermissionEntity } from "./infrastructure/adapters/secondary/persist
 import { RolTypeEntity } from "./infrastructure/adapters/secondary/persistence/entities/rol-type.entity";
 import { AbilityFactory } from "./application/services/ability.factory";
 import { UserController } from "./infrastructure/adapters/primary/controllers/user.controller";
+import { TeacherEntity } from "./infrastructure/adapters/secondary/persistence/entities/teacher.entity";
 
 
 @Module({
@@ -64,7 +65,8 @@ import { UserController } from "./infrastructure/adapters/primary/controllers/us
       PermissionEntity,
       ResourceEntity,
       RolPermissionEntity,
-      RolTypeEntity
+      RolTypeEntity,
+      TeacherEntity
     ], 'alta_demanda'),
   ],
   exports: [AuthService, TokenService, PermissionRepository]

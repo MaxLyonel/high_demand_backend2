@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, Request, UseGuards } from "@nestjs/common";
 
 import { LoginDto } from "@access-control/application/dtos/login.dto";
 import { AuthService } from "@access-control/application/ports/inbound/auth.service"
@@ -24,5 +24,13 @@ export class AuthController {
   @CheckAbilities({ action: 'read', subject: 'user'})
   getProfile(@Request() req) {
     return req.user
+  }
+
+  @UseGuards(JwtAuthGuard, CaslGuard)
+  @Get('info-teacher')
+  @CheckAbilities({ action: 'read', subject: 'user'})
+  getTeacher(@Query() query: { personId: number, gestionId: number}) {
+    const { personId, gestionId } = query
+    return this.authService.getTeacher(personId, gestionId)
   }
 }

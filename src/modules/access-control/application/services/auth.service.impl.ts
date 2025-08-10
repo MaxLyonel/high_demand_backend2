@@ -7,6 +7,7 @@ import { User } from "@access-control/domain/models/user.model";
 import { UserRepository } from "../ports/outbound/user.repository";
 import { AuthService } from "../ports/inbound/auth.service";
 import { TokenService } from "../ports/outbound/token.service";
+import { Teacher } from "@access-control/domain/models/teacher.model";
 
 
 
@@ -42,5 +43,11 @@ export class AuthServiceImpl implements AuthService {
     const user = await this.userRepository.findById(userId)
     if(!user) throw new Error('Usuario no encontrado');
     return user;
+  }
+
+  async getTeacher(personId: number, gestionId: number): Promise<Teacher | null> {
+    const teacher = await this.userRepository.getTeacherInfo(personId, gestionId)
+    if(!teacher) throw new Error('Maestro no encontrado');
+    return teacher;
   }
 }

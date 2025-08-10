@@ -1,5 +1,5 @@
 // framework nestjs
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 // own implementations
 import { HighDemandRegistrationCourse as HighDemandRegistrationCourseModel } from "@high-demand/domain/models/high-demand-registration-course.model"
 import { HighDemandRegistrationEntity } from "./high-demand.entity";
@@ -43,6 +43,15 @@ export class HighDemandRegistrationCourseEntity {
   @ManyToOne(() => ParallelTypeEntity)
   @JoinColumn({ name: 'paralelo_id'})
   parallel: ParallelTypeEntity
+
+  @CreateDateColumn({ name: 'creado_en', type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'actualizado_en', type: 'timestamp' })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'eliminado_en', type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 
   static toDomain(entity: HighDemandRegistrationCourseEntity): HighDemandRegistrationCourseModel {
     return HighDemandRegistrationCourseModel.create({

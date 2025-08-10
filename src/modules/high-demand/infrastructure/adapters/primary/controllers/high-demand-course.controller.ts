@@ -1,6 +1,6 @@
 import { HighDemandCourseDto } from "@high-demand/application/dtos/high-demand-course-request.dto";
 import { HighDemandCourseService } from "@high-demand/domain/ports/inbound/high-demand-course.service";
-import { Body, Controller, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
 
 
 
@@ -46,6 +46,11 @@ export class HighDemandCourseController {
         message: error.message || 'Error al actualizar el cupo',
       }, HttpStatus.BAD_REQUEST)
     }
+  }
+
+  @Delete(':id')
+  async deleteCourse(@Param('id') id: number) {
+    return this.highDemandCourseService.deleteCourse(id);
   }
 
 }

@@ -39,6 +39,20 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
     return HighDemandRegistrationCourseEntity.toDomain(course!);
   }
 
+  async deleteCourse(highDemandCourseId: number): Promise<HighDemandRegistrationCourse> {
+    const course = await this.highDemandRegistrationCourseEntity.findOneOrFail({
+      where: { id: highDemandCourseId }
+    });
+
+    const result = await this.highDemandRegistrationCourseEntity.softDelete(highDemandCourseId);
+
+    if (result.affected === 0) {
+      throw new Error('No se encontró el curso para borrar');
+    }
+
+    return HighDemandRegistrationCourseEntity.toDomain(course);
+  }
+
   async findById(id: number): Promise<HighDemandRegistrationCourse> {
     throw new Error("Method not implemented.");
   }

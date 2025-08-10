@@ -3,6 +3,7 @@ import { HighDemandCourseService } from "../../domain/ports/inbound/high-demand-
 import { HighDemandCourseRepository } from "../../domain/ports/outbound/high-demand-course.repository";
 import { HighDemandCourseDto } from "../dtos/high-demand-course-request.dto";
 import { HighDemandService } from "@high-demand/domain/ports/inbound/high-demand.service";
+import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-demand-registration-course.model";
 
 
 
@@ -23,8 +24,13 @@ export class HighDemanCourseImpl implements HighDemandCourseService {
   }
 
   async changeHighDemandCourseQuota(courseId: number, quota: number): Promise<any> {
-    const result = await this.highDemanCourseRepository.modifyQuota(courseId, quota)
-    return result
+    const updatedCourse = await this.highDemanCourseRepository.modifyQuota(courseId, quota)
+    return updatedCourse
+  }
+
+  async deleteCourse(courseId: number): Promise<HighDemandRegistrationCourse> {
+    const deletedCourse = await this.highDemanCourseRepository.deleteCourse(courseId)
+    return deletedCourse
   }
 
 }

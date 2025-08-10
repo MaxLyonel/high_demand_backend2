@@ -17,9 +17,16 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
     private readonly highDemandRegistrationCourseEntity: Repository<HighDemandRegistrationCourseEntity>
   ) {}
 
-  async saveHighDemandCourse(obj: any): Promise<HighDemandRegistrationCourse> {
-    const newHighDemandCourse = await this.highDemandRegistrationCourseEntity.save(obj)
-    return HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse)
+  async saveHighDemandCourse(highDemandRegistrationId: number, courses: any): Promise<HighDemandRegistrationCourse[]> {
+    console.log("Creando los cursos Alta Demanda: ", courses)
+    const coursesSaved :Array<HighDemandRegistrationCourse> = []
+    for(const course of courses) {
+      const newCourse = { ...course, highDemandRegistrationId: highDemandRegistrationId}
+      console.log("new Course", newCourse)
+      const newHighDemandCourse = await this.highDemandRegistrationCourseEntity.save(newCourse)
+      coursesSaved.push(HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse))
+    }
+    return coursesSaved
   }
 
   async findById(id: number): Promise<HighDemandRegistrationCourse> {

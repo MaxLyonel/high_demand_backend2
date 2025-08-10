@@ -32,7 +32,7 @@ export class HighDemandRegistrationCourse {
     // Regla de negocio: No puede haber una inscripción de un curso de alta demanda con 0 plazas
     const registrationWithZeroPlaces = totalQuota <= 0;
     if(registrationWithZeroPlaces) {
-      throw new Error('El nivel y grado seleccionado debe contener por lo menos un cupo')
+      throw new Error('El cupo del curso seleccionado debe tener un valor distinto a 0')
     }
 
 

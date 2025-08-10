@@ -11,29 +11,29 @@ export class HighDemandRegistrationEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ name: 'institucioneducativa_id'})
+  @Column({ name: 'institucion_educativa_id'})
   educationalInstitutionId: number
 
   @Column({ name: 'usuario_id'})
   userId: number
 
-  @Column({ name: 'estado_actual_flujo'})
-  currentWorkflowState: string
+  @Column({ name: 'flujo_estado_id'})
+  workflowStateId: number
 
   @Column({ name: 'flujo_id'})
   workflowId: number
 
-  @Column({name: 'estado_inscripcion'})
+  @Column({name: 'inscripcion_estado'})
   registrationStatus: RegistrationStatus
 
-  @Column({ name: 'bandeja'})
+  @Column({ name: 'bandeja_estado'})
   inbox: boolean
 
   @Column({ name: 'operativo_id'})
   operativeId: number
 
   @ManyToOne(() => EducationalInstitutionEntity)
-  @JoinColumn({ name: 'institucioneducativa_id'})
+  @JoinColumn({ name: 'institucion_educativa_id'})
   educationalInstitution: EducationalInstitutionEntity
 
   @OneToMany(
@@ -48,7 +48,7 @@ export class HighDemandRegistrationEntity {
       entity.id,
       entity.educationalInstitutionId,
       entity.userId,
-      entity.currentWorkflowState,
+      entity.workflowStateId,
       entity.workflowId,
       entity.registrationStatus,
       entity.inbox,
@@ -66,7 +66,7 @@ export class HighDemandRegistrationEntity {
     entity.id = highDemanRegistration.id,
     entity.educationalInstitutionId = highDemanRegistration.educationalInstitutionId,
     entity.userId = highDemanRegistration.userId,
-    entity.currentWorkflowState = highDemanRegistration.currentWorkflowState,
+    entity.workflowStateId = highDemanRegistration.workflowStateId,
     entity.workflowId = highDemanRegistration.workflowId,
     entity.registrationStatus = highDemanRegistration.registrationStatus,
     entity.inbox = highDemanRegistration.inbox

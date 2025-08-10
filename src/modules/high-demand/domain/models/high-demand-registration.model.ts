@@ -7,19 +7,19 @@ export class HighDemandRegistration {
     public readonly id: number,
     public readonly educationalInstitutionId: number,
     public readonly userId: number,
-    public readonly currentWorkflowState: string, // manejar bandeja
-    public readonly workflowId: number, // lfujo que sigue
-    public readonly registrationStatus: RegistrationStatus,
-    public readonly inbox: boolean, // esta en su bandeja?
-    public readonly operativeId: number,
-    public readonly courses: HighDemandRegistrationCourse[] // Tiene varios cursos asignados
+    public workflowStateId: number, // manejar bandeja
+    public workflowId: number, // lfujo que sigue
+    public registrationStatus: RegistrationStatus,
+    public inbox: boolean, // esta en su bandeja?
+    public operativeId: number,
+    public courses: HighDemandRegistrationCourse[] // Tiene varios cursos asignados
   ) {}
 
   static create({
     id,
     educationalInstitutionId,
     userId,
-    currentWorkflowState,
+    workflowStateId,
     workflowId,
     registrationStatus,
     inbox,
@@ -30,7 +30,7 @@ export class HighDemandRegistration {
     id: number,
     educationalInstitutionId: number,
     userId: number,
-    currentWorkflowState: string,
+    workflowStateId: number,
     workflowId: number,
     registrationStatus: RegistrationStatus,
     inbox: boolean,
@@ -53,7 +53,7 @@ export class HighDemandRegistration {
       id,
       educationalInstitutionId,
       userId,
-      currentWorkflowState,
+      workflowStateId,
       workflowId,
       registrationStatus,
       inbox,

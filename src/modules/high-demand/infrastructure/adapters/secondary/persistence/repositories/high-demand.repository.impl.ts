@@ -14,7 +14,7 @@ interface NewHighDemandRegistration {
   id: number,
   educationalInstitutionId: number;
   userId: number;
-  currentWorkflowState: string;
+  workflowStateId: number;
   workflowId: number;
   registrationStatus: RegistrationStatus;
   inbox: boolean;

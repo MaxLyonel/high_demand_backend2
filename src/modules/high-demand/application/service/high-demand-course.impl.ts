@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { HighDemandCourseService } from "../../domain/ports/inbound/high-demand-course.service";
 import { HighDemandCourseRepository } from "../../domain/ports/outbound/high-demand-course.repository";
-import { HighDemanCourseDto } from "../dtos/high-demand-request.dto";
+import { HighDemandCourseDto } from "../dtos/high-demand-course-request.dto";
+import { HighDemandService } from "@high-demand/domain/ports/inbound/high-demand.service";
 
 
 
@@ -9,13 +10,18 @@ import { HighDemanCourseDto } from "../dtos/high-demand-request.dto";
 export class HighDemanCourseImpl implements HighDemandCourseService {
 
   constructor(
-    private readonly highDemanCourseRepository: HighDemandCourseRepository
+    private readonly highDemanCourseRepository: HighDemandCourseRepository,
+    private readonly highDemanService: HighDemandService
   ) {}
 
-  async saveHighDemandCourseRegistration(course: HighDemanCourseDto): Promise<any> {
-    const saved = await this.highDemanCourseRepository.saveHighDemandCourse(course)
-    return saved
+  async saveHighDemandCourseRegistration(obj: HighDemandCourseDto): Promise<any> {
+    const { highDemand, courses } = obj
+    const institutionSaved = await this.highDemanService.saveHighDemandRegistration(highDemand)
+    const coursesSaved = await this.highDemanCourseRepository.saveHighDemandCourse(institutionSaved.id, courses)
+    institutionSaved.courses = coursesSaved
+    return { highDemandRegistration: institutionSaved }
   }
+
   changeHighDemandCourseQuota(quota: number): Promise<boolean> {
     throw new Error("Method not implemented.");
   }

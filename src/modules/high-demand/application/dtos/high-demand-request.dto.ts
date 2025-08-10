@@ -1,18 +1,17 @@
-import { IsInt } from "class-validator"
+import { IsEnum, IsInt } from "class-validator"
 
+// export enum RegistrationStatus {
+//   PENDING = 'PENDIENTE',
+//   APPROVED = 'APROBADA',
+//   OBSERVED = 'OBSERVADA',
+//   REJECTED = 'RECHAZADA',
+//   CANCELED = 'ANULADA',
+// }
 
-export class HighDemanCourseDto {
+export class HighDemandDto {
+  @IsInt()
+  educationalInstitutionId: number
 
   @IsInt()
-  levelId: number
-
-  @IsInt()
-  gradeId: number
-
-  @IsInt()
-  parallelId: number
-
-  @IsInt()
-  quotas: number
-
+  userId: number
 }

@@ -26,6 +26,13 @@ import { HighDemanCourseImpl } from "./application/service/high-demand-course.im
 import { HighDemandCourseRepository } from "./domain/ports/outbound/high-demand-course.repository";
 import { HighDemandCourseRepositoryImpl } from './infrastructure/adapters/secondary/persistence/repositories/high-demand-course.repository.impl';
 import { HighDemandRegistrationCourseEntity } from "./infrastructure/adapters/secondary/persistence/entities/high-demand-course.entity";
+import { WorkflowEntity } from "./infrastructure/adapters/secondary/persistence/entities/workflow.entity";
+import { WorkflowRepository } from "./domain/ports/outbound/workflow.repository";
+import { WorkflowRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/workflow.repository.impl";
+import { WorkflowStateEntity } from "./infrastructure/adapters/secondary/persistence/entities/workflow-state.entity";
+import { WorkflowStateRepository } from "./domain/ports/outbound/workflow-state.repository";
+import { HighDemandCourseController } from "./infrastructure/adapters/primary/controllers/high-demand-course.controller";
+import { WorkflowStateRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/workflow-state.repository.impl";
 
 
 
@@ -33,7 +40,8 @@ import { HighDemandRegistrationCourseEntity } from "./infrastructure/adapters/se
   controllers: [
     EducationalInstitutionController,
     EducationalInstitutionCourseController,
-    HighDemandController
+    HighDemandController,
+    HighDemandCourseController
   ],
   providers: [
     {
@@ -67,6 +75,14 @@ import { HighDemandRegistrationCourseEntity } from "./infrastructure/adapters/se
     {
       provide: HighDemandCourseRepository,
       useClass: HighDemandCourseRepositoryImpl
+    },
+    {
+      provide: WorkflowRepository,
+      useClass: WorkflowRepositoryImpl
+    },
+    {
+      provide: WorkflowStateRepository,
+      useClass: WorkflowStateRepositoryImpl
     }
   ],
   imports: [
@@ -75,7 +91,9 @@ import { HighDemandRegistrationCourseEntity } from "./infrastructure/adapters/se
         EducationalInstitutionEntity,
         EducationalInstitutionCourseEntity,
         HighDemandRegistrationEntity,
-        HighDemandRegistrationCourseEntity
+        HighDemandRegistrationCourseEntity,
+        WorkflowEntity,
+        WorkflowStateEntity
       ], 'alta_demanda')
   ],
   exports: [EducationalInstitutionService]

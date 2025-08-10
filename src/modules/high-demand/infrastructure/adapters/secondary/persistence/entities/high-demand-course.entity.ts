@@ -13,7 +13,7 @@ export class HighDemandRegistrationCourseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ name: 'alta_demanda_inscripcion_id'})
+  @Column({ name: 'inscripcion_alta_demanda_id'})
   highDemandRegistrationId: number
 
   @Column({ name: 'nivel_id'})
@@ -29,7 +29,7 @@ export class HighDemandRegistrationCourseEntity {
   totalQuota: number
 
   @ManyToOne(() => HighDemandRegistrationEntity)
-  @JoinColumn({ name: 'alta_demanda_inscripcion_id'})
+  @JoinColumn({ name: 'inscripcion_alta_demanda_id'})
   highDemandRegistration: HighDemandRegistrationEntity
 
   @ManyToOne(() => LevelTypeEntity)

@@ -1,6 +1,6 @@
-import { HighDemanCourseDto } from "@high-demand/application/dtos/high-demand-request.dto";
+import { HighDemandCourseDto } from "@high-demand/application/dtos/high-demand-course-request.dto";
 import { HighDemandCourseService } from "@high-demand/domain/ports/inbound/high-demand-course.service";
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, HttpException, HttpStatus, Post } from "@nestjs/common";
 
 
 
@@ -12,7 +12,19 @@ export class HighDemandCourseController {
   ) {}
 
   @Post('create-high-demand-course')
-  createHighDemanCourse(@Body() body: HighDemanCourseDto){
-    return this.highDemandCourseService.saveHighDemandCourseRegistration(body)
+  async createHighDemanCourse(@Body() dto: HighDemandCourseDto){
+    try {
+      const result = await this.highDemandCourseService.saveHighDemandCourseRegistration(dto)
+      return {
+        status: 'success',
+        message: 'Registro exitoso',
+        data: result,
+      }
+    } catch(error) {
+      throw new HttpException({
+      status: 'error',
+      message: error.message || 'Error al registrar curso',
+    }, HttpStatus.BAD_REQUEST);
+    }
   }
 }

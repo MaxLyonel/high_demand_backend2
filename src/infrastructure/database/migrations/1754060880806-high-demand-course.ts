@@ -10,7 +10,10 @@ export class HighDemandCourse1754060880806 implements MigrationInterface {
                 nivel_id BIGINT REFERENCES nivel_tipo(id),
                 grado_id BIGINT REFERENCES grado_tipo(id),
                 paralelo_id varchar  REFERENCES paralelo_tipo(id),
-                plazas_totales INT
+                plazas_totales INT,
+                creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                actualizado_en TIMESTAMP DEFAULT CURREN_TIMESTAMP,
+                eliminado_en TIMESTAMP DEFAULT NULL
             );
         `);
     }

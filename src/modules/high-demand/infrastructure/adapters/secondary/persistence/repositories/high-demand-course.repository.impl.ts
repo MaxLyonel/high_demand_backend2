@@ -18,15 +18,25 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
   ) {}
 
   async saveHighDemandCourse(highDemandRegistrationId: number, courses: any): Promise<HighDemandRegistrationCourse[]> {
-    console.log("Creando los cursos Alta Demanda: ", courses)
     const coursesSaved :Array<HighDemandRegistrationCourse> = []
     for(const course of courses) {
       const newCourse = { ...course, highDemandRegistrationId: highDemandRegistrationId}
-      console.log("new Course", newCourse)
       const newHighDemandCourse = await this.highDemandRegistrationCourseEntity.save(newCourse)
       coursesSaved.push(HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse))
     }
     return coursesSaved
+  }
+
+  async modifyQuota(highDemandCourseId: number, newQuota: number): Promise<HighDemandRegistrationCourse> {
+    const updatedCourse = await this.highDemandRegistrationCourseEntity.update(
+      { id: highDemandCourseId },
+      { totalQuota: newQuota }
+    )
+    if(updatedCourse.affected !== 1) {
+      throw new Error("No se actualizo el cupo para este curso")
+    }
+    const course = await this.highDemandRegistrationCourseEntity.findOneBy({ id: highDemandCourseId });
+    return HighDemandRegistrationCourseEntity.toDomain(course!);
   }
 
   async findById(id: number): Promise<HighDemandRegistrationCourse> {

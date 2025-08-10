@@ -1,6 +1,6 @@
 import { HighDemandCourseDto } from "@high-demand/application/dtos/high-demand-course-request.dto";
 import { HighDemandCourseService } from "@high-demand/domain/ports/inbound/high-demand-course.service";
-import { Body, Controller, HttpException, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
 
 
 
@@ -11,7 +11,7 @@ export class HighDemandCourseController {
     private readonly highDemandCourseService: HighDemandCourseService
   ) {}
 
-  @Post('create-high-demand-course')
+  @Post('create')
   async createHighDemanCourse(@Body() dto: HighDemandCourseDto){
     try {
       const result = await this.highDemandCourseService.saveHighDemandCourseRegistration(dto)
@@ -27,4 +27,25 @@ export class HighDemandCourseController {
     }, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Patch(':id/quota')
+  async modifyQuota(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('totalQuota', ParseIntPipe) totalQuota: number
+  ) {
+    try {
+      const result = await this.highDemandCourseService.changeHighDemandCourseQuota(id, totalQuota)
+      return {
+        status: 'success',
+        message: 'Actualizacion exitosa',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al actualizar el cupo',
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

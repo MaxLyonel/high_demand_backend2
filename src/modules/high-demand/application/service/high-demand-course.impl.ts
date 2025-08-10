@@ -22,8 +22,9 @@ export class HighDemanCourseImpl implements HighDemandCourseService {
     return { highDemandRegistration: institutionSaved }
   }
 
-  changeHighDemandCourseQuota(quota: number): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  async changeHighDemandCourseQuota(courseId: number, quota: number): Promise<any> {
+    const result = await this.highDemanCourseRepository.modifyQuota(courseId, quota)
+    return result
   }
 
 }

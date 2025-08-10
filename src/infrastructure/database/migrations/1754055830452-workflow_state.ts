@@ -6,14 +6,12 @@ export class WorkflowState1754055830452 implements MigrationInterface {
         await queryRunner.query(`
             CREATE TABLE alta_demanda.flujo_estado (
                 id SERIAL PRIMARY KEY,
-                nombre VARCHAR(100),
-                activo BOOLEAN DEFAULT TRUE
+                nombre VARCHAR(100)
             );
         `);
 
         await queryRunner.query(`
             COMMENT ON COLUMN alta_demanda.flujo_estado.nombre IS 'Nombre del flujo';
-            COMMENT ON COLUMN alta_demanda.flujo_estado.activo IS 'Indica si el estado está activo';
         `);
     }
 

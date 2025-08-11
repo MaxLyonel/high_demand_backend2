@@ -12,7 +12,7 @@ export class HighDemandCourse1754060880806 implements MigrationInterface {
                 paralelo_id varchar  REFERENCES paralelo_tipo(id),
                 plazas_totales INT,
                 creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                actualizado_en TIMESTAMP DEFAULT CURREN_TIMESTAMP,
+                actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 eliminado_en TIMESTAMP DEFAULT NULL
             );
         `);

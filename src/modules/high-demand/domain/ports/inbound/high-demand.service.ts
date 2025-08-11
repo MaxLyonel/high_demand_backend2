@@ -8,5 +8,7 @@ export abstract class HighDemandService {
   abstract listHighDemands(): Promise<EducationalInstitution[]>;
   abstract modifyHighDemand(): Promise<HighDemandRegistration>;
   abstract changeHighDemandStatus(): Promise<any>;
+  abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration>;
+  abstract modifyWorkflowStatus(highDemandId: number): Promise<HighDemandRegistration>;
 
 }

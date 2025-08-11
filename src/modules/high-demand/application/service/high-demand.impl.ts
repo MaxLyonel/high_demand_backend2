@@ -9,6 +9,7 @@ import { HighDemandService } from "../../domain/ports/inbound/high-demand.servic
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum";
 import { WorkflowRepository } from "@high-demand/domain/ports/outbound/workflow.repository";
 import { WorkflowStateRepository } from "@high-demand/domain/ports/outbound/workflow-state.repository";
+import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
 
 
 @Injectable()
@@ -16,7 +17,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   constructor(
     private readonly highDemandRepository: HighDemandRepository,
     private readonly workflowRepository: WorkflowRepository,
-    private readonly workflowStateRepository: WorkflowStateRepository
+    private readonly workflowStateRepository: WorkflowStateRepository,
+    private readonly historyRepository: HistoryRepository
   ) {}
 
   async saveHighDemandRegistration(obj: HighDemandRegistration): Promise<HighDemandRegistration> {
@@ -41,8 +43,28 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     // Paso 3: convertir a entidad y guardar
     const entity = HighDemandRegistrationEntity.fromDomain(domain);
     const saved = await this.highDemandRepository.saveHighDemandRegistration(entity)
-    // return HighDemandRegistrationEntity.toDomain(saved)
+    // Registramos en su historial
+    const newHistory = {
+      highDemandRegistrationId: saved.id,
+      workflowStateId: saved.workflowStateId,
+      registrationStatus: saved.registrationStatus,
+      userId: saved.userId,
+      observation: ''
+    }
+    console.log("pasa de esto")
+    this.historyRepository.updatedHistory(newHistory)
+    console.log("no pasa de esto")
     return saved
+  }
+
+  async modifyWorkflowStatus(highDemandId: number): Promise<HighDemandRegistration> {
+    const updatedHighDemand = await this.highDemandRepository.updateWorkflowStatus(highDemandId)
+    return updatedHighDemand
+  }
+
+  async getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration> {
+    const highDemand = await this.highDemandRepository.findByInstitutionId(educationalInstitutionId)
+    return highDemand
   }
 
   cancelHighDemands(): Promise<boolean> {

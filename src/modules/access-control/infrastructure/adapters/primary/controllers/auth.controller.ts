@@ -28,7 +28,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard, CaslGuard)
   @Get('info-teacher')
-  @CheckAbilities({ action: 'read', subject: 'user'})
+  // @CheckAbilities({ action: 'read', subject: 'user'})
   getTeacher(@Query() query: { personId: number, gestionId: number}) {
     const { personId, gestionId } = query
     return this.authService.getTeacher(personId, gestionId)

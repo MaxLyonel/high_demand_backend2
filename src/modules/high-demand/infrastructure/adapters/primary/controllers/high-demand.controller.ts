@@ -1,5 +1,5 @@
 // framework nestjs
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 // own implementations
 import { HighDemandService } from "@high-demand/domain/ports/inbound/high-demand.service"
 
@@ -13,5 +13,10 @@ export class HighDemandController {
   @Post('create-high-demand')
   createHighDemandRegistration(@Body() body: any ) {
     return this.highDemandService.saveHighDemandRegistration(body)
+  }
+
+  @Get(':id/by-institution')
+  getHighDemandByInstitution(@Param('id') id: number) {
+    return this.highDemandService.getHighDemandRegistration(id)
   }
 }

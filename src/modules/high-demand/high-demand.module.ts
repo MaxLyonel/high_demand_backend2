@@ -33,6 +33,12 @@ import { WorkflowStateEntity } from "./infrastructure/adapters/secondary/persist
 import { WorkflowStateRepository } from "./domain/ports/outbound/workflow-state.repository";
 import { HighDemandCourseController } from "./infrastructure/adapters/primary/controllers/high-demand-course.controller";
 import { WorkflowStateRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/workflow-state.repository.impl";
+import { HistoryEntity } from "./infrastructure/adapters/secondary/persistence/entities/history.entity";
+import { HistoryRepository } from "./domain/ports/outbound/history.repository";
+import { HistoryRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/history.repository.impl";
+import { HistoryController } from "./infrastructure/adapters/primary/controllers/history.controller";
+import { HistoryService } from "./domain/ports/inbound/history.service";
+import { HistoryServiceImpl } from "./application/service/history.impl";
 
 
 
@@ -41,7 +47,8 @@ import { WorkflowStateRepositoryImpl } from "./infrastructure/adapters/secondary
     EducationalInstitutionController,
     EducationalInstitutionCourseController,
     HighDemandController,
-    HighDemandCourseController
+    HighDemandCourseController,
+    HistoryController
   ],
   providers: [
     {
@@ -83,6 +90,14 @@ import { WorkflowStateRepositoryImpl } from "./infrastructure/adapters/secondary
     {
       provide: WorkflowStateRepository,
       useClass: WorkflowStateRepositoryImpl
+    },
+    {
+      provide: HistoryRepository,
+      useClass: HistoryRepositoryImpl
+    },
+    {
+      provide: HistoryService,
+      useClass: HistoryServiceImpl
     }
   ],
   imports: [
@@ -93,7 +108,8 @@ import { WorkflowStateRepositoryImpl } from "./infrastructure/adapters/secondary
         HighDemandRegistrationEntity,
         HighDemandRegistrationCourseEntity,
         WorkflowEntity,
-        WorkflowStateEntity
+        WorkflowStateEntity,
+        HistoryEntity
       ], 'alta_demanda')
   ],
   exports: [EducationalInstitutionService]

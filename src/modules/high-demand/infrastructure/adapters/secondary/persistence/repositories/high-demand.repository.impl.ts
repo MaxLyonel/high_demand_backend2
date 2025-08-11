@@ -45,6 +45,24 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return existingRegistrations
   }
 
+  async updateWorkflowStatus(id: number): Promise<HighDemandRegistration> {
+    throw new Error("Method not implemented.");
+    // const updatedHighDemand = await this.highDemandRegistrationRepository.update(
+    //   { id: id },
+    //   // { workflowId: }
+    // )
+  }
+
+  async findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration> {
+    const highDemandRegistratinoEntity = await this.highDemandRegistrationRepository.findOne({
+      where: {
+        educationalInstitutionId: educationalInstitutionId,
+        operativeId: 1
+      }
+    })
+    return HighDemandRegistrationEntity.toDomain(highDemandRegistratinoEntity!)
+  }
+
   async findById(id: number): Promise<HighDemandRegistration | null> {
     const highDemandRegistrationEntity = await this.highDemandRegistrationRepository.findOne({ where: { id }})
     if(!highDemandRegistrationEntity) return null

@@ -9,4 +9,6 @@ export abstract class HighDemandRepository {
   abstract onATray(id: number): Promise<boolean>;
   abstract udpateFlowStatus(id: number, nextFlowStatus: number): Promise<HighDemandRegistration>;
   abstract findInscriptions(obj: HighDemandRegistration): Promise<HighDemandRegistration[]>;
+  abstract findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration>;
+  abstract updateWorkflowStatus(id: number): Promise<HighDemandRegistration>;
 }

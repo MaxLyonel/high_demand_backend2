@@ -4,6 +4,7 @@ import { HighDemandRegistration as HighDemandRegistrationModel } from "@high-dem
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum"
 import { HighDemandRegistrationCourse } from '../../../../../domain/models/high-demand-registration-course.model';
 import { HighDemandRegistrationCourseEntity } from "./high-demand-course.entity";
+import { HistoryEntity } from "./history.entity";
 
 
 @Entity({ schema: 'alta_demanda', name: 'inscripcion_alta_demanda'})
@@ -42,6 +43,9 @@ export class HighDemandRegistrationEntity {
     { cascade: true }
   )
   highDemandCourses: HighDemandRegistrationCourseEntity[];
+
+  @OneToMany(() => HistoryEntity, (history) => history.highDemandRegistration)
+  histories: History[];
 
   static toDomain(entity: HighDemandRegistrationEntity): HighDemandRegistrationModel {
     return new HighDemandRegistrationModel(

@@ -1,0 +1,48 @@
+import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { HistoryEntity } from "../entities/history.entity";
+import { History } from "@high-demand/domain/models/history.model";
+import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto";
+
+
+@Injectable()
+export class HistoryRepositoryImpl implements HistoryRepository {
+
+  constructor(
+    @InjectRepository(HistoryEntity, 'alta_demanda') private _historyRepository: Repository<HistoryEntity>
+  ) {}
+
+  async updatedHistory(obj: CreateHistoryDto): Promise<any> {
+    console.log("ingresa aca", obj)
+    const updatedHistory = await this._historyRepository.insert(obj)
+    if(updatedHistory.identifiers.length <= 0) throw new Error("No se pudo actualizar el historial");
+    console.log("sale de aca")
+    return updatedHistory
+  }
+
+  async getHistory(highDemandRegistrationId: number): Promise<History[]> {
+    const histories = await this._historyRepository.find({
+      where: {
+        highDemandRegistration: { id: highDemandRegistrationId }
+      },
+      relations: ['highDemandRegistration.educationalInstitution', 'user', 'workflowState']
+    });
+
+    return histories.map(entity => {
+      return new History(
+        entity.id,
+        entity.highDemandRegistration.id,
+        entity.highDemandRegistration.educationalInstitution?.id,
+        entity.highDemandRegistration.educationalInstitution?.name,
+        entity.user.username,
+        entity.workflowState.name,
+        entity.registrationStatus,
+        entity.observation,
+        entity.createdAt,
+        entity.updatedAt
+      );
+    });
+  }
+}

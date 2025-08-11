@@ -18,7 +18,7 @@ export class HighDemand1754060834448 implements MigrationInterface {
                 inscripcion_estado alta_demanda.estado_inscripcion_enum NOT NULL,
                 operativo_id INTEGER REFERENCES alta_demanda.operativo(id) NOT NULL,
                 creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                actualizado_en TIMESTAMP DEFAULT CURREN_TIMESTAMP,
+                actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 eliminado_en TIMESTAMP DEFAULT NULL
             );
         `)

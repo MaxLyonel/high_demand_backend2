@@ -8,6 +8,9 @@ import { HighDemandRepository } from "@high-demand/domain/ports/outbound/high-de
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
 import { HighDemandRegistrationEntity } from "../entities/high-demand.entity";
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum"
+import { HistoryService } from "@high-demand/domain/ports/inbound/history.service";
+import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
+import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto";
 
 
 interface NewHighDemandRegistration {
@@ -27,7 +30,8 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
 
   constructor(
     @InjectRepository(HighDemandRegistrationEntity, 'alta_demanda')
-    private readonly highDemandRegistrationRepository: Repository<HighDemandRegistrationEntity>
+    private readonly highDemandRegistrationRepository: Repository<HighDemandRegistrationEntity>,
+    private readonly _history: HistoryRepository
   ){}
 
   async findInscriptions(obj: NewHighDemandRegistration): Promise<HighDemandRegistration[]> {
@@ -45,12 +49,19 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return existingRegistrations
   }
 
-  async updateWorkflowStatus(id: number): Promise<HighDemandRegistration> {
-    throw new Error("Method not implemented.");
-    // const updatedHighDemand = await this.highDemandRegistrationRepository.update(
-    //   { id: id },
-    //   // { workflowId: }
-    // )
+  async updateWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration> {
+    const { highDemandRegistrationId, workflowStateId } = obj
+    const updatedHighDemand = await this.highDemandRegistrationRepository.update(
+      { id: highDemandRegistrationId },
+      { workflowStateId: workflowStateId }
+    )
+    const highDemand = await this.highDemandRegistrationRepository.findOne({
+      where : {
+        id: highDemandRegistrationId
+      }
+    })
+    await this._history.updatedHistory(obj)
+    return HighDemandRegistrationEntity.toDomain(highDemand!)
   }
 
   async findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration> {

@@ -2,6 +2,7 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 // own implementations
 import { HighDemandService } from "@high-demand/domain/ports/inbound/high-demand.service"
+import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto";
 
 
 @Controller('high-demand')
@@ -18,5 +19,10 @@ export class HighDemandController {
   @Get(':id/by-institution')
   getHighDemandByInstitution(@Param('id') id: number) {
     return this.highDemandService.getHighDemandRegistration(id)
+  }
+
+  @Post('udpate-state-worfkflow')
+  updateStateWorkflow(@Body() body: CreateHistoryDto) {
+    return this.highDemandService.modifyWorkflowStatus(body)
   }
 }

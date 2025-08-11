@@ -1,3 +1,4 @@
+import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto";
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
 
 
@@ -10,5 +11,5 @@ export abstract class HighDemandRepository {
   abstract udpateFlowStatus(id: number, nextFlowStatus: number): Promise<HighDemandRegistration>;
   abstract findInscriptions(obj: HighDemandRegistration): Promise<HighDemandRegistration[]>;
   abstract findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration>;
-  abstract updateWorkflowStatus(id: number): Promise<HighDemandRegistration>;
+  abstract updateWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
 }

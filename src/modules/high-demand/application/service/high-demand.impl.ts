@@ -10,6 +10,7 @@ import { RegistrationStatus } from "@high-demand/domain/enums/registration-statu
 import { WorkflowRepository } from "@high-demand/domain/ports/outbound/workflow.repository";
 import { WorkflowStateRepository } from "@high-demand/domain/ports/outbound/workflow-state.repository";
 import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
+import { CreateHistoryDto } from "../dtos/create-history.dto";
 
 
 @Injectable()
@@ -57,8 +58,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return saved
   }
 
-  async modifyWorkflowStatus(highDemandId: number): Promise<HighDemandRegistration> {
-    const updatedHighDemand = await this.highDemandRepository.updateWorkflowStatus(highDemandId)
+  async modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration> {
+    const updatedHighDemand = await this.highDemandRepository.updateWorkflowStatus(obj)
     return updatedHighDemand
   }
 

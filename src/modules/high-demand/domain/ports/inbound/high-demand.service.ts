@@ -1,3 +1,4 @@
+import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto"
 import { EducationalInstitution } from "@high-demand/domain/models/educational-institution.model"
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
 
@@ -9,6 +10,6 @@ export abstract class HighDemandService {
   abstract modifyHighDemand(): Promise<HighDemandRegistration>;
   abstract changeHighDemandStatus(): Promise<any>;
   abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration>;
-  abstract modifyWorkflowStatus(highDemandId: number): Promise<HighDemandRegistration>;
+  abstract modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
 
 }

@@ -4,6 +4,7 @@ import { HighDemandCourseRepository } from "../../domain/ports/outbound/high-dem
 import { HighDemandCourseDto } from "../dtos/high-demand-course-request.dto";
 import { HighDemandService } from "@high-demand/domain/ports/inbound/high-demand.service";
 import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-demand-registration-course.model";
+import { HighDemandCourseDtoReponse } from "../dtos/high-demand-course-response.dto";
 
 
 
@@ -31,6 +32,11 @@ export class HighDemanCourseImpl implements HighDemandCourseService {
   async deleteCourse(courseId: number): Promise<HighDemandRegistrationCourse> {
     const deletedCourse = await this.highDemanCourseRepository.deleteCourse(courseId)
     return deletedCourse
+  }
+
+  async getCourse(highDemandRegistrationId: number): Promise<HighDemandCourseDtoReponse[]> {
+    const courses = await this.highDemanCourseRepository.findByHighDemandRegistrationId(highDemandRegistrationId)
+    return courses
   }
 
 }

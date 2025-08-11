@@ -7,6 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { HighDemandCourseRepository } from "@high-demand/domain/ports/outbound/high-demand-course.repository"
 import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-demand-registration-course.model"
 import { HighDemandRegistrationCourseEntity } from '../entities/high-demand-course.entity';
+import { HighDemandCourseDtoReponse } from "@high-demand/application/dtos/high-demand-course-response.dto";
 
 
 @Injectable()
@@ -57,8 +58,23 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
     throw new Error("Method not implemented.");
   }
 
-  findByHighDemandRegistrationId(highDemandRegistrationId: number): Promise<HighDemandRegistrationCourse> {
-    throw new Error("Method not implemented.");
+  async findByHighDemandRegistrationId(highDemandRegistrationId: number): Promise<HighDemandCourseDtoReponse[]> {
+    const courses = await this.highDemandRegistrationCourseEntity.find({
+      where: {
+        highDemandRegistrationId: highDemandRegistrationId
+      },
+      relations: ['level', 'grade', 'parallel']
+    })
+    return courses.map(course => ({
+      levelName: course.level.name,
+      levelId: course.level.id,
+      gradeName: course.grade.name,
+      gradeId: course.grade.id,
+      parallelName: course.parallel.name,
+      parallelId: course.parallel.id,
+      totalQuota: course.totalQuota
+    }));
+    // return courses.map(HighDemandRegistrationCourseEntity.toDomain)
   }
 
 }

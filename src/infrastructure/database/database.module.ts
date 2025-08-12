@@ -4,6 +4,7 @@ import { Global, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 // own implementations
 import { dataSourceHD } from "./data-source";
+import { DataSource } from "typeorm";
 
 
 @Global()
@@ -15,6 +16,13 @@ import { dataSourceHD } from "./data-source";
       autoLoadEntities: true
     })
   ],
-  exports: [TypeOrmModule]
+  providers: [{
+    provide: 'DATA_SOURCE',
+    useFactory: async() => {
+      const dataSource = new DataSource(dataSourceHD)
+      return dataSource.initialize()
+    }
+  }],
+  exports: [TypeOrmModule, 'DATA_SOURCE']
 })
 export class DatabaseModule {}

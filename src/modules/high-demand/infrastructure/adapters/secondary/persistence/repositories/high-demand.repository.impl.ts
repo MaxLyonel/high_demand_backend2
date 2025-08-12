@@ -1,17 +1,27 @@
 // framework nestjs
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 // external independencies
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 // own implementations
 import { HighDemandRepository } from "@high-demand/domain/ports/outbound/high-demand.repository"
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
 import { HighDemandRegistrationEntity } from "../entities/high-demand.entity";
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum"
-import { HistoryService } from "@high-demand/domain/ports/inbound/history.service";
 import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
 import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto";
+import { HighDemandRegistrationCourseEntity } from "../entities/high-demand-course.entity";
+import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-demand-registration-course.model";
 
+
+interface Course {
+  id: number;
+  highDemandRegistrationId: number;
+  levelId: number;
+  gradeId: number;
+  parallelId: number;
+  totalQuota: number;
+}
 
 interface NewHighDemandRegistration {
   id: number,
@@ -22,6 +32,7 @@ interface NewHighDemandRegistration {
   registrationStatus: RegistrationStatus;
   inbox: boolean;
   operativeId: number;
+  courses: Course[]
 }
 
 
@@ -29,13 +40,40 @@ interface NewHighDemandRegistration {
 export class HighDemandRepositoryImpl implements HighDemandRepository {
 
   constructor(
+    @Inject('DATA_SOURCE') private readonly dataSource: DataSource,
     @InjectRepository(HighDemandRegistrationEntity, 'alta_demanda')
-    private readonly highDemandRegistrationRepository: Repository<HighDemandRegistrationEntity>,
+    private readonly highDemandRepository: Repository<HighDemandRegistrationEntity>,
+    private readonly highDemandCourseRepository: Repository<HighDemandRegistrationCourseEntity>,
     private readonly _history: HistoryRepository
   ){}
 
+  async saveHighDemandRegistration(obj: NewHighDemandRegistration): Promise<HighDemandRegistration> {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    try {
+      const newHighDemand = await queryRunner.manager.save(this.highDemandRepository.target, obj)
+      const { courses } = obj
+      // const coursesSaved :Array<HighDemandRegistrationCourse> = []
+      for(const course of courses) {
+        const newCourse = { ...course, highDemandRegistrationId: newHighDemand.id }
+        const newHighDemandCourse = await queryRunner.manager.save(this.highDemandCourseRepository.target, newCourse)
+        HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse)
+        // coursesSaved.push(HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse))
+      }
+      HighDemandRegistrationEntity.toDomain(newHighDemand)
+      await queryRunner.commitTransaction()
+      return newHighDemand
+    } catch(error) {
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
   async findInscriptions(obj: NewHighDemandRegistration): Promise<HighDemandRegistration[]> {
-    const highDemandsRegisteredEntities = await this.highDemandRegistrationRepository.find({
+    const highDemandsRegisteredEntities = await this.highDemandRepository.find({
       where: {
         educationalInstitutionId: obj.id,
         operativeId: obj.operativeId
@@ -51,11 +89,11 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
 
   async updateWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration> {
     const { highDemandRegistrationId, workflowStateId } = obj
-    const updatedHighDemand = await this.highDemandRegistrationRepository.update(
+    const updatedHighDemand = await this.highDemandRepository.update(
       { id: highDemandRegistrationId },
       { workflowStateId: workflowStateId }
     )
-    const highDemand = await this.highDemandRegistrationRepository.findOne({
+    const highDemand = await this.highDemandRepository.findOne({
       where : {
         id: highDemandRegistrationId
       }
@@ -64,25 +102,23 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return HighDemandRegistrationEntity.toDomain(highDemand!)
   }
 
-  async findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration> {
-    const highDemandRegistratinoEntity = await this.highDemandRegistrationRepository.findOne({
+  async findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration | null> {
+    const highDemandRegistrationEntity = await this.highDemandRepository.findOne({
       where: {
         educationalInstitutionId: educationalInstitutionId,
         operativeId: 1
       }
     })
-    return HighDemandRegistrationEntity.toDomain(highDemandRegistratinoEntity!)
+    if(!highDemandRegistrationEntity) return null
+    return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity!)
   }
 
   async findById(id: number): Promise<HighDemandRegistration | null> {
-    const highDemandRegistrationEntity = await this.highDemandRegistrationRepository.findOne({ where: { id }})
+    const highDemandRegistrationEntity = await this.highDemandRepository.findOne({ where: { id }})
     if(!highDemandRegistrationEntity) return null
     return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity)
   }
-  async saveHighDemandRegistration(obj: NewHighDemandRegistration): Promise<HighDemandRegistration> {
-    const newHighDemandRegistration = await this.highDemandRegistrationRepository.save(obj)
-    return HighDemandRegistrationEntity.toDomain(newHighDemandRegistration)
-  }
+
   modifyHighDemanRegistration(obj: any): Promise<HighDemandRegistration> {
     throw new Error("Method not implemented.");
   }

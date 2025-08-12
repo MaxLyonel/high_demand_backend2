@@ -39,6 +39,9 @@ import { HistoryRepositoryImpl } from "./infrastructure/adapters/secondary/persi
 import { HistoryController } from "./infrastructure/adapters/primary/controllers/history.controller";
 import { HistoryService } from "./domain/ports/inbound/history.service";
 import { HistoryServiceImpl } from "./application/service/history.impl";
+import { UnitOfWork } from './domain/ports/outbound/unit-of-work';
+import { TypeOrmUnitOfWork } from "./infrastructure/adapters/secondary/persistence/repositories/typeorm-unit-of-work.impl";
+import { DatabaseModule } from "@infrastructure-general/database/database.module";
 
 
 
@@ -98,7 +101,12 @@ import { HistoryServiceImpl } from "./application/service/history.impl";
     {
       provide: HistoryService,
       useClass: HistoryServiceImpl
+    },
+    {
+      provide: UnitOfWork,
+      useClass: TypeOrmUnitOfWork
     }
+
   ],
   imports: [
     TypeOrmModule.forFeature(

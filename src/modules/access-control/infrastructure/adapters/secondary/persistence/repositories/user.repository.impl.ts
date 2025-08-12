@@ -34,7 +34,6 @@ export class UserRepositoryImpl implements UserRepository {
         positionTypeId: In([1, 12])
       }
     })
-    console.log("TeacherEntity --> ", teacherEntity)
     if(!teacherEntity) return null
     return TeacherEntity.toDomain(teacherEntity)
   }

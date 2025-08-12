@@ -6,9 +6,7 @@ import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 
 @Controller('user')
 export class UserController {
-  constructor(private abilityFactory: AbilityFactory) {
-    console.log("en el controlador")
-  }
+  constructor(private abilityFactory: AbilityFactory) {}
 
   @Get('abilities')
   @UseGuards(JwtAuthGuard)

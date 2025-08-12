@@ -18,21 +18,21 @@ export interface EducationalInstitutionCourseResponse {
 
 // Paralelo con sus items
 export interface ParallelDTO {
-  parallelId: number;
-  parallelName: string;
+  id: number;
+  name: string;
 }
 
 // Grado con sus paralelos
 export interface GradeDTO {
-  gradeId: number;
-  gradeName: string;
+  id: number;
+  name: string;
   parallels: ParallelDTO[];
 }
 
 // Nivel con sus grados
 export interface LevelDTO {
-  levelId: number;
-  levelName: string;
+  id: number;
+  name: string;
   grades: GradeDTO[];
 }
 

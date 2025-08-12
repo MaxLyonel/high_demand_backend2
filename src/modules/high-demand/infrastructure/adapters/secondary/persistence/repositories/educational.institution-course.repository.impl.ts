@@ -23,7 +23,6 @@ export class EducationalInstitutionCourseRepositoryImpl implements EducationalIn
       where: { educationalInstitutionId, gestionTypeId },
       relations: ["levelType", "gradeType", "parallelType"],
     });
-    console.log("cursos estructura: ", entities)
 
     const dtos = entities.map((entity) => this.toDTO(entity));
     return this.groupByLevelGradeParallel(dtos);
@@ -54,43 +53,43 @@ export class EducationalInstitutionCourseRepositoryImpl implements EducationalIn
     const grouped: GroupedEducationalInstitutionCourses = [];
 
     data.forEach((item) => {
-      let level = grouped.find((l) => l.levelId === item.levelType.id);
+      let level = grouped.find((l) => l.id === item.levelType.id);
       if (!level) {
         level = {
-          levelId: item.levelType.id,
-          levelName: item.levelType.name,
+          id: item.levelType.id,
+          name: item.levelType.name,
           grades: [],
         };
         grouped.push(level);
       }
 
-      let grade = level.grades.find((g) => g.gradeId === item.gradeType.id);
+      let grade = level.grades.find((g) => g.id === item.gradeType.id);
       if (!grade) {
         grade = {
-          gradeId: item.gradeType.id,
-          gradeName: item.gradeType.name,
+          id: item.gradeType.id,
+          name: item.gradeType.name,
           parallels: [],
         };
         level.grades.push(grade);
       }
 
-      let parallel = grade.parallels.find((p) => p.parallelId === item.parallelType.id);
+      let parallel = grade.parallels.find((p) => p.id === item.parallelType.id);
       if (!parallel) {
         parallel = {
-          parallelId: item.parallelType.id,
-          parallelName: item.parallelType.name,
+          id: item.parallelType.id,
+          name: item.parallelType.name,
         };
         grade.parallels.push(parallel);
       }
     });
 
-    grouped.sort((a, b) => a.levelId - b.levelId);
+    grouped.sort((a, b) => a.id - b.id);
 
     grouped.forEach(level => {
-      level.grades.sort((a, b) => a.gradeId - b.gradeId);
+      level.grades.sort((a, b) => a.id - b.id);
 
       level.grades.forEach(grade => {
-        grade.parallels.sort((a, b) => a.parallelId - b.parallelId);
+        grade.parallels.sort((a, b) => a.id - b.id);
       });
     });
 

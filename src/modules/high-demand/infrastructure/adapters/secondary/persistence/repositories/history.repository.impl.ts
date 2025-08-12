@@ -15,10 +15,8 @@ export class HistoryRepositoryImpl implements HistoryRepository {
   ) {}
 
   async updatedHistory(obj: CreateHistoryDto): Promise<any> {
-    console.log("ingresa aca", obj)
     const updatedHistory = await this._historyRepository.insert(obj)
     if(updatedHistory.identifiers.length <= 0) throw new Error("No se pudo actualizar el historial");
-    console.log("sale de aca")
     return updatedHistory
   }
 

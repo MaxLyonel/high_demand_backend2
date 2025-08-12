@@ -19,6 +19,7 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
   ) {}
 
   async saveHighDemandCourse(highDemandRegistrationId: number, courses: any): Promise<HighDemandRegistrationCourse[]> {
+    console.log("highDemand repository")
     const coursesSaved :Array<HighDemandRegistrationCourse> = []
     for(const course of courses) {
       const newCourse = { ...course, highDemandRegistrationId: highDemandRegistrationId}

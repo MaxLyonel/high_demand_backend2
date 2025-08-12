@@ -9,7 +9,7 @@ export abstract class HighDemandService {
   abstract listHighDemands(): Promise<EducationalInstitution[]>;
   abstract modifyHighDemand(): Promise<HighDemandRegistration>;
   abstract changeHighDemandStatus(): Promise<any>;
-  abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration>;
+  abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
   abstract modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
 
 }

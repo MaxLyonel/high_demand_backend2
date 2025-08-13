@@ -5,7 +5,7 @@ import { HighDemandCourseDto } from "../dtos/high-demand-course-request.dto";
 import { HighDemandService } from "@high-demand/domain/ports/inbound/high-demand.service";
 import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-demand-registration-course.model";
 import { HighDemandCourseDtoReponse } from "../dtos/high-demand-course-response.dto";
-import { UnitOfWork } from "@high-demand/domain/ports/outbound/unit-of-work";
+// import { UnitOfWork } from "@high-demand/domain/ports/outbound/unit-of-work";
 
 
 
@@ -15,18 +15,15 @@ export class HighDemanCourseImpl implements HighDemandCourseService {
   constructor(
     private readonly highDemanCourseRepository: HighDemandCourseRepository,
     private readonly highDemanService: HighDemandService,
-    private readonly unitOfWork: UnitOfWork
+    // private readonly unitOfWork: UnitOfWork
   ) {}
 
   async saveHighDemandCourseRegistration(obj: HighDemandCourseDto): Promise<any> {
-    return this.unitOfWork.start(async () => {
+    // return this.unitOfWork.start(async () => {
       const { highDemand, courses } = obj
-      console.log("Ingresa aca")
-      const institutionSaved = await this.highDemanService.saveHighDemandRegistration(highDemand)
-      const coursesSaved = await this.highDemanCourseRepository.saveHighDemandCourse(institutionSaved.id, courses)
-      institutionSaved.courses = coursesSaved
+      const institutionSaved = await this.highDemanService.saveHighDemandRegistration(highDemand, courses)
       return { highDemandRegistration: institutionSaved }
-    })
+    // })
   }
 
   async changeHighDemandCourseQuota(courseId: number, quota: number): Promise<any> {

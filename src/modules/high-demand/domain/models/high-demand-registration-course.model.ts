@@ -1,9 +1,6 @@
 import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand-course.entity";
 
 export class HighDemandRegistrationCourse {
-  static toDomain(course: HighDemandRegistrationCourseEntity): any {
-    throw new Error("Method not implemented.");
-  }
   constructor(
     public readonly id: number,
     public readonly highDemandRegistrationId: number,
@@ -44,5 +41,9 @@ export class HighDemandRegistrationCourse {
       parallelId,
       totalQuota
     )
+  }
+
+  static toDomain(course: HighDemandRegistrationCourseEntity): any {
+    throw new Error("Method not implemented.");
   }
 }

@@ -43,6 +43,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     @Inject('DATA_SOURCE') private readonly dataSource: DataSource,
     @InjectRepository(HighDemandRegistrationEntity, 'alta_demanda')
     private readonly highDemandRepository: Repository<HighDemandRegistrationEntity>,
+    @InjectRepository(HighDemandRegistrationCourseEntity, 'alta_demanda')
     private readonly highDemandCourseRepository: Repository<HighDemandRegistrationCourseEntity>,
     private readonly _history: HistoryRepository
   ){}
@@ -54,12 +55,10 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     try {
       const newHighDemand = await queryRunner.manager.save(this.highDemandRepository.target, obj)
       const { courses } = obj
-      // const coursesSaved :Array<HighDemandRegistrationCourse> = []
       for(const course of courses) {
         const newCourse = { ...course, highDemandRegistrationId: newHighDemand.id }
         const newHighDemandCourse = await queryRunner.manager.save(this.highDemandCourseRepository.target, newCourse)
         HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse)
-        // coursesSaved.push(HighDemandRegistrationCourseEntity.toDomain(newHighDemandCourse))
       }
       HighDemandRegistrationEntity.toDomain(newHighDemand)
       await queryRunner.commitTransaction()

@@ -8,7 +8,6 @@ type AppAbility = Ability<[string, string]>;
 @Injectable()
 export class AbilityFactory {
   constructor(private permissionRepo: PermissionRepository) {
-    console.log("se crea ability factory")
   }
 
   async createForRole(roleId: number): Promise<AppAbility> {

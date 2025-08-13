@@ -42,10 +42,10 @@ export class HighDemandRegistrationEntity {
     course => course.highDemandRegistration,
     { cascade: true }
   )
-  highDemandCourses: HighDemandRegistrationCourseEntity[];
+  courses: HighDemandRegistrationCourseEntity[];
 
   @OneToMany(() => HistoryEntity, (history) => history.highDemandRegistration)
-  histories: History[];
+  histories: HistoryEntity[];
 
   static toDomain(entity: HighDemandRegistrationEntity): HighDemandRegistrationModel {
     return new HighDemandRegistrationModel(
@@ -57,9 +57,9 @@ export class HighDemandRegistrationEntity {
       entity.registrationStatus,
       entity.inbox,
       entity.operativeId,
-      entity.highDemandCourses
-        ? entity.highDemandCourses.map(course =>
-            HighDemandRegistrationCourse.toDomain(course) // convierte cada curso al modelo de dominio
+      entity.courses
+        ? entity.courses.map(course =>
+            HighDemandRegistrationCourseEntity.toDomain(course) // convierte cada curso al modelo de dominio
           )
         : []
     );
@@ -75,6 +75,10 @@ export class HighDemandRegistrationEntity {
     entity.registrationStatus = highDemanRegistration.registrationStatus,
     entity.inbox = highDemanRegistration.inbox
     entity.operativeId = highDemanRegistration.operativeId
+    entity.courses = highDemanRegistration.courses ?
+      highDemanRegistration.courses.map(course =>
+        HighDemandRegistrationCourseEntity.fromDomain(course)
+      ) : []
     return entity
   }
 }

@@ -1,8 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ActionEntity } from "./action.entity";
 import { ResourceEntity } from "./resource.entity";
 import { ConditionEntity } from "./condition.entity";
 import { RolPermissionEntity } from "./rol-permission.entity";
+import { Permission } from "@access-control/domain/models/permission.model";
+import { RolTypeEntity } from "./rol-type.entity";
 
 @Entity({ schema: 'alta_demanda', name: 'permisos'})
 export class PermissionEntity {
@@ -22,6 +24,9 @@ export class PermissionEntity {
 
   @Column({ nullable: true, name: 'descripcion' })
   description: string;
+
+  @ManyToMany(() => RolTypeEntity, (rol) => rol.permissions)
+  roles: RolTypeEntity[];
 
   @OneToMany(() => RolPermissionEntity, (rolPermiso) => rolPermiso.permission)
   rolPermissions: RolPermissionEntity[];

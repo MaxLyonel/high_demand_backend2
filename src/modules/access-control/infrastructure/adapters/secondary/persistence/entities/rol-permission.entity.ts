@@ -10,7 +10,7 @@ export class RolPermissionEntity {
   @PrimaryColumn({ name: 'permiso_id'})
   permissionId: number
 
-  @ManyToOne(() => RolTypeEntity, (rol) => rol.rolPermissions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => RolTypeEntity, (rol) => rol.permissions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'rol_id' })
   rol: RolTypeEntity;
 
@@ -26,4 +26,5 @@ export class RolPermissionEntity {
 
   @Column({ name: 'creado_en', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createAt: Date;
+
 }

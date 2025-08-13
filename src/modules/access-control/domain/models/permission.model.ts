@@ -1,3 +1,12 @@
+export interface Resource {
+  id: number;
+  name: string;
+}
+
+export interface Action {
+  id: number;
+  name: string;
+}
 
 export interface Condition {
   field: string;
@@ -7,8 +16,20 @@ export interface Condition {
 
 export class Permission {
   constructor(
-    public action: string,
-    public subject: string,
+    public action: Action[],
+    public subject: Resource[],
     public conditions?: Condition[]
   ) {}
+
+  static create({
+    action,
+    subject,
+    conditions
+  }: {
+    action: Action[],
+    subject: Resource[],
+    conditions: Condition[]
+  }): Permission {
+    return new Permission(action, subject, conditions)
+  }
 }

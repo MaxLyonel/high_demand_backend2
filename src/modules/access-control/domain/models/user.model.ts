@@ -1,3 +1,5 @@
+import { Rol } from "./rol.model"
+
 export class User {
   constructor(
     public readonly id: number,
@@ -5,7 +7,7 @@ export class User {
     public readonly password: string,
     public readonly isActive: boolean,
     public readonly personId: number,
-    public readonly roles: any
+    public readonly roles: Rol[]
   ) {}
 
   static create({
@@ -21,7 +23,7 @@ export class User {
     password: string,
     isActive: boolean,
     personId: number,
-    roles: any
+    roles: Rol[]
   }): User {
     return new User(id, username, password, isActive, personId, roles)
   }

@@ -1,5 +1,4 @@
 import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto"
-import { EducationalInstitution } from "@high-demand/domain/models/educational-institution.model"
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
 
 export abstract class HighDemandService {
@@ -8,10 +7,11 @@ export abstract class HighDemandService {
     obj: Omit<HighDemandRegistration, 'id' | 'courses' | 'workflowStateId' | 'registrationStatus' | 'operativeId' | 'inbox' | 'workflowId'>,
     course: any
   ): Promise<HighDemandRegistration>;
-  abstract cancelHighDemands(): Promise<boolean>;
-  abstract listHighDemands(): Promise<EducationalInstitution[]>;
-  abstract modifyHighDemand(): Promise<HighDemandRegistration>;
-  abstract changeHighDemandStatus(): Promise<any>;
+  abstract sendHighDemand(obj: any): Promise<HighDemandRegistration>;
+  abstract listInbox(rolId: number, stateId: number): Promise<any[]>;
+  abstract listReceived(rolId: number, stateId: number): Promise<any[]>;
+  abstract receiveHighDemand(id: number): Promise<any>;
+
   abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
   abstract modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
 

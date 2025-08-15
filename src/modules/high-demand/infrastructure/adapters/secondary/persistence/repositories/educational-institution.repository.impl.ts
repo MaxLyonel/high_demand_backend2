@@ -8,6 +8,7 @@ import { EducationalInstitutionEntity } from "../entities/educational-institutio
 import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository"
 import { mapToDto } from "@high-demand/application/mappers/educational-institution.dto";
 import { EducationalInstitutionDto } from "@high-demand/application/dtos/educational-institution-info-response.dto";
+import { EducationalInstitution } from "@high-demand/domain/models/educational-institution.model";
 
 
 
@@ -18,6 +19,16 @@ export class EducationalInstitutionRepositoryImpl implements EducationalInstitut
     @InjectRepository(EducationalInstitutionEntity, 'alta_demanda')
     private readonly educationalInstitutionRepository: Repository<EducationalInstitutionEntity>
   ) {}
+
+  // async findById(id: number): Promise<EducationalInstitution> {
+  //   const institution = await this.educationalInstitutionRepository.findOne({
+  //     where: {
+  //       id: id
+  //     }
+  //   })
+  //   if(!institution) throw new Error('Error al obtener la institución')
+  //   return EducationalInstitution.toDomain(institution)
+  // }
 
   async findBySie(id: number): Promise<EducationalInstitutionDto | null> {
 

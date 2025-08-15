@@ -10,11 +10,10 @@ export class WorkflowStateEntity {
   @Column({ name: 'nombre'})
   name: string
 
-
   static toDomain(entity: WorkflowStateEntity): WorkflowStateModel {
     return new WorkflowStateModel(
       entity.id,
-      entity.name
+      entity.name,
     )
   }
 }

@@ -8,10 +8,10 @@ export class WorkflowState {
 
   static create({
     id,
-    name
+    name,
   }: {
     id: number,
-    name: string
+    name: string,
   }): WorkflowState {
     return new WorkflowState(id, name)
   }

@@ -15,12 +15,17 @@ export class RolRepositoryImpl implements RolRepository {
   ) {}
 
   async find(): Promise<Rol[]> {
-    // const roles = await this._rolRepository.find()
-    // return roles.map(RolTypeEntity.toDomain(roles))
     throw new Error("Method not implemented.");
   }
-  findById(): Promise<Rol> {
-    throw new Error("Method not implemented.");
+  async findById(id: number): Promise<Rol> {
+    const rol = await this._rolRepository.findOne({
+      where: {
+        id: id
+      },
+      select: ['id', 'name']
+    })
+    if(!rol) throw new Error('Rol no encontrado')
+    return RolTypeEntity.toDomain(rol)
   }
 
 }

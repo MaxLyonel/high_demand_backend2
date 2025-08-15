@@ -1,7 +1,6 @@
 // framework nestjs
 import { Injectable } from "@nestjs/common";
 // own implementations
-import { EducationalInstitution } from "../../domain/models/educational-institution.model";
 import { HighDemandRegistration } from "../../domain/models/high-demand-registration.model";
 import { HighDemandRegistrationEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand.entity";
 import { HighDemandRepository } from "../../domain/ports/outbound/high-demand.repository";
@@ -12,6 +11,10 @@ import { WorkflowStateRepository } from "@high-demand/domain/ports/outbound/work
 import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
 import { CreateHistoryDto } from "../dtos/create-history.dto";
 import { HighDemandCourseRepository } from "@high-demand/domain/ports/outbound/high-demand-course.repository";
+import { WorkflowSequenceRepository } from "@high-demand/domain/ports/outbound/workflow-sequence.repository";
+import { RolRepository } from "@access-control/application/ports/outbound/rol.repository";
+import { UserRepository } from '../../../access-control/application/ports/outbound/user.repository';
+import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository";
 
 
 @Injectable()
@@ -22,37 +25,43 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     private readonly workflowStateRepository: WorkflowStateRepository,
     private readonly historyRepository: HistoryRepository,
     private readonly highDemandCourseRepository: HighDemandCourseRepository,
+    private readonly workflowSequenceRepository: WorkflowSequenceRepository,
+    private readonly rolRepository: RolRepository,
+    private readonly userRepository: UserRepository,
+    private readonly educationalInstitutionRepository: EducationalInstitutionRepository
   ) {}
 
+  // ****** Guardar la Alta Demanda *******
   async saveHighDemandRegistration(obj: HighDemandRegistration, coursesParam: any): Promise<HighDemandRegistration> {
 
     const workflow = await this.workflowRepository.findLastActive()
+    if(!workflow) {
+      throw new Error("No se puede crear la Alta Demanda, falta definir el flujo")
+    }
     const workflowState = await this.workflowStateRepository.findByName('BORRADOR')
-    // buscar registros previos de esa institución en ese operativo
+    if(!workflowState) {
+      throw new Error("No se puede crear la Alta Demanda, falta los estados del flujo")
+    }
+
     const existingRegistrations = await this.highDemandRepository.findInscriptions(obj)
-    // Paso 1: Configuracion del objeto
     obj.registrationStatus = RegistrationStatus.PENDING
     obj.workflowStateId = workflowState.id
-    obj.workflowId = workflow ? workflow.id : 1
+    obj.workflowId = workflow!.id
     obj.inbox = true
     obj.operativeId = 1 // ! importante: debe estar esto en el seeder
 
-    // Paso 2: aplicar la lógica del dominio
     const domain = HighDemandRegistration.create({
       ...obj,
       courses: coursesParam,
       existingRegistrations
     });
 
-    // Paso 3: convertir a entidad y guardar
     const entity = HighDemandRegistrationEntity.fromDomain(domain);
     const saved = await this.highDemandRepository.saveHighDemandRegistration(entity)
 
-    // Paso 4: guardar sus cursos
     const { id: highDemandId } = saved
     this.highDemandCourseRepository.saveHighDemandCourse(highDemandId, coursesParam)
 
-    // Paso 5: Registramos en su historial
     const newHistory = {
       highDemandRegistrationId: saved.id,
       workflowStateId: saved.workflowStateId,
@@ -64,7 +73,53 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return saved
   }
 
+  // ****** Registrar la Alta Demanda ******
+  async sendHighDemand(obj: any): Promise<HighDemandRegistration> {
+    const { workflowStateId, rolId } = obj
+    // buscar su siguiente estado
+    const workflowSequence = await this.workflowSequenceRepository.findNextState(rolId, workflowStateId)
+    const { destinyState, rolId: nextRolId } = workflowSequence
+    // actualizar la alta demanda
+    obj.workflowStateId = destinyState
+    obj.rolId = nextRolId
+    obj.inbox = false
+    const entity = HighDemandRegistrationEntity.fromDomain(obj)
+    const saved = await this.highDemandRepository.saveHighDemandRegistration(entity)
+    // actualizar su historial
+    const newHistory = {
+      highDemandRegistrationId: saved.id,
+      workflowStateId: saved.workflowStateId,
+      registrationStatus: saved.registrationStatus,
+      userId: saved.userId,
+      observation: ''
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return saved
+  }
+
+  // ****** Recibir la Alta Demanda *****
+  async receiveHighDemand(id: number): Promise<any> {
+
+    const highDemand = await this.highDemandRepository.updatedInbox(id)
+
+    const newHistory = {
+      highDemandRegistrationId: highDemand.id,
+      workflowStateId: highDemand.workflowStateId,
+      registrationStatus: highDemand.registrationStatus,
+      userId: highDemand.userId,
+      observation: ''
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return highDemand
+  }
+
+
   async modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration> {
+    // 1: buscamos su estado siguiente
+
+    // 2: Actualizamos el estado del tramite
+    //  - rolId, estado_id
+    // const workflowSequence = await this.workflowStateRepository.findByRolId(obj.rolId, workflowState.id)
     const updatedHighDemand = await this.highDemandRepository.updateWorkflowStatus(obj)
     return updatedHighDemand
   }
@@ -74,18 +129,54 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return highDemand
   }
 
-  cancelHighDemands(): Promise<boolean> {
-    throw new Error("Method not implemented.");
-  }
-  listHighDemands(): Promise<EducationalInstitution[]> {
-    throw new Error("Method not implemented.");
-  }
-  modifyHighDemand(): Promise<HighDemandRegistration> {
-    throw new Error("Method not implemented.");
-  }
-  changeHighDemandStatus(): Promise<any> {
-    throw new Error("Method not implemented.");
+  // ****** Listar Altas Demandas de la Bandeja de Entrada ******
+  async listInbox(rolId: number, stateId: number): Promise<any[]> {
+    const highDemands = await this.highDemandRepository.searchByInbox(rolId, stateId)
+    const reducer:any = []
+    for(let highDemand of highDemands) {
+      const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand
+      const workflowState = await this.workflowStateRepository.findById(workflowStateId)
+      const rol = await this.rolRepository.findById(rolId)
+      const user = await this.userRepository.findById(userId)
+      const institution = await this.educationalInstitutionRepository.findBySie(educationalInstitutionId)
+      const obj = {
+        id: highDemand.id,
+        workflowId: highDemand.workflowId,
+        inbox: highDemand.inbox,
+        operativeId: highDemand.operativeId,
+        registrationStatus: highDemand.registrationStatus,
+        workflowState,
+        rol,
+        user,
+        institution
+      }
+      reducer.push(obj)
+    }
+    return reducer
   }
 
-
+  async listReceived(rolId: number, stateId: number): Promise<any[]> {
+    const highDemands = await this.highDemandRepository.searchByReceived(rolId, stateId)
+    const reducer:any = []
+    for(let highDemand of highDemands) {
+      const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand
+      const workflowState = await this.workflowStateRepository.findById(workflowStateId)
+      const rol = await this.rolRepository.findById(rolId)
+      const user = await this.userRepository.findById(userId)
+      const institution = await this.educationalInstitutionRepository.findBySie(educationalInstitutionId)
+      const obj = {
+        id: highDemand.id,
+        workflowId: highDemand.workflowId,
+        inbox: highDemand.inbox,
+        operativeId: highDemand.operativeId,
+        registrationStatus: highDemand.registrationStatus,
+        workflowState,
+        rol,
+        user,
+        institution
+      }
+      reducer.push(obj)
+    }
+    return reducer
+  }
 }

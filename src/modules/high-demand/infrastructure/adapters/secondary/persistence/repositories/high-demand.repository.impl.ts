@@ -32,6 +32,7 @@ interface NewHighDemandRegistration {
   registrationStatus: RegistrationStatus;
   inbox: boolean;
   operativeId: number;
+  rolId: number;
   courses: Course[]
 }
 
@@ -118,17 +119,43 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity)
   }
 
-  modifyHighDemanRegistration(obj: any): Promise<HighDemandRegistration> {
-    throw new Error("Method not implemented.");
+  async searchByInbox(rolId: number, stateId: number): Promise<HighDemandRegistration[]> {
+    const highDemands = await this.highDemandRepository.find({
+      where: {
+        workflowStateId: stateId,
+        rolId: rolId,
+        inbox: false
+      }
+    })
+    return highDemands.map(HighDemandRegistrationEntity.toDomain)
   }
-  updateStatusHighDeman(id: number, newStatus: any): Promise<HighDemandRegistration> {
-    throw new Error("Method not implemented.");
+
+  async searchByReceived(rolId: number, stateId: number): Promise<any> {
+    const highDemands = await this.highDemandRepository.find({
+      where: {
+        workflowStateId: stateId,
+        rolId: rolId,
+        inbox: true
+      }
+    })
+    return highDemands.map(HighDemandRegistrationEntity.toDomain)
   }
-  onATray(id: number): Promise<boolean> {
-    throw new Error("Method not implemented.");
-  }
-  udpateFlowStatus(id: number, nextFlowStatus: number): Promise<HighDemandRegistration> {
-    throw new Error("Method not implemented.");
+
+  async updatedInbox(id: number): Promise<HighDemandRegistration> {
+    const result = await this.highDemandRepository.update(
+      { id: id },
+      { inbox: true }
+    )
+    if(result.affected && result.affected <= 0) {
+      throw new Error('No se actualiza el inbox');
+    }
+    const highDemandEntity = await this.highDemandRepository.findOne({
+      where: {
+        id: id
+      }
+    })
+    if(!highDemandEntity) throw new Error("No existe la Alta Demanda");
+    return HighDemandRegistrationEntity.toDomain(highDemandEntity)
   }
 
 }

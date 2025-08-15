@@ -5,10 +5,11 @@ import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-r
 export abstract class HighDemandRepository {
   abstract findById(id: number): Promise<HighDemandRegistration | null>;
   abstract saveHighDemandRegistration(obj: any): Promise<HighDemandRegistration>;
-  abstract modifyHighDemanRegistration(obj: any): Promise<HighDemandRegistration>;
-  abstract updateStatusHighDeman(id: number, newStatus: any): Promise<HighDemandRegistration>;
-  abstract onATray(id: number): Promise<boolean>;
-  abstract udpateFlowStatus(id: number, nextFlowStatus: number): Promise<HighDemandRegistration>;
+  abstract updatedInbox(id: number): Promise<HighDemandRegistration>;
+  abstract searchByInbox(rolId: number, stateId: number): Promise<HighDemandRegistration[]>;
+  abstract searchByReceived(rolId: number, stateId: number): Promise<any>;
+
+
   abstract findInscriptions(obj: HighDemandRegistration): Promise<HighDemandRegistration[]>;
   abstract findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
   abstract updateWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;

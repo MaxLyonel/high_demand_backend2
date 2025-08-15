@@ -11,6 +11,7 @@ export class WorkflowSequences1754056153760 implements MigrationInterface {
                 estado_origen INTEGER NOT NULL REFERENCES alta_demanda.flujo_estado(id),
                 estado_destino INTEGER NOT NULL REFERENCES alta_demanda.flujo_estado(id),
                 accion VARCHAR(50) NOT NULL,
+                rol_id INTEGER REFERENCES rol_tipo(id),
                 CONSTRAINT chk_estados_diferentes CHECK (estado_origen <> estado_destino)
             );
         `)

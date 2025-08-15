@@ -33,6 +33,9 @@ export class HighDemandRegistrationEntity {
   @Column({ name: 'operativo_id'})
   operativeId: number
 
+  @Column({ name: 'rol_id'})
+  rolId: number
+
   @ManyToOne(() => EducationalInstitutionEntity)
   @JoinColumn({ name: 'institucion_educativa_id'})
   educationalInstitution: EducationalInstitutionEntity
@@ -57,6 +60,7 @@ export class HighDemandRegistrationEntity {
       entity.registrationStatus,
       entity.inbox,
       entity.operativeId,
+      entity.rolId,
       entity.courses
         ? entity.courses.map(course =>
             HighDemandRegistrationCourseEntity.toDomain(course) // convierte cada curso al modelo de dominio
@@ -75,6 +79,7 @@ export class HighDemandRegistrationEntity {
     entity.registrationStatus = highDemanRegistration.registrationStatus,
     entity.inbox = highDemanRegistration.inbox
     entity.operativeId = highDemanRegistration.operativeId
+    entity.rolId = highDemanRegistration.rolId
     entity.courses = highDemanRegistration.courses ?
       highDemanRegistration.courses.map(course =>
         HighDemandRegistrationCourseEntity.fromDomain(course)

@@ -39,9 +39,14 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findById(id: number): Promise<User | null> {
-    const userEntity = await this.userRepository.findOne( { where: { id }, relations: ['roles']})
-    if(!userEntity) return null;
-    return UserEntity.toDomain(userEntity)
+    const user = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+      select: ['id', 'username' ]
+    })
+    if(!user) throw new Error('No se encontro al usuario')
+    return UserEntity.toDomain(user)
   }
 
 }

@@ -12,6 +12,7 @@ export class HighDemand1754060834448 implements MigrationInterface {
                 id SERIAL PRIMARY KEY,
                 institucion_educativa_id BIGINT REFERENCES institucioneducativa(id),
                 usuario_id BIGINT REFERENCES usuario(id),
+                rol_id INTEGER REFERENCES rol_tipo(id),
                 flujo_id BIGINT REFERENCES alta_demanda.flujo(id),
                 flujo_estado_id BIGINT REFERENCES alta_demanda.flujo_estado(id),
                 bandeja_estado BOOLEAN,

@@ -30,25 +30,25 @@ export class UserEntity {
   })
   roles: RolTypeEntity[];
 
-  // static toDomain(entity: UserEntity): UserModel {
-  //   return UserModel.create({
-  //     id: entity.id,
-  //     username: entity.username,
-  //     password: entity.password,
-  //     personId: entity.personId,
-  //     isActive: entity.isActive,
-  //     roles: entity.roles.map(rolEntity => RolTypeEntity.toDomain(rolEntity))
-  //   });
-  // }
+  static toDomain(entity: UserEntity): UserModel {
+    return UserModel.create({
+      id: entity.id,
+      username: entity.username,
+      password: entity.password,
+      personId: entity.personId,
+      isActive: entity.isActive,
+      roles: entity.roles.map(rolEntity => RolTypeEntity.toDomain(rolEntity))
+    });
+  }
 
-  // static fromDomain(user: UserModel): UserEntity {
-  //   const entity = new UserEntity()
-  //   entity.id = user.id;
-  //   entity.username = user.username;
-  //   entity.password = user.password;
-  //   entity.personId = user.personId;
-  //   entity.isActive = user.isActive;
-  //   entity.roles ? user.roles.map(rolDomain => RolTypeEntity.fromDomain(rolDomain)) : [];
-  //   return entity;
-  // }
+  static fromDomain(user: UserModel): UserEntity {
+    const entity = new UserEntity()
+    entity.id = user.id;
+    entity.username = user.username;
+    entity.password = user.password;
+    entity.personId = user.personId;
+    entity.isActive = user.isActive;
+    entity.roles ? user.roles.map(rolDomain => RolTypeEntity.fromDomain(rolDomain)) : [];
+    return entity;
+  }
 }

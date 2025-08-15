@@ -16,8 +16,8 @@ export interface Condition {
 
 export class Permission {
   constructor(
-    public action: Action[],
-    public subject: Resource[],
+    public action: Action,
+    public subject: Resource,
     public conditions?: Condition[]
   ) {}
 
@@ -26,8 +26,8 @@ export class Permission {
     subject,
     conditions
   }: {
-    action: Action[],
-    subject: Resource[],
+    action: Action,
+    subject: Resource,
     conditions: Condition[]
   }): Permission {
     return new Permission(action, subject, conditions)

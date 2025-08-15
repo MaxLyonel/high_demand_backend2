@@ -25,9 +25,9 @@ export class AbilityFactory {
           // Podrías hacer mapeo del operador aquí, para simplicidad asigno valor directamente
           conditionsObj[c.field] = c.value;
         });
-        can(perm.action, perm.subject, conditionsObj);
+        can(perm.action.name, perm.subject.name, conditionsObj);
       } else {
-        can(perm.action, perm.subject);
+        can(perm.action.name, perm.subject.name);
       }
     });
 

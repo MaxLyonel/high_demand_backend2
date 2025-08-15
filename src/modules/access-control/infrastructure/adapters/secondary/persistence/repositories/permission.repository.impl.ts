@@ -22,7 +22,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
   async findByRoleId(roleId: number): Promise<Permission[]> {
     const rolPermissions = await this.rolPermissionRepository.find({
       where: { rol: { id: roleId }, active: true },
-      relations: ['permission', 'permission.action', 'permission.resource', 'permission.condition']
+      relations: ['permission', 'permission.action', 'permission.subject', 'permission.condition']
     })
 
     return rolPermissions.map((rp) => {
@@ -34,8 +34,8 @@ export class PermissionRepositoryImpl implements PermissionRepository {
       }))
 
       return new Permission(
-        permission.action.name,
-        permission.resource.name,
+        permission.action,
+        permission.subject,
         conditions
       )
     })

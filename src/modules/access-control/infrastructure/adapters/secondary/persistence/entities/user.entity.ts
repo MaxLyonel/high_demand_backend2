@@ -1,9 +1,10 @@
 // external dependencies
-import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 // own implementations
 import { User as UserModel } from '@access-control/domain/models/user.model';
 import { RolTypeEntity } from "./rol-type.entity";
 import { Rol } from "@access-control/domain/models/rol.model";
+import { UserRoleEntity } from "./user-rol.entity";
 
 @Entity({name: 'usuario'})
 export class UserEntity {
@@ -22,13 +23,8 @@ export class UserEntity {
   @Column({name: 'esactivo'})
   isActive: boolean
 
-  @ManyToMany(() => RolTypeEntity, (rol) => rol.users, { eager: true }) // le dice a TypeOrm que la relación entre UserEntity y RolTypeEntity es de mucho a muchos
-  @JoinTable({
-    name: 'usuario_rol',
-    joinColumn: { name: 'usuario_id', referencedColumnName: 'id' }, // que columnas componen
-    inverseJoinColumn: { name: 'rol_tipo_id', referencedColumnName: 'id' },
-  })
-  roles: RolTypeEntity[];
+  @OneToMany(() => UserRoleEntity, (userRole) => userRole.user, { eager: true })
+  userRoles: UserRoleEntity[];
 
   static toDomain(entity: UserEntity): UserModel {
     return UserModel.create({
@@ -37,18 +33,25 @@ export class UserEntity {
       password: entity.password,
       personId: entity.personId,
       isActive: entity.isActive,
-      roles: entity.roles.map(rolEntity => RolTypeEntity.toDomain(rolEntity))
+      roles: entity.userRoles
+        .filter(ur => ur.active) // 👈 solo roles activos
+        .map(ur => UserRoleEntity.toDomain(ur))
     });
   }
 
   static fromDomain(user: UserModel): UserEntity {
-    const entity = new UserEntity()
+    const entity = new UserEntity();
     entity.id = user.id;
     entity.username = user.username;
     entity.password = user.password;
     entity.personId = user.personId;
     entity.isActive = user.isActive;
-    entity.roles ? user.roles.map(rolDomain => RolTypeEntity.fromDomain(rolDomain)) : [];
+
+    entity.userRoles = user.roles?.map(rolDomain =>
+      UserRoleEntity.fromDomain(rolDomain, entity)
+    ) || [];
+
     return entity;
   }
+
 }

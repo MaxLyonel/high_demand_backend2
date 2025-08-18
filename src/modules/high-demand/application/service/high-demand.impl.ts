@@ -47,7 +47,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     obj.registrationStatus = RegistrationStatus.PENDING
     obj.workflowStateId = workflowState.id
     obj.workflowId = workflow!.id
-    obj.inbox = true
+    obj.inbox = false
     obj.operativeId = 1 // ! importante: debe estar esto en el seeder
 
     const domain = HighDemandRegistration.create({
@@ -55,12 +55,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       courses: coursesParam,
       existingRegistrations
     });
-
-    const entity = HighDemandRegistrationEntity.fromDomain(domain);
-    const saved = await this.highDemandRepository.saveHighDemandRegistration(entity)
-
-    const { id: highDemandId } = saved
-    this.highDemandCourseRepository.saveHighDemandCourse(highDemandId, coursesParam)
+    // const entity = HighDemandRegistrationEntity.fromDomain(domain);
+    const saved = await this.highDemandRepository.saveHighDemandRegistration(domain)
 
     const newHistory = {
       highDemandRegistrationId: saved.id,

@@ -13,7 +13,7 @@ export class HighDemandController {
     private readonly highDemandService: HighDemandService
   ) {}
 
-  @Post('create-high-demand')
+  @Post('create')
   async createHighDemandRegistration(@Body() body: CreateHighDemandDto) {
     try {
       const { highDemand, courses } = body
@@ -31,7 +31,7 @@ export class HighDemandController {
     }
   }
 
-  @Post('send-high-demand')
+  @Post('send')
   async sendHighDemand(@Body() body: RegisterHighDemandDto){
     try {
       const result = await this.highDemandService.sendHighDemand(body)

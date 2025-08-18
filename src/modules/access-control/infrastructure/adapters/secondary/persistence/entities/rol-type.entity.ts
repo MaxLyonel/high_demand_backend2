@@ -1,7 +1,8 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { PermissionEntity } from "./permission.entity";
 import { Rol } from "@access-control/domain/models/rol.model";
+import { UserRoleEntity } from "./user-rol.entity";
 
 
 
@@ -14,9 +15,6 @@ export class RolTypeEntity {
   @Column({ name: 'rol'})
   name: string;
 
-  // @Column({ name: 'lugar_nivel_tipo_id'})
-  // placeLevelTypeId: number;
-
   @ManyToMany(() => PermissionEntity, (permission) => permission.roles, { eager: true })
   @JoinTable({
     name: 'rol_permisos',
@@ -26,21 +24,21 @@ export class RolTypeEntity {
   })
   permissions: PermissionEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.roles)
-  users: UserEntity[];
+  @OneToMany(() => UserRoleEntity, (userRole) => userRole.role)
+  userRoles: UserRoleEntity[];
 
   static toDomain(entity: RolTypeEntity): Rol {
     return Rol.create({
       id: entity.id,
       name: entity.name,
       permissions: entity.permissions?.map(p => PermissionEntity.toDomain(p)) || []
-    })
+    });
   }
 
   static fromDomain(model: Rol): RolTypeEntity {
-    const entity = new RolTypeEntity()
-    entity.id = model.id
-    entity.name = model.name
+    const entity = new RolTypeEntity();
+    entity.id = model.id;
+    entity.name = model.name;
     entity.permissions = model.permissions?.map(p => PermissionEntity.fromDomain(p)) || [];
     return entity;
   }

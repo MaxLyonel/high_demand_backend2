@@ -21,9 +21,17 @@ export class UserRepositoryImpl implements UserRepository {
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
-    const userEntity = await this.userRepository.findOne({ where: { username }, relations: ['roles']})
-    if(!userEntity) return null;
-    return UserEntity.toDomain(userEntity)
+    const userEntity = await this.userRepository
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.userRoles", "userRol")
+      .leftJoinAndSelect("userRol.role", "role")
+      .where("user.username = :username", { username })
+      .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38] })
+      .andWhere("userRol.esactivo = true")
+      .getOne();
+
+    if (!userEntity) return null;
+    return UserEntity.toDomain(userEntity);
   }
 
   async getTeacherInfo(personId: number, gestionId: number): Promise<Teacher | null> {
@@ -31,7 +39,8 @@ export class UserRepositoryImpl implements UserRepository {
       where: {
         personId: personId,
         gestionId: gestionId,
-        positionTypeId: In([1, 12])
+        positionTypeId: In([1, 12]),
+        isVigentAdmin: true
       }
     })
     if(!teacherEntity) return null

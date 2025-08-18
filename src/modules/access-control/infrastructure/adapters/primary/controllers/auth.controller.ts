@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, Request, UseGuards } from "@nestjs/common";
 
 import { LoginDto } from "@access-control/application/dtos/login.dto";
 import { AuthService } from "@access-control/application/ports/inbound/auth.service"
@@ -28,8 +28,20 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, CaslGuard)
   @Get('info-teacher')
   // @CheckAbilities({ action: 'read', subject: 'user'})
-  getTeacher(@Query() query: { personId: number, gestionId: number}) {
-    const { personId, gestionId } = query
-    return this.authService.getTeacher(personId, gestionId)
+  async getTeacher(@Query() query: { personId: number, gestionId: number}) {
+    try {
+      const { personId, gestionId } = query
+      const result = await this.authService.getTeacher(personId, gestionId)
+      return {
+        status: 'success',
+        message: 'Informacion del maestro obtenida exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener informacion del maestro'
+      }, HttpStatus.BAD_REQUEST)
+    }
   }
 }

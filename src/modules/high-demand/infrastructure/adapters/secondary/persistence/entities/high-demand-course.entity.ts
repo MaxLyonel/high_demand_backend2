@@ -54,19 +54,27 @@ export class HighDemandRegistrationCourseEntity {
   deletedAt?: Date;
 
   static toDomain(entity: HighDemandRegistrationCourseEntity): HighDemandRegistrationCourseModel {
-    return HighDemandRegistrationCourseModel.create({
-      id: entity.id,
-      highDemandRegistrationId: entity.highDemandRegistrationId,
-      levelId: entity.levelId,
-      gradeId: entity.gradeId,
-      parallelId: entity.parallelId,
-      totalQuota: entity.totalQuota
-    })
+    // return HighDemandRegistrationCourseModel.create({
+    //   id: entity.id,
+    //   highDemandRegistrationId: entity.highDemandRegistrationId,
+    //   levelId: entity.levelId,
+    //   gradeId: entity.gradeId,
+    //   parallelId: entity.parallelId,
+    //   totalQuota: entity.totalQuota
+    // })
+    return new HighDemandRegistrationCourseModel(
+      entity.id,
+      entity.highDemandRegistrationId,
+      entity.levelId,
+      entity.gradeId,
+      entity.parallelId,
+      entity.totalQuota
+    )
   }
 
   static fromDomain(highDemandRegistrationCourse: HighDemandRegistrationCourseModel): HighDemandRegistrationCourseEntity {
     const entity = new HighDemandRegistrationCourseEntity()
-    entity.id = highDemandRegistrationCourse.id;
+    // entity.id = highDemandRegistrationCourse.id;
     entity.highDemandRegistrationId = highDemandRegistrationCourse.highDemandRegistrationId;
     entity.levelId = highDemandRegistrationCourse.levelId;
     entity.gradeId = highDemandRegistrationCourse.gradeId;

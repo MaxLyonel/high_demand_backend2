@@ -42,6 +42,11 @@ export class HighDemandRegistration {
     courses: HighDemandRegistrationCourse[]
   }): HighDemandRegistration {
 
+    // Regla negocio: La unidad educativa debe tener por lo menos un curso para registrar
+    if(courses.length <= 0) {
+      throw new Error('La unidad educativa debe registrar por lo menos un curso como alta demanda')
+    }
+
     // Regla negocio: Una unidad educativa no puede estar doblemente registrada en una misma gestión
     const alreadyRegistered = existingRegistrations.some(
       (reg) => reg.educationalInstitutionId === educationalInstitutionId && reg.operativeId === operativeId

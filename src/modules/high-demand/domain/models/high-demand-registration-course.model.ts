@@ -2,12 +2,12 @@ import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/
 
 export class HighDemandRegistrationCourse {
   constructor(
-    public readonly id: number,
+    public readonly id: number | null,
     public readonly highDemandRegistrationId: number,
     public readonly levelId: number,
     public readonly gradeId: number,
     public readonly parallelId: number,
-    public readonly totalQuota: number
+    public readonly totalQuota: number,
   ) {}
 
   static create({
@@ -16,14 +16,16 @@ export class HighDemandRegistrationCourse {
     levelId,
     gradeId,
     parallelId,
-    totalQuota
+    totalQuota,
+    existingCourses
   }: {
-    id: number,
+    id: number | null,
     highDemandRegistrationId: number,
-    levelId,
-    gradeId,
-    parallelId,
-    totalQuota: number
+    levelId: number,
+    gradeId: number,
+    parallelId: number,
+    totalQuota: number,
+    existingCourses: HighDemandRegistrationCourse[]
   }): HighDemandRegistrationCourse {
 
     // Regla de negocio: No puede haber una inscripción de un curso de alta demanda con 0 plazas
@@ -32,6 +34,17 @@ export class HighDemandRegistrationCourse {
       throw new Error('El cupo del curso seleccionado debe tener un valor distinto a 0')
     }
 
+    // Regla: No puede haber cursos duplicados en la misma inscripción
+    const alreadyExists = existingCourses.some(c =>
+      c.highDemandRegistrationId === highDemandRegistrationId &&
+      c.levelId === levelId &&
+      c.gradeId === gradeId &&
+      c.parallelId === parallelId
+    );
+
+    if (alreadyExists) {
+      throw new Error('Ya existe un curso con el mismo nivel, grado y paralelo para esta inscripción');
+    }
 
     return new HighDemandRegistrationCourse(
       id,

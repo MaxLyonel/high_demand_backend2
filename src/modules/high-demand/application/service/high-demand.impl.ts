@@ -101,13 +101,13 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     const highDemandFound = await this.highDemandRepository.findById(id)
     if(!highDemandFound) throw new Error('No existe la alta demanda')
 
-    await this.highDemandRepository.updatedInbox(highDemandFound.id, 2)
+    const saved = await this.highDemandRepository.updatedInbox(highDemandFound.id, 2)
 
     const newHistory = {
-      highDemandRegistrationId: highDemandFound.id,
-      workflowStateId: highDemandFound.workflowStateId,
-      registrationStatus: highDemandFound.registrationStatus,
-      userId: highDemandFound.userId,
+      highDemandRegistrationId: saved.id,
+      workflowStateId: saved.workflowStateId,
+      registrationStatus: saved.registrationStatus,
+      userId: saved.userId,
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
@@ -123,6 +123,34 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       registrationStatus: saved.registrationStatus,
       userId: saved.userId,
       observation: observation
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return saved
+  }
+
+  // ** aprobar alta demanda **
+  async approveHighDemand(obj: any): Promise<any> {
+    const saved = await this.highDemandRepository.approveHighDemand(obj.id, RegistrationStatus.APPROVED)
+    const newHistory = {
+      highDemandRegistrationId: saved.id,
+      workflowStateId: saved.workflowStateId,
+      registrationStatus: saved.registrationStatus,
+      userId: saved.userId,
+      observation: ''
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return saved
+  }
+
+  // ** rechazar alta demanda **
+  async declineHighDemand(obj: any): Promise<any> {
+    const saved = await this.highDemandRepository.declinehighDemand(obj.id, RegistrationStatus.REJECTED)
+    const newHistory = {
+      highDemandRegistrationId: saved.id,
+      workflowStateId: saved.workflowStateId,
+      registrationStatus: saved.registrationStatus,
+      userId: saved.userId,
+      observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
     return saved

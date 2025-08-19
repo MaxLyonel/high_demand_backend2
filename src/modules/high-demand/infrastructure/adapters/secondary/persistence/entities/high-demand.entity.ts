@@ -24,7 +24,11 @@ export class HighDemandRegistrationEntity {
   @Column({ name: 'flujo_id'})
   workflowId: number
 
-  @Column({name: 'inscripcion_estado'})
+  @Column({
+    name: 'inscripcion_estado',
+    type: 'enum',
+    enum: RegistrationStatus
+  })
   registrationStatus: RegistrationStatus
 
   @Column({ name: 'bandeja_estado'})

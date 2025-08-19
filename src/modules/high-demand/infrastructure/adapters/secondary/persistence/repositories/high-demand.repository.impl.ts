@@ -218,6 +218,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return HighDemandRegistrationEntity.toDomain(highDemandEntity);
   }
 
+  // ** derivar la alta demanda **
   async deriveHighDemand(id: number, rolId: number): Promise<any> {
     const result = await this.highDemandRepository.update(
       { id: id },
@@ -234,4 +235,41 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     if(!highDemandEntity) throw new Error('No existe la Alta demanda')
     return HighDemandRegistrationEntity.toDomain(highDemandEntity)
   }
+
+  // ** aprobar la alta demanda **
+  async approveHighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration> {
+    const result = await this.highDemandRepository.update(
+      { id: id },
+      { registrationStatus: registrationStatus }
+    )
+    if(result.affected && result.affected <= 0) {
+      throw new Error("No se aprobo la alta demanda")
+    }
+    const highDemandEntity = await this.highDemandRepository.findOne({
+      where: {
+        id: id,
+      }
+    })
+    if(!highDemandEntity) throw new Error('No existe la Alta demanda');
+    return HighDemandRegistrationEntity.toDomain(highDemandEntity)
+  }
+
+  // ** rechazar la alta demanda
+  async declinehighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration> {
+    const result = await this.highDemandRepository.update(
+      { id: id },
+      { registrationStatus: registrationStatus }
+    )
+    if(result.affected && result.affected <= 0) {
+      throw new Error("No se rechazo la alta demanda")
+    }
+    const highDemandEntity = await this.highDemandRepository.findOne({
+      where: {
+        id: id
+      }
+    })
+    if(!highDemandEntity) throw new Error('No existe la Alta demanda');
+    return HighDemandRegistrationEntity.toDomain(highDemandEntity)
+  }
+
 }

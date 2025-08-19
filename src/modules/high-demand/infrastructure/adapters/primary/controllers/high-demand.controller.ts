@@ -66,6 +66,42 @@ export class HighDemandController {
     }
   }
 
+  @Post('approve')
+  async approveHighDemand(@Body() body: any) {
+    try {
+      const { highDemand } = body
+      const result = await this.highDemandService.approveHighDemand(highDemand)
+      return {
+        status: 'success',
+        message: 'Registro como Alta Demanda exitosa',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al aprobar la alta demanda'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Post('decline')
+  async declineHighDemand(@Body() body: any) {
+    try {
+      const { highDemand } = body
+      const result = await this.highDemandService.declineHighDemand(highDemand)
+      return {
+        status: 'success',
+        message: 'Alta demanda rechazada',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al rechazar la alta demanda'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Get('list-by-state-rol')
   async getHighDemandsRolState(@Query() params: any) {
     try {

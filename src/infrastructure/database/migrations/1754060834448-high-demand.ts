@@ -4,7 +4,7 @@ export class HighDemand1754060834448 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            CREATE TYPE alta_demanda.estado_inscripcion_enum AS ENUM ('ANULADO','PENDIENTE','OBSERVADO','APROBADO','RECHAZADO');
+            CREATE TYPE alta_demanda.estado_inscripcion_enum AS ENUM ('ANULADO','REGISTRADO','OBSERVADO','APROBADO','RECHAZADO');
         `)
 
         await queryRunner.query(`

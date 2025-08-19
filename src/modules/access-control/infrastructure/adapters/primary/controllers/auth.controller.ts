@@ -20,7 +20,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard, CaslGuard)
   @Get('profile')
-  @CheckAbilities({ action: 'read', subject: 'user'})
+  // @CheckAbilities({ action: 'read', subject: 'user'})
   getProfile(@Request() req) {
     return req.user
   }

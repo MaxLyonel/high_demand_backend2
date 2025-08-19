@@ -20,16 +20,6 @@ export class EducationalInstitutionRepositoryImpl implements EducationalInstitut
     private readonly educationalInstitutionRepository: Repository<EducationalInstitutionEntity>
   ) {}
 
-  // async findById(id: number): Promise<EducationalInstitution> {
-  //   const institution = await this.educationalInstitutionRepository.findOne({
-  //     where: {
-  //       id: id
-  //     }
-  //   })
-  //   if(!institution) throw new Error('Error al obtener la institución')
-  //   return EducationalInstitution.toDomain(institution)
-  // }
-
   async findBySie(id: number): Promise<EducationalInstitutionDto | null> {
 
     const result = await this.educationalInstitutionRepository.query(`
@@ -53,8 +43,16 @@ export class EducationalInstitutionRepositoryImpl implements EducationalInstitut
 
     return mapToDto(row)
 
-    // const educationalInstitutinEntity = await this.educationalInstitutionRepository.findOne({ where: { id }})
-    // if(!educationalInstitutinEntity) return null
-    // return EducationalInstitutionEntity.toDomain(educationalInstituionEntity)
+  }
+
+  async searchEducationalInstitutionDistrict(id: number): Promise<any> {
+    const institution  = await this.educationalInstitutionRepository.findOne({
+      where: {
+        id: id
+      },
+      relations: ['jurisdiction', 'jurisdiction.districtPlaceType', 'state', 'educationalInstitutionType']
+    })
+    if(!institution) throw new Error('No se encontro a la institución');
+    return EducationalInstitutionEntity.toDomain(institution)
   }
 }

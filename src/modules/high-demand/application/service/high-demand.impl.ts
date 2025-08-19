@@ -32,6 +32,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   // ****** Guardar la Alta Demanda *******
   async saveHighDemandRegistration(obj: HighDemandRegistration, coursesParam: any): Promise<HighDemandRegistration> {
 
+
     const workflow = await this.workflowRepository.findLastActive()
     if(!workflow) {
       throw new Error("No se puede crear la Alta Demanda, falta definir el flujo")
@@ -42,8 +43,13 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     }
     const firstWorkflowState = workflowStates[0]
 
+    // buscamos su distrito
+    const ditrictFound = await this.educationalInstitutionRepository.searchEducationalInstitutionDistrict(obj.educationalInstitutionId)
+    const { jurisdiction } = ditrictFound
+    obj.placeDistrict = jurisdiction.districtPlaceType
+
     const existingRegistrations = await this.highDemandRepository.findInscriptions(obj)
-    obj.registrationStatus = RegistrationStatus.PENDING
+    obj.registrationStatus = RegistrationStatus.REGISTER
     obj.rolId = firstWorkflowState.currentState
     obj.workflowStateId = 2 //TODO
     obj.workflowId = workflow.id
@@ -198,6 +204,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return reducer
   }
 
+  // ****** Listar Altas Demandas de la Bandeja de Recibidos *****
   async listReceived(rolId: number): Promise<any[]> {
     const highDemands = await this.highDemandRepository.searchByReceived(rolId)
     const reducer:any = []
@@ -221,5 +228,11 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       reducer.push(obj)
     }
     return reducer
+  }
+
+  // ****** Listar Altas Demandas Aprobadas *****
+  async listHighDemandsApproved(): Promise<any[]> {
+    const highDemandsApproved = await this.highDemandRepository.getHighDemandsApproved()
+    return highDemandsApproved
   }
 }

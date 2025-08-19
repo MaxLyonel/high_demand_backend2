@@ -17,4 +17,9 @@ export class EducationalInstitutionImpl implements EducationalInstitutionService
     const educationalInstitution = await this.educationalInstitutionRepository.findBySie(sie)
     return educationalInstitution
   }
+
+  async searchEducationalInstitutionDistrict(sie: number): Promise<any> {
+    const institution = await this.educationalInstitutionRepository.searchEducationalInstitutionDistrict(sie)
+    return institution
+  }
 }

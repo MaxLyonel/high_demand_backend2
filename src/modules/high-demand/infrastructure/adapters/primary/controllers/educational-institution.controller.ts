@@ -13,4 +13,9 @@ export class EducationalInstitutionController {
   getEducationalInstitutionInfo(@Param('sie') sie: number) {
     return this.educationalInstitutionService.getInfoEducationalInstitution(sie)
   }
+
+  @Get('prueba/:sie')
+  search(@Param('sie') sie: number) {
+    return this.educationalInstitutionService.searchEducationalInstitutionDistrict(sie)
+  }
 }

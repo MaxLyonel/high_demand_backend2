@@ -5,6 +5,7 @@ import { RegistrationStatus } from "@high-demand/domain/enums/registration-statu
 import { HighDemandRegistrationCourse } from '../../../../../domain/models/high-demand-registration-course.model';
 import { HighDemandRegistrationCourseEntity } from "./high-demand-course.entity";
 import { HistoryEntity } from "./history.entity";
+import { PlaceTypeEntity } from "./place-type.entity";
 
 
 @Entity({ schema: 'alta_demanda', name: 'inscripcion_alta_demanda'})
@@ -54,6 +55,10 @@ export class HighDemandRegistrationEntity {
   @OneToMany(() => HistoryEntity, (history) => history.highDemandRegistration)
   histories: HistoryEntity[];
 
+  @ManyToOne(() => PlaceTypeEntity)
+  @JoinColumn({ name: 'lugar_distrito_id'})
+  placeDistrict: PlaceTypeEntity
+
   static toDomain(entity: HighDemandRegistrationEntity): HighDemandRegistrationModel {
     return new HighDemandRegistrationModel(
       entity.id,
@@ -65,6 +70,7 @@ export class HighDemandRegistrationEntity {
       entity.inbox,
       entity.operativeId,
       entity.rolId,
+      entity.placeDistrict,
       entity.courses
         ? entity.courses.map(course =>
             HighDemandRegistrationCourseEntity.toDomain(course) // convierte cada curso al modelo de dominio

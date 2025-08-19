@@ -17,6 +17,7 @@ export class HighDemand1754060834448 implements MigrationInterface {
                 flujo_estado_id BIGINT REFERENCES alta_demanda.flujo_estado(id),
                 bandeja_estado BOOLEAN,
                 inscripcion_estado alta_demanda.estado_inscripcion_enum NOT NULL,
+                lugar_distrito_id INTEGER REFERENCES lugar_tipo(id) NOT NULL,
                 operativo_id INTEGER REFERENCES alta_demanda.operativo(id) NOT NULL,
                 creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

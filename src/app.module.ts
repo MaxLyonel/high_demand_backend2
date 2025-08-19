@@ -5,12 +5,14 @@ import { AuthModule } from "./modules/access-control/auth.module";
 import { DatabaseModule } from "./infrastructure/database/database.module";
 import { HighDemandModule } from "./modules/high-demand/high-demand.module";
 import { OperationsProgrammingModule } from "./modules/operations-programming/operations-programming.module";
+import { PreRegistrationModule } from "./modules/pre-registration/pre-registration.module";
 
 @Module({
   imports: [
     AuthModule,
     DatabaseModule,
     HighDemandModule,
+    PreRegistrationModule,
     OperationsProgrammingModule
   ]
 })

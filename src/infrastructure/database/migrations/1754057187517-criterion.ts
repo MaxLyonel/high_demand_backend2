@@ -7,7 +7,8 @@ export class Criterion1754057187517 implements MigrationInterface {
             CREATE TABLE alta_demanda.criterio (
                 id SERIAL PRIMARY KEY,
                 nombre VARCHAR(100),
-                descripcion VARCHAR(255)
+                descripcion VARCHAR(255),
+                activo BOOLEAN DEFAULT TRUE
             );
         `)
     }

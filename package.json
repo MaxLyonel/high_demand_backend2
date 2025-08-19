@@ -90,6 +90,7 @@
   "_moduleAliases": {
     "@access-control": "dist/modules/access-control",
     "@high-demand": "dist/modules/high-demand",
-    "@infrastructure-general": "dist/infrastructure"
+    "@infrastructure-general": "dist/infrastructure",
+    "@pre-registration": "dist/modules/pre-registration"
   }
 }

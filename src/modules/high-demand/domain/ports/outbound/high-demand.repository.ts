@@ -11,6 +11,7 @@ export abstract class HighDemandRepository {
   abstract declinehighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration>;
   abstract searchByInbox(rolId: number, stateId: number): Promise<HighDemandRegistration[]>;
   abstract searchByReceived(rolId: number): Promise<any>;
+  abstract getHighDemandsApproved(): Promise<any[]>;
 
 
   abstract findById(id: number): Promise<HighDemandRegistration | null>;

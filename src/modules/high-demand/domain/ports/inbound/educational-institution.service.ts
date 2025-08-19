@@ -4,4 +4,5 @@ import { EducationalInstitution } from '@high-demand/domain/models/educational-i
 
 export abstract class EducationalInstitutionService {
   abstract getInfoEducationalInstitution(sie: number): Promise<EducationalInstitutionDto | null>;
+  abstract searchEducationalInstitutionDistrict(sie: number): Promise<any>;
 }

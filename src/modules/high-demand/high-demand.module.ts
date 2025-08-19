@@ -51,6 +51,7 @@ import { UserRepositoryImpl } from "@access-control/infrastructure/adapters/seco
 import { RolTypeEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/rol-type.entity";
 import { UserEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/user.entity";
 import { TeacherEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/teacher.entity";
+import { GeographicJurisdictionEntity } from "../pre-registration/infrastructure/adapters/secondary/persistence/entities/geographic-jurisdiction.entity";
 
 
 
@@ -60,7 +61,7 @@ import { TeacherEntity } from "@access-control/infrastructure/adapters/secondary
     EducationalInstitutionCourseController,
     HighDemandController,
     HighDemandCourseController,
-    HistoryController
+    HistoryController,
   ],
   providers: [
     {
@@ -126,7 +127,7 @@ import { TeacherEntity } from "@access-control/infrastructure/adapters/secondary
     {
       provide: UserRepository,
       useClass: UserRepositoryImpl
-    }
+    },
   ],
   imports: [
     TypeOrmModule.forFeature(
@@ -141,7 +142,8 @@ import { TeacherEntity } from "@access-control/infrastructure/adapters/secondary
         HistoryEntity,
         RolTypeEntity,
         UserEntity,
-        TeacherEntity
+        TeacherEntity,
+        GeographicJurisdictionEntity
       ], 'alta_demanda')
   ],
   exports: [EducationalInstitutionService]

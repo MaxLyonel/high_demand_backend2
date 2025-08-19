@@ -20,7 +20,8 @@
     "paths": {
       "@access-control/*": ["src/modules/access-control/*"],
       "@infrastructure-general/*": ["src/infrastructure/*"],
-      "@high-demand/*": ["src/modules/high-demand/*"]
+      "@high-demand/*": ["src/modules/high-demand/*"],
+      "@pre-registration/*": ["src/modules/pre-registration/*"]
     }
   }
 }

@@ -155,6 +155,23 @@ export class HighDemandController {
     }
   }
 
+  @Get('list-high-demands-approved')
+  async getHighDemandsApproved() {
+    try {
+      const result = await this.highDemandService.listHighDemandsApproved()
+      return {
+        status: 'success',
+        message: 'Se ha obtenido las Altas Demandas aprobadas exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener las altas demandas aprobadas'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 
 
 

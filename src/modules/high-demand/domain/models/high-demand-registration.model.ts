@@ -13,6 +13,7 @@ export class HighDemandRegistration {
     public inbox: boolean, // esta en su bandeja?
     public operativeId: number,
     public rolId: number,
+    public placeDistrict: any,
     public courses: HighDemandRegistrationCourse[] // Tiene varios cursos asignados
   ) {}
 
@@ -26,6 +27,7 @@ export class HighDemandRegistration {
     inbox,
     operativeId,
     rolId,
+    placeDistrict,
     existingRegistrations,
     courses
   }: {
@@ -38,6 +40,7 @@ export class HighDemandRegistration {
     inbox: boolean,
     operativeId: number,
     rolId: number,
+    placeDistrict: any,
     existingRegistrations: HighDemandRegistration[],
     courses: HighDemandRegistrationCourse[]
   }): HighDemandRegistration {
@@ -67,6 +70,7 @@ export class HighDemandRegistration {
       inbox,
       operativeId,
       rolId,
+      placeDistrict,
       courses
     )
   }

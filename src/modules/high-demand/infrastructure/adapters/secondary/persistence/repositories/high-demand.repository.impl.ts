@@ -32,6 +32,7 @@ interface NewHighDemandRegistration {
   inbox: boolean;
   operativeId: number;
   rolId: number;
+  placeDistrict: any;
   courses: Course[];
 }
 
@@ -73,9 +74,8 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
 
       // 3. Crear y validar cursos en el dominio
       for (const course of courses) {
-        // Crear dominio sin id
         const domainCourse = HighDemandRegistrationCourse.create({
-          id: null, // o simplemente no incluirlo en create
+          id: null,
           highDemandRegistrationId: newHighDemand.id,
           levelId: course.levelId,
           gradeId: course.gradeId,
@@ -91,7 +91,6 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
           ),
         });
 
-        // Mapear a entidad TypeORM sin id, TypeORM lo generará
         const entityCourse = this.highDemandCourseRepository.create({
           highDemandRegistrationId: domainCourse.highDemandRegistrationId,
           levelId: domainCourse.levelId,
@@ -104,7 +103,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
           this.highDemandCourseRepository.target,
           entityCourse,
         );
-        existingCourses.push(savedCourse); // actualizar lista
+        existingCourses.push(savedCourse);
       }
 
       await queryRunner.commitTransaction();
@@ -270,6 +269,24 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     })
     if(!highDemandEntity) throw new Error('No existe la Alta demanda');
     return HighDemandRegistrationEntity.toDomain(highDemandEntity)
+  }
+
+  // ** obtener altas demandas aprobadas **
+  async getHighDemandsApproved(): Promise<any[]> {
+    const highDemandsAproved = await this.highDemandRepository.find({
+      where: {
+        registrationStatus: RegistrationStatus.APPROVED,
+        operativeId: 1 //TODO
+      },
+      relations: [
+        'educationalInstitution',
+        'educationalInstitution.state',
+        'educationalInstitution.educationalInstitutionType',
+        'educationalInstitution.dependencyType',
+        'educationalInstitution.jurisdiction',
+        'courses']
+    })
+    return highDemandsAproved
   }
 
 }

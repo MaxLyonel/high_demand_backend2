@@ -10,7 +10,6 @@ import { WorkflowRepository } from "@high-demand/domain/ports/outbound/workflow.
 import { WorkflowStateRepository } from "@high-demand/domain/ports/outbound/workflow-state.repository";
 import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
 import { CreateHistoryDto } from "../dtos/create-history.dto";
-import { HighDemandCourseRepository } from "@high-demand/domain/ports/outbound/high-demand-course.repository";
 import { WorkflowSequenceRepository } from "@high-demand/domain/ports/outbound/workflow-sequence.repository";
 import { RolRepository } from "@access-control/application/ports/outbound/rol.repository";
 import { UserRepository } from '../../../access-control/application/ports/outbound/user.repository';
@@ -24,7 +23,6 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     private readonly workflowRepository: WorkflowRepository,
     private readonly workflowStateRepository: WorkflowStateRepository,
     private readonly historyRepository: HistoryRepository,
-    private readonly highDemandCourseRepository: HighDemandCourseRepository,
     private readonly workflowSequenceRepository: WorkflowSequenceRepository,
     private readonly rolRepository: RolRepository,
     private readonly userRepository: UserRepository,
@@ -38,24 +36,26 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     if(!workflow) {
       throw new Error("No se puede crear la Alta Demanda, falta definir el flujo")
     }
-    const workflowState = await this.workflowStateRepository.findByName('BORRADOR')
-    if(!workflowState) {
-      throw new Error("No se puede crear la Alta Demanda, falta los estados del flujo")
+    const workflowStates = await this.workflowSequenceRepository.getOrderedFlowStates()
+    if(workflowStates.length <= 0) {
+      throw new Error("No se puede crear la Alta Demanda, falta definir las secuencias")
     }
+    const firstWorkflowState = workflowStates[0]
 
     const existingRegistrations = await this.highDemandRepository.findInscriptions(obj)
     obj.registrationStatus = RegistrationStatus.PENDING
-    obj.workflowStateId = workflowState.id
-    obj.workflowId = workflow!.id
+    obj.rolId = firstWorkflowState.currentState
+    obj.workflowStateId = 2 //TODO
+    obj.workflowId = workflow.id
     obj.inbox = false
-    obj.operativeId = 1 // ! importante: debe estar esto en el seeder
+    obj.operativeId = 1 //TODO
 
     const domain = HighDemandRegistration.create({
       ...obj,
       courses: coursesParam,
       existingRegistrations
     });
-    // const entity = HighDemandRegistrationEntity.fromDomain(domain);
+
     const saved = await this.highDemandRepository.saveHighDemandRegistration(domain)
 
     const newHistory = {
@@ -71,17 +71,14 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
   // ****** Registrar la Alta Demanda ******
   async sendHighDemand(obj: any): Promise<HighDemandRegistration> {
-    const { workflowStateId, rolId } = obj
-    // buscar su siguiente estado
-    const workflowSequence = await this.workflowSequenceRepository.findNextState(rolId, workflowStateId)
-    const { destinyState, rolId: nextRolId } = workflowSequence
-    // actualizar la alta demanda
-    obj.workflowStateId = destinyState
-    obj.rolId = nextRolId
+    const { rolId } = obj
+    const workflowSequence = await this.workflowSequenceRepository.findNextStates(rolId)
+    const { nextState } = workflowSequence[0]
+    obj.rolId = nextState
+    obj.workflowStateId = 1
     obj.inbox = false
     const entity = HighDemandRegistrationEntity.fromDomain(obj)
     const saved = await this.highDemandRepository.saveHighDemandRegistration(entity)
-    // actualizar su historial
     const newHistory = {
       highDemandRegistrationId: saved.id,
       workflowStateId: saved.workflowStateId,
@@ -93,20 +90,42 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return saved
   }
 
+  // ** Obtener los roles a donde ir **
+  async getRolesToGo(rolId: number): Promise<any> {
+    const workflowSequences = await this.workflowSequenceRepository.findNextStates(rolId)
+    return workflowSequences
+  }
+
   // ****** Recibir la Alta Demanda *****
   async receiveHighDemand(id: number): Promise<any> {
+    const highDemandFound = await this.highDemandRepository.findById(id)
+    if(!highDemandFound) throw new Error('No existe la alta demanda')
 
-    const highDemand = await this.highDemandRepository.updatedInbox(id)
+    await this.highDemandRepository.updatedInbox(highDemandFound.id, 2)
 
     const newHistory = {
-      highDemandRegistrationId: highDemand.id,
-      workflowStateId: highDemand.workflowStateId,
-      registrationStatus: highDemand.registrationStatus,
-      userId: highDemand.userId,
+      highDemandRegistrationId: highDemandFound.id,
+      workflowStateId: highDemandFound.workflowStateId,
+      registrationStatus: highDemandFound.registrationStatus,
+      userId: highDemandFound.userId,
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
-    return highDemand
+    return highDemandFound
+  }
+
+  // ** Derivar alta demanda **
+  async deriveHighDemand(obj: any, rolId: number, observation: string | null): Promise<any> {
+    const saved = await this.highDemandRepository.deriveHighDemand(obj.id, rolId)
+    const newHistory = {
+      highDemandRegistrationId: saved.id,
+      workflowStateId: saved.workflowStateId,
+      registrationStatus: saved.registrationStatus,
+      userId: saved.userId,
+      observation: observation
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return saved
   }
 
 
@@ -151,8 +170,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return reducer
   }
 
-  async listReceived(rolId: number, stateId: number): Promise<any[]> {
-    const highDemands = await this.highDemandRepository.searchByReceived(rolId, stateId)
+  async listReceived(rolId: number): Promise<any[]> {
+    const highDemands = await this.highDemandRepository.searchByReceived(rolId)
     const reducer:any = []
     for(let highDemand of highDemands) {
       const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand

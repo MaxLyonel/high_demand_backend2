@@ -48,19 +48,38 @@ export class HighDemandController {
     }
   }
 
-  @Get(':id/receive')
-  async receiveHighDemand(@Param('id', ParseIntPipe) id: number ) {
+  @Post('derive')
+  async deriveHighDemand(@Body() body: any) {
     try {
-      const result = await this.highDemandService.receiveHighDemand(id)
+      const { highDemand, rolId, observation } = body
+      const result = await this.highDemandService.deriveHighDemand(highDemand, rolId, observation)
       return {
         status: 'success',
-        message: 'Se recepcionó exitosamente',
+        message: 'Derivacion exitosa',
         data: result
       }
     } catch(error) {
       throw new HttpException({
         status: 'error',
-        message: error.message || 'Error al recepcionar'
+        message: error.message || 'Error al derivar la alta demanda'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('list-by-state-rol')
+  async getHighDemandsRolState(@Query() params: any) {
+    try {
+      const { rolId, stateId } = params
+      const result = await this.highDemandService.listInbox(rolId, stateId)
+      return {
+        status: 'succes',
+        message: 'Listado de Altas demandas exitoso',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener altas demandas por estado y rol',
       }, HttpStatus.BAD_REQUEST)
     }
   }
@@ -83,6 +102,45 @@ export class HighDemandController {
     }
   }
 
+  @Get('action-roles/:rolId')
+  async getActionsFromRoles(@Param('rolId', ParseIntPipe) rolId: number) {
+    try {
+      const result = await this.highDemandService.getRolesToGo(rolId)
+      return {
+        status: 'success',
+        message: 'Se ha obtenido exitosamente las acciones de los roles',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener acciones de roles'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+
+
+
+  @Get(':id/receive')
+  async receiveHighDemand(@Param('id', ParseIntPipe) id: number ) {
+    try {
+      const result = await this.highDemandService.receiveHighDemand(id)
+      return {
+        status: 'success',
+        message: 'Se recepcionó exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al recepcionar'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+
+
   @Get(':id/by-institution')
   getHighDemandByInstitution(@Param('id') id: number) {
     return this.highDemandService.getHighDemandRegistration(id)
@@ -93,21 +151,5 @@ export class HighDemandController {
     return this.highDemandService.modifyWorkflowStatus(body)
   }
 
-  @Get('list-by-state-rol')
-  async getHighDemandsRolState(@Query() params: any) {
-    try {
-      const { rolId, stateId } = params
-      const result = await this.highDemandService.listInbox(rolId, stateId)
-      return {
-        status: 'succes',
-        message: 'Listado de Altas demandas exitoso',
-        data: result
-      }
-    } catch(error) {
-      throw new HttpException({
-        status: 'error',
-        message: error.message || 'Error al obtener altas demandas por estado y rol',
-      }, HttpStatus.BAD_REQUEST)
-    }
-  }
+
 }

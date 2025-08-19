@@ -16,5 +16,5 @@ export class CreateHistoryDto {
   registrationStatus: RegistrationStatus
 
   @IsString()
-  observation: string
+  observation: string | null
 }

@@ -6,27 +6,24 @@ export class WorkflowSequence {
   constructor(
     public readonly id: number,
     public readonly workflowId: number,
-    public readonly originState: number,
-    public readonly destinyState: number,
+    public readonly currentState: number,
+    public readonly nextState: number,
     public readonly action: string,
-    public readonly rolId: number
   ) {}
 
   static create({
     id,
     workflowId,
-    originState,
-    destinyState,
+    currentState,
+    nextState,
     action,
-    rolId
   }: {
     id: number,
     workflowId: number,
-    originState: number,
-    destinyState: number,
+    currentState: number,
+    nextState: number,
     action: string,
-    rolId: number
   }): WorkflowSequence {
-    return new WorkflowSequence(id, workflowId, originState, destinyState, action, rolId)
+    return new WorkflowSequence(id, workflowId, currentState, nextState, action)
   }
 }

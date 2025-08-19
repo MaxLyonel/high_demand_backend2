@@ -22,8 +22,8 @@ export class HistoryEntity {
   @Column({ name: 'user_id'})
   userId: number
 
-  @Column({ name: 'observacion'})
-  observation: string
+  @Column({ name: 'observacion', type: 'varchar'})
+  observation: string | null
 
   @CreateDateColumn({ name: 'creado_en', type: 'timestamp' })
   createdAt: Date;

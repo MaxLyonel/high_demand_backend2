@@ -46,6 +46,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     private readonly _history: HistoryRepository,
   ) {}
 
+  // ** guarda la alta demanda **
   async saveHighDemandRegistration(
     obj: HighDemandRegistration,
   ): Promise<HighDemandRegistration> {
@@ -116,6 +117,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     }
   }
 
+  // ** busca alta demandas previamente registradas **
   async findInscriptions(
     obj: NewHighDemandRegistration,
   ): Promise<HighDemandRegistration[]> {
@@ -171,6 +173,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity);
   }
 
+  // ** busca altas demandas que esten en la bandeja **
   async searchByInbox(
     rolId: number,
     stateId: number,
@@ -185,10 +188,11 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return highDemands.map(HighDemandRegistrationEntity.toDomain);
   }
 
-  async searchByReceived(rolId: number, stateId: number): Promise<any> {
+  // ** busca altas demandas que esten recepcionadas **
+  async searchByReceived(rolId: number): Promise<any> {
     const highDemands = await this.highDemandRepository.find({
       where: {
-        workflowStateId: stateId,
+        workflowStateId: 2,
         rolId: rolId,
         inbox: true,
       },
@@ -196,10 +200,11 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return highDemands.map(HighDemandRegistrationEntity.toDomain);
   }
 
-  async updatedInbox(id: number): Promise<HighDemandRegistration> {
+  // ** recibir la alta demanda **
+  async updatedInbox(id: number, nextStateId: number): Promise<HighDemandRegistration> {
     const result = await this.highDemandRepository.update(
       { id: id },
-      { inbox: true },
+      { inbox: true, workflowStateId: nextStateId },
     );
     if (result.affected && result.affected <= 0) {
       throw new Error('No se actualiza el inbox');
@@ -211,5 +216,22 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     });
     if (!highDemandEntity) throw new Error('No existe la Alta Demanda');
     return HighDemandRegistrationEntity.toDomain(highDemandEntity);
+  }
+
+  async deriveHighDemand(id: number, rolId: number): Promise<any> {
+    const result = await this.highDemandRepository.update(
+      { id: id },
+      { inbox: false, workflowStateId: 1, rolId: rolId }
+    )
+    if(result.affected && result.affected <= 0) {
+      throw new Error('No se actualizo el derive')
+    }
+    const highDemandEntity = await this.highDemandRepository.findOne({
+      where: {
+        id: id
+      }
+    })
+    if(!highDemandEntity) throw new Error('No existe la Alta demanda')
+    return HighDemandRegistrationEntity.toDomain(highDemandEntity)
   }
 }

@@ -41,8 +41,7 @@ export class WorkflowStateRepositoryImpl implements WorkflowStateRepository {
   async findNextState(rolId: number, previousStateId: number): Promise<WorkflowSequence> {
     const workflowSequenceEntity = await this.workflowSequenceRepository.findOne({
       where: {
-        rol: { id: rolId },
-        stateOrigin: { id: previousStateId }
+        currentState: { id: previousStateId }
       },
       relations:  ['rol', 'stateOrigin', 'stateDestiny', 'workflow']
     })

@@ -14,17 +14,25 @@ export class WorkflowSequenceRepositoryImpl implements WorkflowSequenceRepositor
     private readonly workflowSequenceRepository: Repository<WorkflowSequenceEntity>
   ){}
 
-  async findNextState(rolId: number, previousStateId: number): Promise<WorkflowSequence> {
-    const workflowSequenceEntity  = await this.workflowSequenceRepository.findOne({
-      where: {
-        rol: { id: rolId },
-        stateOrigin: { id: previousStateId }
+  // ** obtenemos la lista de secuencias ordenadas **
+  async getOrderedFlowStates(): Promise<WorkflowSequence[]> {
+    const workflowStates = await this.workflowSequenceRepository.find({
+      order: {
+        sequence: 'ASC'
       },
-      relations: ['rol', 'stateOrigin', 'stateDestiny', 'workflow']
+      relations: ['workflow', 'currentState', 'nextState']
     })
-    return WorkflowSequenceEntity.toDomain(workflowSequenceEntity!)
+    const aux =  workflowStates.map(WorkflowSequenceEntity.toDomain)
+    return aux
   }
 
-
-
+  async findNextStates(rolId: number): Promise<WorkflowSequence[]> {
+    const workflowSequenceEntity  = await this.workflowSequenceRepository.find({
+      where: {
+        currentState: { id: rolId }
+      },
+      relations: ['currentState', 'nextState', 'workflow']
+    })
+    return workflowSequenceEntity.map(WorkflowSequenceEntity.toDomain)
+  }
 }

@@ -3,5 +3,6 @@ import { WorkflowSequence } from "@high-demand/domain/models/workflow-sequence.m
 
 
 export abstract class WorkflowSequenceRepository {
-  abstract findNextState(rolId: number, previousStateId: number): Promise<WorkflowSequence>;
+  abstract getOrderedFlowStates(): Promise<WorkflowSequence[]>;
+  abstract findNextStates(rolId: number): Promise<WorkflowSequence[]>;
 }

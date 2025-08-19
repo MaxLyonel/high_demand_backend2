@@ -10,7 +10,7 @@ export class History {
     public userName: string,
     public workflowState: string,
     public registrationStatus: RegistrationStatus,
-    public observation: string,
+    public observation: string | null,
     public createdAt?: Date,      // agregar opcional o obligatorio según convenga
     public updatedAt?: Date
   ) { }

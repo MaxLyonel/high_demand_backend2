@@ -34,13 +34,14 @@ export class CatalogsRepositoryImpl implements CatalogsRepository {
     return criterias
   }
 
+  // *** obtener el catálogo de municipios ***
   async getMunicipies(): Promise<any> {
-    throw new Error('Method not implemented')
-    // const municipies = await this.placeRepository.find({
-    //   where: {
-    //     placeLevelId: 
-    //   }
-    // })
+    const municipies = await this.placeRepository.find({
+      where: {
+        placeLevelId: 3
+      }
+    })
+    return municipies
   }
 
 }

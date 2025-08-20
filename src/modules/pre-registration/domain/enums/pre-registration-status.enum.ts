@@ -1,0 +1,7 @@
+
+export enum PreRegistrationStatus {
+  NO_REGISTER = 'NO REGISTRADO',
+  REGISTER = 'REGISTRADO',
+  ACCEPTED = 'ACEPTADO',
+  NOT_ACCEPTED = 'NO_ACEPTADO'
+}

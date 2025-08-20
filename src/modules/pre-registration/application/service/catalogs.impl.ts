@@ -22,6 +22,7 @@ export class CatalogsServiceImpl implements CatalogsService {
   }
 
   async listMunicipies(): Promise<any> {
-    throw new Error("Method not implemented.");
+    const municipies = await this.catalogRepository.getMunicipies()
+    return municipies
   }
 }

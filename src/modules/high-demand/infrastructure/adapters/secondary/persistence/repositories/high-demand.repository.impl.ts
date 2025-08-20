@@ -284,7 +284,15 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
         'educationalInstitution.educationalInstitutionType',
         'educationalInstitution.dependencyType',
         'educationalInstitution.jurisdiction',
-        'courses']
+        'educationalInstitution.jurisdiction.localityPlaceType',
+        'educationalInstitution.jurisdiction.localityPlaceType.parent.parent',
+        'educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent',
+        'educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent.parent',
+        'courses',
+        'courses.level',
+        'courses.grade',
+        'courses.parallel'
+      ]
     })
     return highDemandsAproved
   }

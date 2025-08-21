@@ -13,7 +13,10 @@ export class Postulant1754057372571 implements MigrationInterface {
                 fecha_nacimiento DATE,
                 lugar_nacimiento VARCHAR(100),
                 genero VARCHAR(2),
-                codigo_rude VARCHAR(255)
+                codigo_rude VARCHAR(255),
+                creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                eliminado_en TIMESTAMP DEFAULT NULL
             );
         `)
     }

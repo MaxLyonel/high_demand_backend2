@@ -13,11 +13,19 @@ import { StudentRepositoryImpl } from "./infrastructure/adapters/secondary/persi
 import { StudentEntity } from "./infrastructure/adapters/secondary/persistence/entities/student.entity";
 import { StudentService } from "./domain/ports/inbound/student.service";
 import { StudentServiceImpl } from "./application/service/student.impl";
+import { PreRegistrationRepository } from "./domain/ports/outbound/pre-registration.repository";
+import { PreRegistrationRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/pre-registration.repository.impl";
+import { PreRegistrationEntity } from "./infrastructure/adapters/secondary/persistence/entities/pre-registration.entity";
+import { RepresentativeEntity } from "./infrastructure/adapters/secondary/persistence/entities/representative.entity";
+import { PostulantEntity } from "./infrastructure/adapters/secondary/persistence/entities/postulant.entity";
+import { PreRegistrationService } from "./domain/ports/inbound/pre-registration.service";
+import { PreRegistrationServiceImpl } from "./application/service/pre-registration.impl";
+import { PreRegistrationController } from "./infrastructure/adapters/primary/controllers/pre-registration.controller";
 
 
 
 @Module({
-  controllers: [CatalogsController],
+  controllers: [CatalogsController, PreRegistrationController],
   providers: [
     {
       provide: CatalogsService,
@@ -34,6 +42,14 @@ import { StudentServiceImpl } from "./application/service/student.impl";
     {
       provide: StudentRepository,
       useClass: StudentRepositoryImpl
+    },
+    {
+      provide: PreRegistrationRepository,
+      useClass: PreRegistrationRepositoryImpl
+    },
+    {
+      provide: PreRegistrationService,
+      useClass: PreRegistrationServiceImpl
     }
   ],
   imports : [
@@ -41,7 +57,10 @@ import { StudentServiceImpl } from "./application/service/student.impl";
       RelationshipEntity,
       CriteriaEntity,
       PlaceTypeEntity,
-      StudentEntity
+      StudentEntity,
+      PreRegistrationEntity,
+      RepresentativeEntity,
+      PostulantEntity,
     ], 'alta_demanda')
   ]
 })

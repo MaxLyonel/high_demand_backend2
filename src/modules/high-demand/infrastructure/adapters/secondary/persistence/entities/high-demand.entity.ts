@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { EducationalInstitutionEntity } from "./educational-institution.entity";
 import { HighDemandRegistration as HighDemandRegistrationModel } from "@high-demand/domain/models/high-demand-registration.model"
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum"
@@ -58,6 +58,16 @@ export class HighDemandRegistrationEntity {
   @ManyToOne(() => PlaceTypeEntity)
   @JoinColumn({ name: 'lugar_distrito_id'})
   placeDistrict: PlaceTypeEntity
+
+  @CreateDateColumn({ name: 'creado_en', type: 'timestamp'})
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'actualizado_en', type: 'timestamp'})
+  updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'eliminado_en', type: 'timestamp'})
+  deletedAt?: Date;
+
 
   static toDomain(entity: HighDemandRegistrationEntity): HighDemandRegistrationModel {
     return new HighDemandRegistrationModel(

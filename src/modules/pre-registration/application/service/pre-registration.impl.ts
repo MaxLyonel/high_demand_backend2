@@ -21,4 +21,14 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     const result = await this.preRegistrationRepository.getAllPreRegistration()
     return result
   }
+
+  async lotterySelection(postulantId: number): Promise<any> {
+    const result = await this.preRegistrationRepository.updateStatus(postulantId)
+    return result
+  }
+
+  async getPostulantsDrawn(): Promise<any> {
+    const result = await this.preRegistrationRepository.getApplicantsAcceptedStatus()
+    return result
+  }
 }

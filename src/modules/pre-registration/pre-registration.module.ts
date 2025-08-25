@@ -21,6 +21,9 @@ import { PostulantEntity } from "./infrastructure/adapters/secondary/persistence
 import { PreRegistrationService } from "./domain/ports/inbound/pre-registration.service";
 import { PreRegistrationServiceImpl } from "./application/service/pre-registration.impl";
 import { PreRegistrationController } from "./infrastructure/adapters/primary/controllers/pre-registration.controller";
+import { SegipService } from "./domain/ports/outbound/segip.service";
+import { SegipServiceImpl } from "./infrastructure/adapters/secondary/services/segip/segip.service.impl";
+import { HttpModule } from "@nestjs/axios";
 
 
 
@@ -50,9 +53,14 @@ import { PreRegistrationController } from "./infrastructure/adapters/primary/con
     {
       provide: PreRegistrationService,
       useClass: PreRegistrationServiceImpl
+    },
+    {
+      provide: SegipService,
+      useClass: SegipServiceImpl
     }
   ],
   imports : [
+    HttpModule,
     TypeOrmModule.forFeature([
       RelationshipEntity,
       CriteriaEntity,

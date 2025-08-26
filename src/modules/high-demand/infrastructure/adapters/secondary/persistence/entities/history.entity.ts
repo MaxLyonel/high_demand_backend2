@@ -4,6 +4,7 @@ import { HighDemandRegistrationEntity } from "./high-demand.entity";
 import { WorkflowStateEntity } from "./workflow-state.entity";
 import { UserEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/user.entity";
 import { History } from "@high-demand/domain/models/history.model";
+import { RolTypeEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/rol-type.entity";
 
 @Entity({ schema: 'alta_demanda', name: 'historial'})
 export class HistoryEntity {
@@ -21,6 +22,9 @@ export class HistoryEntity {
 
   @Column({ name: 'user_id'})
   userId: number
+
+  @Column({ name: 'rol_id'})
+  rolId: number
 
   @Column({ name: 'observacion', type: 'varchar'})
   observation: string | null
@@ -43,6 +47,10 @@ export class HistoryEntity {
   @JoinColumn({ name: 'user_id'})
   user: UserEntity
 
+  @ManyToOne(() => RolTypeEntity)
+  @JoinColumn({ name: 'rol_id'})
+  rol: RolTypeEntity
+
   static toDomain(entity: any): History {
     return new History(
       entity.id,
@@ -50,6 +58,7 @@ export class HistoryEntity {
       entity.educationalInstitutionId,
       entity.educationalInstitutionName,
       entity.userName,
+      entity.rol,
       entity.workflowState,
       entity.registrationStatus,
       entity.observation

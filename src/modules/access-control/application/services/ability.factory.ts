@@ -16,7 +16,7 @@ export class AbilityFactory {
     );
 
     const permissions = await this.permissionRepo.findByRoleId(roleId);
-    console.log("permissions: ", permissions)
+    // console.log("permissions: ", permissions)
 
     permissions.forEach((perm) => {
       if (perm.conditions?.length) {

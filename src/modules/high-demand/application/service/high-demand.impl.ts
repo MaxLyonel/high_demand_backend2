@@ -32,7 +32,6 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   // ****** Guardar la Alta Demanda *******
   async saveHighDemandRegistration(obj: HighDemandRegistration, coursesParam: any): Promise<HighDemandRegistration> {
 
-
     const workflow = await this.workflowRepository.findLastActive()
     if(!workflow) {
       throw new Error("No se puede crear la Alta Demanda, falta definir el flujo")
@@ -69,6 +68,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       workflowStateId: saved.workflowStateId,
       registrationStatus: saved.registrationStatus,
       userId: saved.userId,
+      rolId: saved.rolId,
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
@@ -90,6 +90,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       workflowStateId: saved.workflowStateId,
       registrationStatus: saved.registrationStatus,
       userId: saved.userId,
+      rolId: saved.rolId,
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
@@ -103,7 +104,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   }
 
   // ****** Recibir la Alta Demanda *****
-  async receiveHighDemand(id: number): Promise<any> {
+  async receiveHighDemand(id: number, userId: number): Promise<any> {
     const highDemandFound = await this.highDemandRepository.findById(id)
     if(!highDemandFound) throw new Error('No existe la alta demanda')
 
@@ -113,7 +114,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       highDemandRegistrationId: saved.id,
       workflowStateId: saved.workflowStateId,
       registrationStatus: saved.registrationStatus,
-      userId: saved.userId,
+      userId: userId,
+      rolId: saved.rolId,
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
@@ -128,6 +130,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       workflowStateId: saved.workflowStateId,
       registrationStatus: saved.registrationStatus,
       userId: saved.userId,
+      rolId: saved.rolId,
       observation: observation
     }
     this.historyRepository.updatedHistory(newHistory)
@@ -142,6 +145,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       workflowStateId: saved.workflowStateId,
       registrationStatus: saved.registrationStatus,
       userId: saved.userId,
+      rolId: saved.rolId,
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
@@ -156,10 +160,26 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       workflowStateId: saved.workflowStateId,
       registrationStatus: saved.registrationStatus,
       userId: saved.userId,
+      rolId: saved.rolId,
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
     return saved
+  }
+
+  // ** modificar estado inscripción alta demanda **
+  async cancelHighDemand(obj: any): Promise<any> {
+    const updated = await this.highDemandRepository.cancelHighDemand(obj, RegistrationStatus.CANCELED)
+    const newHistory = {
+      highDemandRegistrationId: updated.id,
+      workflowStateId: updated.workflowStateId,
+      registrationStatus: updated.registrationStatus,
+      userId: updated.userId,
+      rolId: updated.rolId,
+      observation: 'Inscripción de Alta Demanda anulada por el director'
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return updated
   }
 
 

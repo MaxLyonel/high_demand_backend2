@@ -8,11 +8,12 @@ export abstract class HighDemandService {
     course: any
   ): Promise<HighDemandRegistration>;
   abstract sendHighDemand(obj: any): Promise<HighDemandRegistration>;
-  abstract receiveHighDemand(id: number): Promise<any>;
+  abstract receiveHighDemand(id: number, userId: number): Promise<any>;
   abstract deriveHighDemand(obj: any, rolId: number, observation?: string | null): Promise<any>;
   abstract approveHighDemand(obj: any): Promise<any>;
   abstract declineHighDemand(obj:any): Promise<any>;
   abstract getRolesToGo(rolId): Promise<any>;
+  abstract cancelHighDemand(obj: any): Promise<any>;
   // listar
   abstract listInbox(rolId: number, stateId: number): Promise<any[]>;
   abstract listReceived(rolId: number, stateId: number): Promise<any[]>;

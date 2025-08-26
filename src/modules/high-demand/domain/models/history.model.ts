@@ -8,6 +8,7 @@ export class History {
     public educationalInstitutionId: number,
     public educationalInstitutionName: string,
     public userName: string,
+    public rol: string,
     public workflowState: string,
     public registrationStatus: RegistrationStatus,
     public observation: string | null,

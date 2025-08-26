@@ -1,10 +1,12 @@
 // framework nestjs
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
 // own implementations
 import { HighDemandService } from "@high-demand/domain/ports/inbound/high-demand.service"
 import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto";
 import { CreateHighDemandDto } from "@high-demand/application/dtos/create-high-demand.dto";
 import { RegisterHighDemandDto } from "@high-demand/application/dtos/register-high-demand.dto";
+import { JwtAuthGuard } from "@access-control/infrastructure/adapters/primary/guards/jwt-auth.guard";
+import { User } from "../decorators/user.decorator";
 
 
 @Controller('high-demand')
@@ -174,11 +176,14 @@ export class HighDemandController {
 
 
 
-
+  @UseGuards(JwtAuthGuard)
   @Get(':id/receive')
-  async receiveHighDemand(@Param('id', ParseIntPipe) id: number ) {
+  async receiveHighDemand(
+    @Param('id', ParseIntPipe) id: number,
+    @User('id') userId: number
+  ) {
     try {
-      const result = await this.highDemandService.receiveHighDemand(id)
+      const result = await this.highDemandService.receiveHighDemand(id, userId)
       return {
         status: 'success',
         message: 'Se recepcionó exitosamente',
@@ -204,5 +209,21 @@ export class HighDemandController {
     return this.highDemandService.modifyWorkflowStatus(body)
   }
 
+  @Post('cancel')
+  async updateRegistrationStatus(@Body() body: any) {
+    try {
+      const result = await this.highDemandService.cancelHighDemand(body)
+      return {
+        status: 'success',
+        message: 'Alta demanda anulada exitosamente',
+        data: result
+      }
+    } catch(error){
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'No se pudó anular la alta demanda'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
 
 }

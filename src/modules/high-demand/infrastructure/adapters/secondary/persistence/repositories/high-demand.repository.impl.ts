@@ -1,7 +1,7 @@
 // framework nestjs
 import { Inject, Injectable } from '@nestjs/common';
 // external independencies
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 // own implementations
 import { HighDemandRepository } from '@high-demand/domain/ports/outbound/high-demand.repository';
@@ -160,6 +160,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
           educationalInstitutionId: educationalInstitutionId,
           operativeId: 1,
         },
+        withDeleted: true
       });
     if (!highDemandRegistrationEntity) return null;
     return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity!);
@@ -268,6 +269,24 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
       }
     })
     if(!highDemandEntity) throw new Error('No existe la Alta demanda');
+    return HighDemandRegistrationEntity.toDomain(highDemandEntity)
+  }
+
+  // ** anular inscripción alta demanda
+  async cancelHighDemand(obj: any, registrationStatus: RegistrationStatus): Promise<any> {
+    const { highDemandRegistrationId: id } = obj
+    const result = await this.highDemandRepository.update(
+      { id: id, rolId: In([37, 9]), inbox: false, workflowStateId: 1 },
+      { registrationStatus: registrationStatus, deletedAt: new Date() }
+    )
+    if(result.affected! <= 0) {
+      throw new Error("No se anuló la alta demanda")
+    }
+    const highDemandEntity = await this.highDemandRepository.findOne({
+      where: { id },
+      withDeleted: true
+    })
+    if(!highDemandEntity) throw new Error('No existe la Alta Demanda');
     return HighDemandRegistrationEntity.toDomain(highDemandEntity)
   }
 

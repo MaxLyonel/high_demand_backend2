@@ -25,7 +25,8 @@ export class HistoryRepositoryImpl implements HistoryRepository {
       where: {
         highDemandRegistration: { id: highDemandRegistrationId }
       },
-      relations: ['highDemandRegistration.educationalInstitution', 'user', 'workflowState']
+      withDeleted: true,
+      relations: ['highDemandRegistration.educationalInstitution', 'user', 'workflowState', 'rol']
     });
 
     return histories.map(entity => {
@@ -35,6 +36,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         entity.highDemandRegistration.educationalInstitution?.id,
         entity.highDemandRegistration.educationalInstitution?.name,
         entity.user.username,
+        entity.rol.name,
         entity.workflowState.name,
         entity.registrationStatus,
         entity.observation,

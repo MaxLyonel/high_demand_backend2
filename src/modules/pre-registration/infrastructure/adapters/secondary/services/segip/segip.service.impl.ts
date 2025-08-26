@@ -35,7 +35,6 @@ export class SegipServiceImpl implements SegipService {
 
   async contrastar(person: any, typeCI: number): Promise<{ finalizado: boolean; mensaje: string; }> {
     try {
-      console.log("ingresa aca?", this.apiUrl)
       if(!typeCI) {
         typeCI = 1
       }

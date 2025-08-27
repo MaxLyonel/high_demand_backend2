@@ -123,8 +123,11 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     }
   }
 
-  async getAllPreRegistration(): Promise<any> {
+  async getAllPreRegistration(highDemandId: number): Promise<any> {
     const preRegistrations = await this.preRegistrationRepository.find({
+      where: {
+        highDemandCourse: { highDemandRegistrationId: highDemandId }
+      },
       relations: [
         'highDemandCourse',
         'highDemandCourse.level',
@@ -135,6 +138,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         'criteria'
       ]
     })
+    console.log("pre inscripciones: ", preRegistrations)
     return preRegistrations
   }
 

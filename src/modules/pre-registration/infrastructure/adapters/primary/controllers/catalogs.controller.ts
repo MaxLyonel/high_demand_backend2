@@ -89,4 +89,21 @@ export class CatalogsController {
     }
   }
 
+  @Get('list-levels')
+  async getLevels() {
+    try {
+      const result = await this.catalogsService.listLevels()
+      return {
+        status: 'success',
+        message: 'Obtención exitosa de los niveles',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener los niveles'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

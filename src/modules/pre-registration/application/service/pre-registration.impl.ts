@@ -17,8 +17,8 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     return result
   }
 
-  async listPreRegistration(): Promise<any> {
-    const result = await this.preRegistrationRepository.getAllPreRegistration()
+  async listPreRegistration(highDemandId: number): Promise<any> {
+    const result = await this.preRegistrationRepository.getAllPreRegistration(highDemandId)
     return result
   }
 

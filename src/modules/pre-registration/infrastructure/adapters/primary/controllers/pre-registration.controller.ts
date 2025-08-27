@@ -27,10 +27,10 @@ export class PreRegistrationController {
     }
   }
 
-  @Get('list')
-  async listPreRegistration() {
+  @Get('list/:highDemandId')
+  async listPreRegistration(@Param('highDemandId', ParseIntPipe) sie: number) {
     try {
-      const result = await this.preRegistrationService.listPreRegistration()
+      const result = await this.preRegistrationService.listPreRegistration(sie)
       return {
         status: 'success',
         message: 'Listado de pre inscripciones obtenido exitosamente',

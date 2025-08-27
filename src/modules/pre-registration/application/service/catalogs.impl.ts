@@ -25,4 +25,9 @@ export class CatalogsServiceImpl implements CatalogsService {
     const municipies = await this.catalogRepository.getMunicipies()
     return municipies
   }
+
+  async listLevels(): Promise<any> {
+    const levels = await this.catalogRepository.getLevels()
+    return levels
+  }
 }

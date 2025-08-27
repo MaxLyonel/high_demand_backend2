@@ -24,6 +24,7 @@ import { PreRegistrationController } from "./infrastructure/adapters/primary/con
 import { SegipService } from "./domain/ports/outbound/segip.service";
 import { SegipServiceImpl } from "./infrastructure/adapters/secondary/services/segip/segip.service.impl";
 import { HttpModule } from "@nestjs/axios";
+import { LevelEntity } from "./infrastructure/adapters/secondary/persistence/entities/level.entity";
 
 
 
@@ -69,6 +70,7 @@ import { HttpModule } from "@nestjs/axios";
       PreRegistrationEntity,
       RepresentativeEntity,
       PostulantEntity,
+      LevelEntity
     ], 'alta_demanda')
   ]
 })

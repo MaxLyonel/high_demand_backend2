@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CatalogsRepository } from "src/modules/pre-registration/domain/ports/outbound/catalogs.repository";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CriteriaEntity } from "../entities/criteria.entity";
 import { RelationshipEntity } from "../entities/relationship.entity";
 import { PlaceTypeEntity } from "../entities/place-type.entity";
+import { LevelEntity } from "../entities/level.entity";
 
 @Injectable()
 export class CatalogsRepositoryImpl implements CatalogsRepository {
@@ -15,7 +16,9 @@ export class CatalogsRepositoryImpl implements CatalogsRepository {
     @InjectRepository(CriteriaEntity, 'alta_demanda')
     private readonly criteriaRepository: Repository<CriteriaEntity>,
     @InjectRepository(PlaceTypeEntity, 'alta_demanda')
-    private readonly placeRepository: Repository<PlaceTypeEntity>
+    private readonly placeRepository: Repository<PlaceTypeEntity>,
+    @InjectRepository(LevelEntity, 'alta_demanda')
+    private readonly levelRepository: Repository<LevelEntity>
   ){}
 
   // *** obtener el catálogo de parentesco ***
@@ -42,6 +45,16 @@ export class CatalogsRepositoryImpl implements CatalogsRepository {
       }
     })
     return municipies
+  }
+
+  // ** obtener el catálogo de niveles de educación
+  async getLevels(): Promise<any> {
+    const levels = await this.levelRepository.find({
+      where: {
+        id: In([11, 12, 13])
+      }
+    })
+    return levels
   }
 
 }

@@ -26,4 +26,21 @@ export class HistoryController {
     }
   }
 
+  @Get('list-histories')
+  async getHistories() {
+    try {
+      const result = await this.historyService.historiesList()
+      return {
+        status: 'success',
+        message: 'Listado de historiales obtenido exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener el listado de historiales'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

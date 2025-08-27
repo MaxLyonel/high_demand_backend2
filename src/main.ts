@@ -5,6 +5,7 @@ import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder } from '@nestjs/swagger';
 // own implementation
 import { AppModule } from './app.module';
+import { TypenameInterceptor } from '@access-control/infrastructure/adapters/primary/interceptors/typename.interceptor';
 
 require('module-alias/register');
 
@@ -20,6 +21,8 @@ async function bootstrap() {
       transform: true, // conversión de tipos
     })
   );
+
+  app.useGlobalInterceptors(new TypenameInterceptor());
 
 
   app.setGlobalPrefix('api', {

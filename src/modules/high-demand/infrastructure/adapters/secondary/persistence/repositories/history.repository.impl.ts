@@ -35,6 +35,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         entity.highDemandRegistration.id,
         entity.highDemandRegistration.educationalInstitution?.id,
         entity.highDemandRegistration.educationalInstitution?.name,
+        entity.userId,
         entity.user.username,
         entity.rol.name,
         entity.workflowState.name,
@@ -44,5 +45,28 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         entity.updatedAt
       );
     });
+  }
+
+  async getHistories(): Promise<History[]> {
+    const histories = await this._historyRepository.find({
+      withDeleted: true,
+      relations: ['highDemandRegistration.educationalInstitution', 'user', 'workflowState', 'rol']
+    })
+    return histories.map(entity => {
+      return new History(
+        entity.id,
+        entity.highDemandRegistration.id,
+        entity.highDemandRegistration.educationalInstitution?.id,
+        entity.highDemandRegistration.educationalInstitution?.name,
+        entity.userId,
+        entity.user.username,
+        entity.rol.name,
+        entity.workflowState.name,
+        entity.registrationStatus,
+        entity.observation,
+        entity.createdAt,
+        entity.updatedAt
+      )
+    })
   }
 }

@@ -7,6 +7,7 @@ export class History {
     public highDemandRegistrationId: number,
     public educationalInstitutionId: number,
     public educationalInstitutionName: string,
+    public userId: number,
     public userName: string,
     public rol: string,
     public workflowState: string,

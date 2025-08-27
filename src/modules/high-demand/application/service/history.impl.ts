@@ -15,4 +15,9 @@ export class HistoryServiceImpl implements HistoryService {
     const histories = await this._historyRepository.getHistory(highDemandRegistrationId)
     return histories
   }
+
+  async historiesList(): Promise<History[]> {
+    const histories = await this._historyRepository.getHistories()
+    return histories
+  }
 }

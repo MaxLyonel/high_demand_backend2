@@ -57,6 +57,7 @@ export class HistoryEntity {
       entity.highDemandRegistrationId,
       entity.educationalInstitutionId,
       entity.educationalInstitutionName,
+      entity.userId,
       entity.userName,
       entity.rol,
       entity.workflowState,

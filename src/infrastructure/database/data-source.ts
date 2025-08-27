@@ -14,5 +14,6 @@ export const dataSourceHD: DataSourceOptions = {
   migrations: ["dist/infrastructure/database/migrations/*.js"],
   entities: ["dist/**/*.entity{.ts,.js}"],
   synchronize: false, // cambiar en producción
-  applicationName: 'backend-high-demand'
+  applicationName: 'backend-high-demand',
+  migrationsTableName: 'alta_demanda.migraciones'
 }

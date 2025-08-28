@@ -2,16 +2,15 @@ import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PreRegistrationRepository } from "@pre-registration/domain/ports/outbound/pre-registration.repository";
 import { PreRegistrationEntity } from "../entities/pre-registration.entity";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, In, Repository } from "typeorm";
 import { RepresentativeEntity } from "../entities/representative.entity";
 import { PostulantEntity } from "../entities/postulant.entity";
-import { CriteriaEntity } from "../entities/criteria.entity";
 import { WorkRepresentativeEntity } from "../entities/work-representative.entity";
-import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum";
 import { PreRegistrationStatus } from "@pre-registration/domain/enums/pre-registration-status.enum";
 import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand-course.entity";
 import { PostulantResidence } from "../entities/postulant-residence.entity";
 import { SegipService } from "@pre-registration/domain/ports/outbound/segip.service";
+import { HistoryPreRegistrationEntity } from "../entities/history-pre-registration.entity";
 
 
 
@@ -112,9 +111,143 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         state: PreRegistrationStatus.REGISTER,
         highDemandCourse: searchCourse
       })
-      await queryRunner.commitTransaction()
+
+      const history = {
+        preRegistration: { id: newPreRegistration.id},
+        rol: { id: 49 }, // Rol postulante
+        state: newPreRegistration.state,
+        observation: '',
+      }
+
+      const newHistory = await queryRunner.manager.insert(HistoryPreRegistrationEntity, history)
+      if (newHistory.identifiers.length > 0) {
+        await queryRunner.commitTransaction()
+      } else {
+        throw new Error("Historial no registrado")
+      }
+
       return newPreRegistration
 
+    } catch(error) {
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  async invalidatePreRegistration(obj: any): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    try {
+      const result = await queryRunner.manager.update(PreRegistrationEntity,
+        { id: obj.id },
+        { state: PreRegistrationStatus.INVALIDATED, deletedAt: new Date() }
+      )
+      if (result.affected && result.affected > 0) {
+        const updated = await queryRunner.manager.findOne(PreRegistrationEntity, {
+          where: { id: obj.id },
+          withDeleted: true
+        })
+        console.log("updated: ", updated)
+        const history = {
+          preRegistration: { id: obj.id },
+          rol: { id: 9 },
+          state: updated!.state,
+          observation: obj.observation
+        }
+        const newHistory = await queryRunner.manager.insert(PreRegistrationEntity, history)
+        if (newHistory.identifiers.length > 0) {
+          await queryRunner.commitTransaction()
+        } else {
+          throw new Error('Historial no registrado')
+        }
+        return updated
+      } else {
+        throw new Error(`No se pudo invalidar la preinscripción`);
+      }
+    } catch(error) {
+            console.log("hasta aqui 5")
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  async validatePreRegistration(obj: any): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    try {
+      const result = await queryRunner.manager.update(PreRegistrationEntity,
+        { id: obj.id },
+        { state: PreRegistrationStatus.VALIDATED }
+      )
+      if(result.affected && result.affected > 0) {
+        const updated = await queryRunner.manager.findOneBy(PreRegistrationEntity, { id: obj.id })
+        const history = {
+          preRegistration: { id: obj.id },
+          rol: { id: 9 },
+          state: updated!.state,
+          observation: ''
+        }
+        const newHistory = await queryRunner.manager.insert(PreRegistrationEntity, history)
+        if (newHistory.identifiers.length > 0) {
+          await queryRunner.commitTransaction()
+        } else {
+          throw new Error('Historial no registrado')
+        }
+        return updated
+      } else {
+        throw new Error(`NO se pudo validar la preinscripción`)
+      }
+    } catch(error) {
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  async acceptPreRegistrations(obj: any): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    try {
+      let count = 0;
+      const updated: any[] = []
+      for(let o of obj) {
+        const result = await queryRunner.manager.update(PreRegistrationEntity,
+          { id: o.id },
+          { state: PreRegistrationStatus.ACCEPTED }
+        )
+        if(result.affected && result.affected < 0) {
+          count++;
+          const preRegistration = await queryRunner.manager.findOne(PreRegistrationEntity,
+            { where : { id: o.id }}
+          )
+          const history = {
+            preRegistration: { id: obj.id },
+            rol: { id: 9 },
+            state: preRegistration!.state,
+            observation: ''
+          }
+          const newHistory = await queryRunner.manager.insert(PreRegistrationEntity, history)
+          if (newHistory.identifiers.length > 0) {
+            await queryRunner.commitTransaction()
+          } else {
+            throw new Error('Historial no registrado')
+          }
+          updated.push(preRegistration)
+        }
+      }
+      if(count >= 0) {
+        return updated
+      } else {
+        throw new Error("No se realizó el sorteo")
+      }
     } catch(error) {
       await queryRunner.rollbackTransaction()
       throw error
@@ -128,6 +261,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       where: {
         highDemandCourse: { highDemandRegistrationId: highDemandId }
       },
+      withDeleted: true,
       relations: [
         'highDemandCourse',
         'highDemandCourse.level',
@@ -138,8 +272,26 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         'criteria'
       ]
     })
-    console.log("pre inscripciones: ", preRegistrations)
     return preRegistrations
+  }
+
+  async getValidPreRegistrations(highDemandId: number): Promise<any> {
+    const validPreRegistrations = await this.preRegistrationRepository.find({
+      where: {
+        highDemandCourse: { highDemandRegistrationId: highDemandId },
+        state: In([PreRegistrationStatus.VALIDATED, PreRegistrationStatus.ACCEPTED])
+      },
+      relations: [
+        'highDemandCourse',
+        'highDemandCourse.level',
+        'highDemandCourse.grade',
+        'highDemandCourse.parallel',
+        'representative',
+        'postulant',
+        'criteria'
+      ]
+    })
+    return validPreRegistrations
   }
 
   async updateStatus(preRegistrationId: number): Promise<any> {

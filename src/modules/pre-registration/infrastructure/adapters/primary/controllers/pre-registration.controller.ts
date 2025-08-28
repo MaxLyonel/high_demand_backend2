@@ -27,6 +27,58 @@ export class PreRegistrationController {
     }
   }
 
+  @Post('invalidate')
+  async invalidatePreRegistration(@Body() body: any) {
+    try {
+      const result = await this.preRegistrationService.invalidatePreRegistration(body)
+      return {
+        status: 'success',
+        message: 'Pre inscripción invalidada exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al invalidar la pre inscripción'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Post('validate')
+  async validatePreRegistration(@Body() body: any) {
+    try {
+      const result = await this.preRegistrationService.validatePreRegistration(body)
+      return {
+        status: 'success',
+        message: 'Pre inscripción validada exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al validar la pre inscripción'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+
+  @Post('accept-chosen')
+  async acceptChosen(@Body() body: any) {
+    try {
+      const results = await this.preRegistrationService.acceptPreRegistrations(body)
+      return {
+        status: 'success',
+        message: 'Postulantes aceptados exitosamente',
+        data: results
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al aceptar postulantes'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Get('list/:highDemandId')
   async listPreRegistration(@Param('highDemandId', ParseIntPipe) sie: number) {
     try {
@@ -40,6 +92,23 @@ export class PreRegistrationController {
       throw new HttpException({
         status: 'error',
         message: error.message || 'Error al obtener las pre inscripciones'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('list-valid/:highDemandId')
+  async listValidPreRegistration(@Param('highDemandId', ParseIntPipe) highDemandId: number) {
+    try {
+      const result = await this.preRegistrationService.listValidPreRegistrations(highDemandId)
+      return {
+        status: 'success',
+        message: 'Listado de pre inscripciones validas obtenido exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener las pre inscripciones validas'
       }, HttpStatus.BAD_REQUEST)
     }
   }

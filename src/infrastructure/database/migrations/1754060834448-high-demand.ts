@@ -4,7 +4,7 @@ export class HighDemand1754060834448 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            CREATE TYPE alta_demanda.estado_inscripcion_enum AS ENUM ('ANULADO','REGISTRADO','OBSERVADO','APROBADO','RECHAZADO');
+            CREATE TYPE alta_demanda.estado_inscripcion_alta_demanda_enum AS ENUM ('ANULADO','REGISTRADO','OBSERVADO','APROBADO','RECHAZADO');
         `)
 
         await queryRunner.query(`
@@ -16,7 +16,7 @@ export class HighDemand1754060834448 implements MigrationInterface {
                 flujo_id BIGINT REFERENCES alta_demanda.flujo(id),
                 flujo_estado_id BIGINT REFERENCES alta_demanda.flujo_estado(id),
                 bandeja_estado BOOLEAN,
-                inscripcion_estado alta_demanda.estado_inscripcion_enum NOT NULL,
+                inscripcion_estado alta_demanda.estado_inscripcion_alta_demanda_enum NOT NULL,
                 lugar_distrito_id INTEGER REFERENCES lugar_tipo(id) NOT NULL,
                 operativo_id INTEGER REFERENCES alta_demanda.operativo(id) NOT NULL,
                 creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

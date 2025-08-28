@@ -6,7 +6,7 @@ import { UserEntity } from "@access-control/infrastructure/adapters/secondary/pe
 import { History } from "@high-demand/domain/models/history.model";
 import { RolTypeEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/rol-type.entity";
 
-@Entity({ schema: 'alta_demanda', name: 'historial'})
+@Entity({ schema: 'alta_demanda', name: 'historial_alta_demanda'})
 export class HistoryEntity {
   @PrimaryGeneratedColumn()
   id: number

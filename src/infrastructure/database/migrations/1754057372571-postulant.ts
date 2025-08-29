@@ -7,6 +7,7 @@ export class Postulant1754057372571 implements MigrationInterface {
             CREATE TABLE alta_demanda.postulante (
                 id SERIAL PRIMARY KEY,
                 carnet_identidad VARCHAR(20),
+                complement VARCHAR(20),
                 paterno VARCHAR(50),
                 materno VARCHAR(50),
                 nombre VARCHAR(100),

@@ -4,6 +4,8 @@ import { RepresentativeEntity } from "./representative.entity";
 import { PostulantEntity } from "./postulant.entity";
 import { CriteriaEntity } from "./criteria.entity";
 import { PreRegistrationStatus } from "@pre-registration/domain/enums/pre-registration-status.enum";
+import { PreRegistration as PreRegistrationModel } from "@pre-registration/domain/models/pre-registration.model";
+import { HighDemandRegistrationEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand.entity";
 
 
 
@@ -43,5 +45,27 @@ export class PreRegistrationEntity {
 
   @DeleteDateColumn({ name: 'eliminado_en', type: 'timestamp'})
   deletedAt?: Date;
+
+  static toDomain(entity: PreRegistrationEntity): PreRegistrationModel {
+    return new PreRegistrationModel(
+      entity.id,
+      HighDemandRegistrationCourseEntity.toDomain(entity.highDemandCourse),
+      RepresentativeEntity.toDomain(entity.representative),
+      PostulantEntity.toDomain(entity.postulant),
+      CriteriaEntity.toDomain(entity.criteria),
+      entity.state
+    );
+  }
+
+  // static fromDomain(model: PreRegistrationModel): PreRegistrationEntity {
+  //   const entity = new PreRegistrationEntity();
+  //   entity.id = model.id;
+  //   entity.highDemandCourseId = (model.highDemandCourseId as any).id ?? model.highDemandCourseId;
+  //   entity.representativeId = (model.representativeId as any).id ?? model.representativeId;
+  //   entity.postulantId = (model.postulantId as any).id ?? model.postulantId;
+  //   entity.criteriaId = (model.criteriaId as any).id ?? model.criteriaId;
+  //   entity.state = model.state;
+  //   return entity;
+  // }
 
 }

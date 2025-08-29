@@ -34,6 +34,11 @@ export class Postulant {
     genere: string,
     codeRude: string
   }): Postulant {
+
+    if(!identityCard || identityCard.trim() === '') {
+      throw new Error('El CI es obligatorio')
+    }
+
     return new Postulant(
       id,
       identityCard,

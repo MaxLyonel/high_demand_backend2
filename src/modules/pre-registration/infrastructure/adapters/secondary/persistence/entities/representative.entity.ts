@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { RelationshipEntity } from "./relationship.entity";
 import { WorkRepresentativeEntity } from "./work-representative.entity";
+import { Representative } from "@pre-registration/domain/models/representative.model";
 
 
 @Entity({ schema: 'alta_demanda', name: 'apoderado'})
@@ -45,4 +46,16 @@ export class RepresentativeEntity {
   @DeleteDateColumn({ name: 'eliminado_en', type: 'timestamp'})
   deletedAt?: Date;
 
+  static toDomain(entity: RepresentativeEntity): Representative {
+    return new Representative (
+      entity.id,
+      entity.identityCard,
+      entity.complement,
+      entity.lastName,
+      entity.mothersLastName,
+      entity.name,
+      entity.dateBirth,
+      entity.nationality,
+    )
+  }
 }

@@ -34,9 +34,9 @@ export class PreRegistration {
     existingPreRegistration: PreRegistration[]
   }): PreRegistration {
     // Regla de negocio: no puede haber pre inscripciones con id de curso duplicado
-    const alreadyExists = existingPreRegistration.some(c => c.highDemandCourseId === highDemandCourseId && c.postulantId === postulantId)
+    const alreadyExists = existingPreRegistration.some(c => c.highDemandCourseId.id === highDemandCourseId.id && c.postulantId.id === postulantId.id)
     if(alreadyExists) {
-      throw new Error('Ya existe una pre inscripción con este postulante')
+      throw new Error('Ya existe una pre inscripción a este curso con este postulante')
     }
 
 

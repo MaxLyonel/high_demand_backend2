@@ -11,6 +11,7 @@ import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/
 import { PostulantResidence } from "../entities/postulant-residence.entity";
 import { SegipService } from "@pre-registration/domain/ports/outbound/segip.service";
 import { HistoryPreRegistrationEntity } from "../entities/history-pre-registration.entity";
+import { PreRegistration } from "@pre-registration/domain/models/pre-registration.model";
 
 
 
@@ -56,17 +57,23 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         throw new Error(result.mensaje)
       }
 
-      // 1. Guardar postulante
-      const newPostulant = await queryRunner.manager.save(PostulantEntity, {
+      const existsPostulant = await queryRunner.manager.findOne(PostulantEntity, {
+        where: {
+          identityCard: postulant.identityCard,
+        }
+      });
+
+      // Creamos o usamos el existente
+      const newPostulant = existsPostulant ?? await queryRunner.manager.save(PostulantEntity, {
         identityCard: postulant.identityCard,
+        // complement: postulant.complement ?? '', // evita null
         lastName: postulant.lastName,
         mothersLastName: postulant.mothersLastName,
         name: postulant.name,
         dateBirth: postulant.dateBirth,
         placeBirth: postulant.placeBirth,
-        gender: postulant.gender,
-        nationality: postulant.nationality // no hay este campo
-      })
+        gender: postulant.gender
+      });
 
       if(justification === 2) { //! Guardar residencia del postulante
         const newPostulantResidence = await queryRunner.manager.save(PostulantResidence, {
@@ -105,6 +112,38 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         }
       })
       if(!searchCourse) throw new Error("Curso no encontrado para la pre-inscripción");
+
+      const existingPreRegistrations = await queryRunner.manager.find(PreRegistrationEntity, {
+        where: { postulant: { id: newPostulant.id } },
+        relations: ['highDemandCourse', 'postulant']
+      })
+      // 2. Construir modelo de dominio y validar regla de negocio
+      PreRegistration.create({
+        id: 0, // aún no existe en BD
+        highDemandCourseId: searchCourse, // entidad del curso
+        representativeId: newRepresentative,
+        postulantId: PostulantEntity.toDomain(newPostulant),
+        criteriaId: justification,
+        state: PreRegistrationStatus.REGISTER,
+        existingPreRegistration: existingPreRegistrations.map(e =>
+          new PreRegistration(
+            e.id,
+            e.highDemandCourse,
+            e.representative,
+            PostulantEntity.toDomain(e.postulant),
+            e.criteria,
+            e.state
+          )
+        )
+      })
+      // Verificar la cantidad de cupos
+      const numberPreRegistrations = await queryRunner.manager.find(PreRegistrationEntity, {
+        where: { highDemandCourse: { id: courseId }}
+      })
+      if(numberPreRegistrations.length - 1 > searchCourse.totalQuota) {
+        throw new Error("Ya se alcanzó el cupo máximo para este curso")
+      }
+
 
       const newPreRegistration = await queryRunner.manager.save(PreRegistrationEntity, {
         representative: newRepresentative,
@@ -152,7 +191,6 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           where: { id: obj.id },
           withDeleted: true
         })
-        console.log("updated: ", updated)
         const history = {
           preRegistration: { id: obj.id },
           rol: { id: 9 },
@@ -170,7 +208,6 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         throw new Error(`No se pudo invalidar la preinscripción`);
       }
     } catch(error) {
-            console.log("hasta aqui 5")
       await queryRunner.rollbackTransaction()
       throw error
     } finally {

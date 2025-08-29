@@ -1,3 +1,4 @@
+import { Postulant } from "@pre-registration/domain/models/postulant.model";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
@@ -38,5 +39,19 @@ export class PostulantEntity {
 
   @DeleteDateColumn({ name: 'eliminado_en', type: 'timestamp'})
   deletedAt?: Date;
+
+  static toDomain(entity: PostulantEntity): Postulant {
+    return new Postulant(
+      entity.id,
+      entity.identityCard,
+      entity.lastName,
+      entity.mothersLastName,
+      entity.name,
+      entity.dateBirth,
+      entity.placeBirth,
+      entity.gender,
+      entity.codeRude
+    )
+  }
 
 }

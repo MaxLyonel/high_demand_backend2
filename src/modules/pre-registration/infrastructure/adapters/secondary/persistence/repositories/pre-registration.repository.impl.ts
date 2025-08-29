@@ -51,10 +51,10 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       }
       const typeCI = guardian.guardianNationality
 
-      // const result = await this.segipService.contrastar(personSEGIP, typeCI || 1)
-      // if(!result.finalizado) {
-      //   throw new Error(result.mensaje)
-      // }
+      const result = await this.segipService.contrastar(personSEGIP, typeCI || 1)
+      if(!result.finalizado) {
+        throw new Error(result.mensaje)
+      }
 
       // 1. Guardar postulante
       const newPostulant = await queryRunner.manager.save(PostulantEntity, {

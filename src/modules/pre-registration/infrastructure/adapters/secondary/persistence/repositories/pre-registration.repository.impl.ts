@@ -22,7 +22,9 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     @Inject('DATA_SOURCE') private readonly dataSource: DataSource,
     @InjectRepository(PreRegistrationEntity, 'alta_demanda')
     private readonly preRegistrationRepository: Repository<PreRegistrationEntity>,
-    private readonly segipService: SegipService
+    private readonly segipService: SegipService,
+    @InjectRepository(PostulantEntity, 'alta_demanda')
+    private readonly postulantRepository: Repository<PostulantEntity>
   ){}
 
   async savePreRegistration(obj: any): Promise<any> {
@@ -49,10 +51,10 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       }
       const typeCI = guardian.guardianNationality
 
-      const result = await this.segipService.contrastar(personSEGIP, typeCI || 1)
-      if(!result.finalizado) {
-        throw new Error(result.mensaje)
-      }
+      // const result = await this.segipService.contrastar(personSEGIP, typeCI || 1)
+      // if(!result.finalizado) {
+      //   throw new Error(result.mensaje)
+      // }
 
       // 1. Guardar postulante
       const newPostulant = await queryRunner.manager.save(PostulantEntity, {
@@ -157,7 +159,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           state: updated!.state,
           observation: obj.observation
         }
-        const newHistory = await queryRunner.manager.insert(PreRegistrationEntity, history)
+        const newHistory = await queryRunner.manager.insert(HistoryPreRegistrationEntity, history)
         if (newHistory.identifiers.length > 0) {
           await queryRunner.commitTransaction()
         } else {
@@ -193,7 +195,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           state: updated!.state,
           observation: ''
         }
-        const newHistory = await queryRunner.manager.insert(PreRegistrationEntity, history)
+        const newHistory = await queryRunner.manager.insert(HistoryPreRegistrationEntity, history)
         if (newHistory.identifiers.length > 0) {
           await queryRunner.commitTransaction()
         } else {
@@ -216,45 +218,59 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     await queryRunner.connect()
     await queryRunner.startTransaction()
     try {
-      let count = 0;
+      let count = 0
       const updated: any[] = []
-      for(let o of obj) {
-        const result = await queryRunner.manager.update(PreRegistrationEntity,
+
+      for (let o of obj) {
+        const result = await queryRunner.manager.update(
+          PreRegistrationEntity,
           { id: o.id },
           { state: PreRegistrationStatus.ACCEPTED }
         )
-        if(result.affected && result.affected < 0) {
-          count++;
-          const preRegistration = await queryRunner.manager.findOne(PreRegistrationEntity,
-            { where : { id: o.id }}
+
+        if (result.affected && result.affected > 0) {
+          count++
+          const preRegistration = await queryRunner.manager.findOne(
+            PreRegistrationEntity,
+            { where: { id: o.id } }
           )
+
           const history = {
-            preRegistration: { id: obj.id },
+            preRegistration: { id: o.id },
             rol: { id: 9 },
             state: preRegistration!.state,
             observation: ''
           }
-          const newHistory = await queryRunner.manager.insert(PreRegistrationEntity, history)
-          if (newHistory.identifiers.length > 0) {
-            await queryRunner.commitTransaction()
-          } else {
+
+          const newHistory = await queryRunner.manager.insert(
+            HistoryPreRegistrationEntity,
+            history
+          )
+
+          if (newHistory.identifiers.length === 0) {
             throw new Error('Historial no registrado')
           }
+
           updated.push(preRegistration)
         }
       }
-      if(count >= 0) {
+
+      // 👈 commit SOLO una vez después de todo
+      await queryRunner.commitTransaction()
+
+      if (count > 0) {
         return updated
       } else {
         throw new Error("No se realizó el sorteo")
       }
-    } catch(error) {
+    } catch (error) {
       await queryRunner.rollbackTransaction()
       throw error
     } finally {
       await queryRunner.release()
     }
   }
+
 
   async getAllPreRegistration(highDemandId: number): Promise<any> {
     const preRegistrations = await this.preRegistrationRepository.find({
@@ -293,6 +309,37 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     })
     return validPreRegistrations
   }
+
+  async getPreRegistrationFollow(identityCardPostulant: string): Promise<any> {
+    const postulant = await this.postulantRepository.findOne({
+      where: {
+        identityCard: identityCardPostulant
+      }
+    });
+
+    if (!postulant) {
+      throw new Error("No existe un postulante con ese número de carnet");
+    }
+
+    const preRegistrations = await this.preRegistrationRepository.find({
+      where: {
+        postulant: { id: postulant.id }
+      },
+      relations: [
+        'postulant',
+        'criteria',
+        'highDemandCourse',
+        'highDemandCourse.level',
+        'highDemandCourse.grade',
+        'highDemandCourse.parallel',
+        'highDemandCourse.highDemandRegistration',
+        'highDemandCourse.highDemandRegistration.educationalInstitution'
+      ]
+    });
+
+    return preRegistrations;
+  }
+
 
   async updateStatus(preRegistrationId: number): Promise<any> {
     const preRegistration = await this.preRegistrationRepository.findOne({

@@ -113,6 +113,23 @@ export class PreRegistrationController {
     }
   }
 
+  @Get('list-follow/:identityCardPostulant')
+  async listPreRegistrationFollow(@Param('identityCardPostulant') identityCardPostulant: string) {
+    try {
+      const result = await this.preRegistrationService.listPreRegistrationFollow(identityCardPostulant)
+      return {
+        status: 'success',
+        message: result.length == 0 ? 'No se encontraron resultados' : 'Se encontraron resultados',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener el listado para el seguimiento'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Get('update-status/:preRegistrationId')
   async updateStatus(@Param('preRegistrationId', ParseIntPipe) preRegistrationId: number) {
     try {

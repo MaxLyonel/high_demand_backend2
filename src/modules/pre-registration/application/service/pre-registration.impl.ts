@@ -42,6 +42,11 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     return result
   }
 
+  async listPreRegistrationFollow(identityCardPostulant: string): Promise<any> {
+    const result = await this.preRegistrationRepository.getPreRegistrationFollow(identityCardPostulant)
+    return result
+  }
+
   async lotterySelection(postulantId: number): Promise<any> {
     const result = await this.preRegistrationRepository.updateStatus(postulantId)
     return result

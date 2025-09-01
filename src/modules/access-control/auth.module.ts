@@ -27,10 +27,15 @@ import { RolTypeEntity } from "./infrastructure/adapters/secondary/persistence/e
 import { AbilityFactory } from "./application/services/ability.factory";
 import { UserController } from "./infrastructure/adapters/primary/controllers/user.controller";
 import { TeacherEntity } from "./infrastructure/adapters/secondary/persistence/entities/teacher.entity";
+import { RolController } from "./infrastructure/adapters/primary/controllers/rol.controller";
+import { RolRepository } from "./application/ports/outbound/rol.repository";
+import { RolRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/rol.repository.impl";
+import { RolService } from "./application/ports/inbound/rol.service";
+import { RolServiceImpl } from "./application/services/rol.service.impl";
 
 
 @Module({
-  controllers: [AuthController, UserController],
+  controllers: [AuthController, UserController, RolController],
   providers: [
     {
       provide: UserRepository,
@@ -47,6 +52,14 @@ import { TeacherEntity } from "./infrastructure/adapters/secondary/persistence/e
     {
       provide: PermissionRepository,
       useClass: PermissionRepositoryImpl
+    },
+    {
+      provide: RolRepository,
+      useClass: RolRepositoryImpl
+    },
+    {
+      provide: RolService,
+      useClass: RolServiceImpl
     },
     LocalStrategy,
     JwtStrategy,

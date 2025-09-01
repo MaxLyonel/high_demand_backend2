@@ -28,6 +28,7 @@ export class RolTypeEntity {
   userRoles: UserRoleEntity[];
 
   static toDomain(entity: RolTypeEntity): Rol {
+    console.log("ingrsa aca")
     return Rol.create({
       id: entity.id,
       name: entity.name,

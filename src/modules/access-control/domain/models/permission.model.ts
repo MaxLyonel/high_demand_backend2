@@ -16,20 +16,26 @@ export interface Condition {
 
 export class Permission {
   constructor(
+    public description: string,
+    public active: boolean,
     public action: Action,
     public subject: Resource,
     public conditions?: Condition[]
   ) {}
 
   static create({
+    description,
+    active,
     action,
     subject,
     conditions
   }: {
+    description: string,
+    active: boolean,
     action: Action,
     subject: Resource,
-    conditions: Condition[]
+    conditions?: Condition[]
   }): Permission {
-    return new Permission(action, subject, conditions)
+    return new Permission(description, active, action, subject, conditions)
   }
 }

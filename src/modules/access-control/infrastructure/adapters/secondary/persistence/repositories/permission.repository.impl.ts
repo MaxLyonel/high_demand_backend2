@@ -34,6 +34,8 @@ export class PermissionRepositoryImpl implements PermissionRepository {
       }))
 
       return new Permission(
+        permission.description,
+        permission.active,
         permission.action,
         permission.subject,
         conditions

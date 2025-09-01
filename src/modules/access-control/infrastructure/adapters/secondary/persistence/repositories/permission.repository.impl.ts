@@ -1,12 +1,16 @@
 // framework nestjs
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 // external dependencies
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 // own implementations
 import { RolPermissionEntity } from "../entities/rol-permission.entity";
 import { PermissionRepository } from "@access-control/application/ports/outbound/permission.repository";
 import { Permission } from "@access-control/domain/models/permission.model";
+import { ActionEntity } from "../entities/action.entity";
+import { ResourceEntity } from "../entities/resource.entity";
+import { PermissionEntity } from "../entities/permission.entity";
+import { ConditionEntity } from "../entities/condition.entity";
 
 
 
@@ -15,8 +19,13 @@ import { Permission } from "@access-control/domain/models/permission.model";
 export class PermissionRepositoryImpl implements PermissionRepository {
 
   constructor(
+    @Inject('DATA_SOURCE') private readonly dataSource: DataSource,
     @InjectRepository(RolPermissionEntity, 'alta_demanda')
-    private readonly rolPermissionRepository: Repository<RolPermissionEntity>
+    private readonly rolPermissionRepository: Repository<RolPermissionEntity>,
+    @InjectRepository(ActionEntity, 'alta_demanda')
+    private readonly actionRepository: Repository<ActionEntity>,
+    @InjectRepository(ResourceEntity, 'alta_demanda')
+    private readonly resourceEntity: Repository<ResourceEntity>,
   ) {}
 
   async findByRoleId(roleId: number): Promise<Permission[]> {
@@ -34,6 +43,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
       }))
 
       return new Permission(
+        permission.id,
         permission.description,
         permission.active,
         permission.action,
@@ -41,5 +51,102 @@ export class PermissionRepositoryImpl implements PermissionRepository {
         conditions
       )
     })
+  }
+
+  async getActions(): Promise<any> {
+    const actions = await this.actionRepository.find()
+    return actions
+  }
+
+  async getResources(): Promise<any> {
+    const resources = await this.resourceEntity.find()
+    return resources
+  }
+
+  async savePermission(obj: any): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    try {
+      // aqui la logica de guardar condiciones
+      const { action, subject, active, description, conditions, ...rest } = obj
+      const newPermission = await queryRunner.manager.save(PermissionEntity,
+        {
+          action: action,
+          subject: subject,
+          active,
+          description
+        }
+      )
+      if(!newPermission.id) throw new Error("No se creó el permiso");
+      // creando las condiciones
+      for(let condition of conditions) {
+        const newCondition = await queryRunner.manager.save(ConditionEntity,
+          {
+            ...condition,
+            permission: { id: newPermission.id }
+          }
+        )
+        if(!newCondition.id) throw new Error("No se pudo crear la condición")
+      }
+
+      const newRolPermission = await queryRunner.manager.save(RolPermissionEntity,
+        {
+          rol: rest.rol,
+          permission: { id: newPermission.id }
+        }
+      )
+      if(!newRolPermission) throw new Error("No se pudo asignar el permiso al rol");
+      await queryRunner.commitTransaction()
+      return newRolPermission
+    } catch(error) {
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  async getOperators(): Promise<any> {
+    const query = await this.dataSource.query(
+      `
+        SELECT unnest(enum_range(NULL::alta_demanda.operador_enum));
+      `
+    )
+    return query
+  }
+
+  async getFields(): Promise<any> {
+    const query = await this.dataSource.query(
+      `
+        SELECT DISTINCT column_name
+        FROM information_schema.columns
+        WHERE (table_schema = 'alta_demanda')
+          OR (table_schema = 'public' AND table_name IN ('usuario', 'usuario_rol'))
+        ORDER BY column_name;
+      `
+    )
+    return query
+  }
+
+  async updatePermissionStatus(obj: any): Promise<RolPermissionEntity> {
+    console.log("esto no sirve")
+    const { rolId, id: permissionId } = obj;
+
+    const permiso = await this.rolPermissionRepository.findOne({
+      where: { rolId, permissionId },
+      relations: ["rol", "permission"]
+    });
+    if (!permiso) throw new Error("Permiso no encontrado");
+
+
+    const newActive = !permiso.active;
+
+    const result = await this.rolPermissionRepository.update({ rolId, permissionId }, { active: newActive });
+
+    return this.rolPermissionRepository.findOne({
+      where: { rolId, permissionId },
+      relations: ["rol", "permission"]
+    }) as Promise<RolPermissionEntity>;
   }
 }

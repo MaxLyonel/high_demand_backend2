@@ -44,8 +44,8 @@ export class PermissionEntity {
   deletedAt: Date | null
 
   static toDomain(entity: PermissionEntity): Permission {
-    console.log("ingresa aca", entity)
     return Permission.create({
+      id: entity.id,
       description: entity.description,
       active: entity.active,
       action: { id: entity.action.id, name: entity.action.name },

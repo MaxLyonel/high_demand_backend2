@@ -26,7 +26,7 @@ export class UserRepositoryImpl implements UserRepository {
       .leftJoinAndSelect("user.userRoles", "userRol")
       .leftJoinAndSelect("userRol.role", "role")
       .where("user.username = :username", { username })
-      .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48] })
+      .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48, 50] })
       .andWhere("userRol.esactivo = true")
       .getOne();
 
@@ -53,20 +53,19 @@ export class UserRepositoryImpl implements UserRepository {
       .leftJoinAndSelect("user.userRoles", "userRol")
       .leftJoinAndSelect("userRol.role", "role")
       .where("user.id = :id", { id })
-      .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48] })
+      .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48, 50] })
       .andWhere("userRol.esactivo = true")
       .getOne();
 
     if (!userEntity) return null;
-    return UserEntity.toDomain(userEntity);
-    // const user = await this.userRepository.findOne({
-    //   where: {
-    //     id: id,
-    //   },
-    //   select: ['id', 'username' ]
-    // })
-    // if(!user) throw new Error('No se encontro al usuario')
-    // return UserEntity.toDomain(user)
+    const user = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+      select: ['id', 'username' ]
+    })
+    if(!user) throw new Error('No se encontro al usuario')
+    return UserEntity.toDomain(user)
   }
 
 }

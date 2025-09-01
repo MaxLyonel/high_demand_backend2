@@ -32,10 +32,13 @@ import { RolRepository } from "./application/ports/outbound/rol.repository";
 import { RolRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/rol.repository.impl";
 import { RolService } from "./application/ports/inbound/rol.service";
 import { RolServiceImpl } from "./application/services/rol.service.impl";
+import { PermissionService } from "./application/ports/inbound/permission.service";
+import { PermissionServiceImpl } from "./application/services/permission.service.impl";
+import { PermissionController } from "./infrastructure/adapters/primary/controllers/permission.controller";
 
 
 @Module({
-  controllers: [AuthController, UserController, RolController],
+  controllers: [AuthController, UserController, RolController, PermissionController],
   providers: [
     {
       provide: UserRepository,
@@ -52,6 +55,10 @@ import { RolServiceImpl } from "./application/services/rol.service.impl";
     {
       provide: PermissionRepository,
       useClass: PermissionRepositoryImpl
+    },
+    {
+      provide: PermissionService,
+      useClass: PermissionServiceImpl
     },
     {
       provide: RolRepository,

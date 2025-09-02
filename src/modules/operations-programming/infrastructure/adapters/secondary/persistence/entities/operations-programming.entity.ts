@@ -1,5 +1,5 @@
 // import { Operative } from "src/modules/operations-programming/domain/operative.model";
-import { Operative } from "../../../../../../operations-programming/domain/operative.model"
+import { Operative } from "../../../../../domain/models/operative.model"
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
@@ -9,29 +9,29 @@ export class OperativeEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ name: 'fecha_pos_ue_ini'})
+  @Column({ name: 'fec_pos_ue_ini'})
   datePosUEIni: Date
 
-  @Column({ name: 'fecha_pos_ue_fin'})
+  @Column({ name: 'fec_pos_ue_fin'})
   datePosUEEnd: Date
 
-  @Column({ name: 'fecha_rev_dis_ini'})
+  @Column({ name: 'fec_rev_dis_ini'})
   dateRevDisIni: Date
 
-  @Column({ name: 'fecha_rev_dis_fin'})
-  dateRevDisFin: Date
+  @Column({ name: 'fec_rev_dis_fin'})
+  dateRevDisEnd: Date
 
-  @Column({ name: 'fecha_rev_dep_ini'})
+  @Column({ name: 'fec_rev_dep_ini'})
   dateRevDepIni: Date
 
-  @Column({ name: 'fecha_rev_dep_fin'})
-  dateRevDepFin: Date
+  @Column({ name: 'fec_rev_dep_fin'})
+  dateRevDepEnd: Date
 
-  @Column({ name: 'fecha_ope_ini'})
+  @Column({ name: 'fec_ope_ini'})
   dateOpeIni: Date
 
-  @Column({ name: 'fecha_ope_fin'})
-  dateOpeFin: Date
+  @Column({ name: 'fec_ope_fin'})
+  dateOpeEnd: Date
 
   @Column({ name: 'fecha_sorteo'})
   dateLottery: Date
@@ -40,44 +40,20 @@ export class OperativeEntity {
   gestionId: number
 
 
-
-  static create({
-    id,
-    datePosUEIni,
-    datePosUEEnd,
-    dateRevDisIni,
-    dateRevDisEnd,
-    dateRevDepIni,
-    dateRevDepEnd,
-    dateOpeIni,
-    dateOpeFin,
-    dateLottery,
-    gestionId
-  }: {
-    id: number,
-    datePosUEIni: Date,
-    datePosUEEnd: Date,
-    dateRevDisIni: Date,
-    dateRevDisEnd: Date,
-    dateRevDepIni: Date,
-    dateRevDepEnd: Date,
-    dateOpeIni: Date,
-    dateOpeFin: Date,
-    dateLottery: Date,
-    gestionId: number
-  }): Operative {
+  static toDomain(entity: OperativeEntity): Operative {
     return new Operative(
-    id,
-    datePosUEIni,
-    datePosUEEnd,
-    dateRevDisIni,
-    dateRevDisEnd,
-    dateRevDepIni,
-    dateRevDepEnd,
-    dateOpeIni,
-    dateOpeFin,
-    dateLottery,
-    gestionId
+      entity.id,
+      entity.datePosUEIni,
+      entity.datePosUEEnd,
+      entity.dateRevDisIni,
+      entity.dateRevDisEnd,
+      entity.dateRevDepIni,
+      entity.dateRevDepEnd,
+      entity.dateOpeIni,
+      entity.dateOpeEnd,
+      entity.dateLottery,
+      entity.gestionId
     )
   }
+
 }

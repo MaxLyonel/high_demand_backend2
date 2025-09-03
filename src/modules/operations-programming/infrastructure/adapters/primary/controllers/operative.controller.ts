@@ -13,10 +13,18 @@ export class OperativeController {
   async getOperative(@Param('gestionId', ParseIntPipe) gestionId: number) {
     try {
       const result = await this.operativeService.getRegisterOperative(gestionId)
-      return {
-        status: 'success',
-        message: 'Se obtuvo exitosamente el operativo',
-        data: result
+      if(result) {
+        return {
+          status: 'success',
+          message: 'Se obtuvo exitosamente el operativo',
+          data: result
+        }
+      } else {
+        return {
+          status: 'success',
+          message: 'Aún no existe el operativo',
+          data: result
+        }
       }
     } catch(error) {
       throw new HttpException({

@@ -16,7 +16,7 @@ export class OperationsProgrammingServiceImpl implements OperationsProgrammingSe
     return newOperative
   }
 
-  async getRegisterOperative(gestionId: number): Promise<Operative> {
+  async getRegisterOperative(gestionId: number): Promise<Operative | null> {
     const operative = await this.operativeRepository.getOperative(gestionId)
     return operative
   }

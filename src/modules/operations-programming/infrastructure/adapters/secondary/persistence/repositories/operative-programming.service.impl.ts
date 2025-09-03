@@ -26,13 +26,13 @@ export class OperativeProgrammingRepositoryImpl implements OperationsProgramming
   }
 
 
-  async getOperative(gestionId: number): Promise<Operative> {
+  async getOperative(gestionId: number): Promise<Operative | null> {
     const operative = await this.operativeRepository.findOne({
       where: {
         gestionId: gestionId
       }
     })
-    if(!operative) throw new Error("No existe operativo")
+    if(!operative) return null
     return OperativeEntity.toDomain(operative!)
   }
 

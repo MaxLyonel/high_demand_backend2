@@ -19,6 +19,7 @@ export class RolController {
         data: result
       }
     } catch (error) {
+      console.log(error)
       throw new HttpException({
         status: 'error',
         message: error.message || 'Error al obtener los roles'

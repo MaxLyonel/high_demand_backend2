@@ -13,11 +13,11 @@ export class PermissionEntity {
 
   @ManyToOne(() => ActionEntity, { eager: true })
   @JoinColumn({ name: 'accion_id' })
-  action: ActionEntity;
+  action?: ActionEntity;
 
   @ManyToOne(() => ResourceEntity, { eager: true })
   @JoinColumn({ name: 'recurso_id' })
-  subject: ResourceEntity;
+  subject?: ResourceEntity;
 
   @Column({ default: true, name: 'activo' })
   active: boolean;
@@ -25,14 +25,14 @@ export class PermissionEntity {
   @Column({ nullable: true, name: 'descripcion' })
   description: string;
 
-  @ManyToMany(() => RolTypeEntity, (rol) => rol.permissions)
-  roles: RolTypeEntity[];
+  // @ManyToMany(() => RolTypeEntity, (rol) => rol.permissions)
+  // roles: RolTypeEntity[];
 
   @OneToMany(() => RolPermissionEntity, (rolPermiso) => rolPermiso.permission)
   rolPermissions: RolPermissionEntity[];
 
   @OneToMany(() => ConditionEntity, (condicion) => condicion.permission, { eager: true })
-  condition: ConditionEntity[];
+  condition?: ConditionEntity[];
 
   @Column({ name: 'creado_en', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
@@ -48,8 +48,12 @@ export class PermissionEntity {
       id: entity.id,
       description: entity.description,
       active: entity.active,
-      action: { id: entity.action.id, name: entity.action.name },
-      subject: { id: entity.subject.id, name: entity.subject.name },
+      action: entity.action
+        ? { id: entity.action.id, name: entity.action.name }
+        : undefined,
+      subject: entity.subject
+        ? { id: entity.subject.id, name: entity.subject.name }
+        : undefined,
       conditions: entity.condition?.map(c => ({
         field: c.field,
         operator: c.operator,
@@ -59,20 +63,27 @@ export class PermissionEntity {
   }
 
   static fromDomain(model: Permission): PermissionEntity {
-    const entity = new PermissionEntity()
+    const entity = new PermissionEntity();
 
-    entity.action = { id: model.action.id, name: model.action.name } as ActionEntity
-    entity.subject = { id: model.subject.id, name: model.subject.name } as ResourceEntity
+    if (model.action) {
+      entity.action = { id: model.action.id, name: model.action.name } as ActionEntity;
+    }
+
+    if (model.subject) {
+      entity.subject = { id: model.subject.id, name: model.subject.name } as ResourceEntity;
+    }
+
     entity.condition = model.conditions?.map(c => {
       const condEntity = new ConditionEntity();
-      condEntity.field = c.field,
-      condEntity.operator = OperatorEnum[c.operator as keyof typeof OperatorEnum]
+      condEntity.field = c.field;
+      condEntity.operator = OperatorEnum[c.operator as keyof typeof OperatorEnum];
       condEntity.value = Array.isArray(c.value)
         ? JSON.stringify(c.value)
-        : String(c.value)
-      return condEntity
-    }) || []
-    return entity
+        : String(c.value);
+      return condEntity;
+    }) || [];
+
+    return entity;
   }
 
 }

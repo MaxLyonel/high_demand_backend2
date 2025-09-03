@@ -2,6 +2,8 @@ import { Entity, ManyToOne, JoinColumn, PrimaryColumn, Column } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { RolTypeEntity } from "./rol-type.entity";
 import { Rol } from "@access-control/domain/models/rol.model";
+import { PermissionEntity } from "./permission.entity";
+import { RolPermissionEntity } from "./rol-permission.entity";
 
 @Entity({ name: 'usuario_rol' })
 export class UserRoleEntity {
@@ -23,7 +25,8 @@ export class UserRoleEntity {
     return Rol.create({
       id: entity.role.id,
       name: entity.role.name,
-      permissions: entity.role.permissions?.map(p => p) || []
+      // rolPermissions: entity.role.rolPermissions?.map(rp => PermissionEntity.toDomain(rp.permission)) || []
+      rolPermissions: entity.role.rolPermissions?.map(rp => RolPermissionEntity.toDomain(rp))
     });
   }
 

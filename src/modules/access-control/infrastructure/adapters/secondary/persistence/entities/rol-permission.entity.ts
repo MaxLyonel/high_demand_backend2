@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { PermissionEntity } from "./permission.entity";
 import { RolTypeEntity } from "./rol-type.entity";
+import { RolPermission } from "@access-control/domain/models/rol-permission.model";
 
 @Entity({ schema: 'alta_demanda', name: 'rol_permisos' })
 export class RolPermissionEntity {
@@ -10,7 +11,7 @@ export class RolPermissionEntity {
   @PrimaryColumn({ name: 'permiso_id'})
   permissionId: number
 
-  @ManyToOne(() => RolTypeEntity, (rol) => rol.permissions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => RolTypeEntity, (rol) => rol.rolPermissions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'rol_id' })
   rol: RolTypeEntity;
 
@@ -27,4 +28,20 @@ export class RolPermissionEntity {
   @Column({ name: 'creado_en', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createAt: Date;
 
+  static toDomain(entity: RolPermissionEntity): RolPermission {
+    console.log("PermissionEntity", entity.permission)
+    return RolPermission.create({
+      permission: PermissionEntity.toDomain(entity.permission),
+      active: entity.active,
+      createdBy: entity.createBy,
+      createdAt: entity.createAt
+    });
+  }
+
+  static fromDomain(rolPermission: RolPermission): RolPermissionEntity {
+    const entity = new RolPermissionEntity()
+    entity.permission = PermissionEntity.fromDomain(entity.permission)
+    entity.active = rolPermission.active
+    return entity
+  }
 }

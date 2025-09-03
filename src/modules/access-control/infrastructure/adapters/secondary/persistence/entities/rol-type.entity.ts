@@ -3,6 +3,7 @@ import { UserEntity } from "./user.entity";
 import { PermissionEntity } from "./permission.entity";
 import { Rol } from "@access-control/domain/models/rol.model";
 import { UserRoleEntity } from "./user-rol.entity";
+import { RolPermissionEntity } from "./rol-permission.entity";
 
 
 
@@ -15,14 +16,9 @@ export class RolTypeEntity {
   @Column({ name: 'rol'})
   name: string;
 
-  @ManyToMany(() => PermissionEntity, (permission) => permission.roles, { eager: true })
-  @JoinTable({
-    name: 'rol_permisos',
-    schema: 'alta_demanda',
-    joinColumn: { name: 'rol_id', referencedColumnName: 'id'},
-    inverseJoinColumn: { name: 'permiso_id', referencedColumnName: 'id'}
-  })
-  permissions: PermissionEntity[];
+  // Relación hacia la tabla intermedia
+  @OneToMany(() => RolPermissionEntity, (rolPermission) => rolPermission.rol, { eager: true })
+  rolPermissions: RolPermissionEntity[];
 
   @OneToMany(() => UserRoleEntity, (userRole) => userRole.role)
   userRoles: UserRoleEntity[];
@@ -31,7 +27,7 @@ export class RolTypeEntity {
     return Rol.create({
       id: entity.id,
       name: entity.name,
-      permissions: entity.permissions?.map(p => PermissionEntity.toDomain(p)) || []
+      rolPermissions: entity.rolPermissions?.map(rp => RolPermissionEntity.toDomain(rp)) || []
     });
   }
 
@@ -39,7 +35,13 @@ export class RolTypeEntity {
     const entity = new RolTypeEntity();
     entity.id = model.id;
     entity.name = model.name;
-    entity.permissions = model.permissions?.map(p => PermissionEntity.fromDomain(p)) || [];
+
+    entity.rolPermissions = model.rolPermissions?.map(p => {
+      const rp = new RolPermissionEntity()
+      rp.permission = PermissionEntity.fromDomain(rp.permission)
+      return rp
+    }) || []
+
     return entity;
   }
 

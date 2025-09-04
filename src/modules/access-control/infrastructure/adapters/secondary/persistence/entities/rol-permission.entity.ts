@@ -29,13 +29,14 @@ export class RolPermissionEntity {
   createAt: Date;
 
   static toDomain(entity: RolPermissionEntity): RolPermission {
-    console.log("PermissionEntity", entity.permission)
-    return RolPermission.create({
+    const res =  RolPermission.create({
       permission: PermissionEntity.toDomain(entity.permission),
       active: entity.active,
       createdBy: entity.createBy,
       createdAt: entity.createAt
     });
+    // console.log(JSON.stringify(res, null, 2));
+    return res
   }
 
   static fromDomain(rolPermission: RolPermission): RolPermissionEntity {

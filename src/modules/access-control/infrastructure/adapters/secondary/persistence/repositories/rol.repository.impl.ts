@@ -17,35 +17,23 @@ export class RolRepositoryImpl implements RolRepository {
     private readonly _rolRepository: Repository<RolTypeEntity>
   ) {}
 
-  // async find(): Promise<Rol[]> {
-  //   const roles = await this._rolRepository.find({
-  //     where: {
-  //       id: In([9, 37, 38, 48, 49])
-  //     },
-  //     relations: {
-  //       rolPermissions: {   // 👈 relación intermedia
-  //         permission: true  // 👈 y dentro de esa, el permiso real
-  //       }
-  //     }
-  //   })
-  //   console.log(roles)
-  //   return roles.map(RolTypeEntity.toDomain)
-  // }
   async find(): Promise<Rol[]> {
     const roles = await this._rolRepository
       .createQueryBuilder("rol")
       .leftJoinAndSelect("rol.rolPermissions", "rolPerm")
       .leftJoinAndSelect("rolPerm.permission", "perm")
+      .leftJoinAndSelect("perm.action", "action")
+      .leftJoinAndSelect("perm.subject", "subject")
+      .leftJoinAndSelect("perm.condition", "conditions")
       .where("rol.id IN (:...ids)", { ids: [9, 37, 38, 48, 49] })
       .getMany();
 
-    // console.log(JSON.stringify(roles, null, 2));
-
-    return roles.map(rol => ({
+    const res = roles.map(rol => ({
       id: rol.id,
       name: rol.name,
       rolPermissions: rol.rolPermissions.map(RolPermissionEntity.toDomain)
     }));
+    return res
   }
 
   async findById(id: number): Promise<Rol> {

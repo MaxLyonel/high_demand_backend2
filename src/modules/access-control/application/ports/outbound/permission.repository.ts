@@ -5,7 +5,9 @@ export abstract class PermissionRepository {
   abstract getActions(): Promise<any>;
   abstract getResources(): Promise<any>;
   abstract savePermission(obj: any): Promise<any>;
+  abstract updatePermission(obj: any): Promise<any>;
   abstract getOperators(): Promise<any>;
   abstract getFields(): Promise<any>;
   abstract updatePermissionStatus(obj: any): Promise<any>;
+  abstract getPermissions(): Promise<any>;
 }

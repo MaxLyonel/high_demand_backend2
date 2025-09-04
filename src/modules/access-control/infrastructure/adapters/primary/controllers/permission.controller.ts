@@ -60,6 +60,23 @@ export class PermissionController {
     }
   }
 
+  @Post('update')
+  async updatePermission(@Body() body: any) {
+    try {
+      const result = await this.permissionService.updatePermission(body)
+      return {
+        status: 'success',
+        message: 'Se actualizó exitosamente el permiso',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al guardar el permiso'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Get('operators')
   async getOperators() {
     try {
@@ -107,6 +124,23 @@ export class PermissionController {
       throw new HttpException({
         status: 'error',
         message: error.message || 'Hubo un error al actualizar el estado del permiso'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('all')
+  async getPermissions() {
+    try {
+      const result = await this.permissionService.getPermissions()
+      return {
+        status: 'success',
+        message: 'Se ha obtenido exitosamente los permisos',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener los permisos'
       }, HttpStatus.BAD_REQUEST)
     }
   }

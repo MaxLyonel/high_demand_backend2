@@ -1,7 +1,7 @@
 // framework nestjs
 import { Inject, Injectable } from "@nestjs/common";
 // external dependencies
-import { DataSource, Repository } from "typeorm";
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from "@nestjs/typeorm";
 // own implementations
 import { RolPermissionEntity } from "../entities/rol-permission.entity";
@@ -26,6 +26,8 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     private readonly actionRepository: Repository<ActionEntity>,
     @InjectRepository(ResourceEntity, 'alta_demanda')
     private readonly resourceEntity: Repository<ResourceEntity>,
+    @InjectRepository(PermissionEntity, 'alta_demanda')
+    private readonly permissionRepository: Repository<PermissionEntity>
   ) {}
 
   async findByRoleId(roleId: number): Promise<Permission[]> {
@@ -107,6 +109,47 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     }
   }
 
+  async updatePermission(obj: any): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    try {
+      const { id, rol, conditions, __typename, ...rest } = obj
+      if(conditions.length) {
+        for(let condition of conditions) {
+          const resultCondition = await queryRunner.manager.update(
+            ConditionEntity,
+            { id: condition.id },
+            { ...condition }
+          )
+          if(resultCondition.affected && resultCondition.affected == 0) {
+            throw new Error("No se pudo actualizar la condición")
+          } else {
+          }
+        }
+      }
+      const result = await queryRunner.manager.update(
+        PermissionEntity,
+        { id: obj.id },
+        { ...rest }
+      )
+      if(result.affected && result.affected == 0) {
+        throw new Error('No se pudo actualizar el permiso')
+      }
+      const updatedPermission = await queryRunner.manager.findOne(
+        PermissionEntity,
+        { where: { id: obj.id } }
+      )
+      await queryRunner.commitTransaction()
+      return updatedPermission
+    } catch(error) {
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
   async getOperators(): Promise<any> {
     const query = await this.dataSource.query(
       `
@@ -122,7 +165,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
         SELECT DISTINCT column_name
         FROM information_schema.columns
         WHERE (table_schema = 'alta_demanda')
-          OR (table_schema = 'public' AND table_name IN ('usuario', 'usuario_rol'))
+          OR (table_schema = 'public' AND table_name IN ('usuario', 'usuario_rol', 'rol_tipo'))
         ORDER BY column_name;
       `
     )
@@ -130,7 +173,6 @@ export class PermissionRepositoryImpl implements PermissionRepository {
   }
 
   async updatePermissionStatus(obj: any): Promise<RolPermissionEntity> {
-    console.log("esto no sirve")
     const { rolId, id: permissionId } = obj;
 
     const permiso = await this.rolPermissionRepository.findOne({
@@ -148,5 +190,10 @@ export class PermissionRepositoryImpl implements PermissionRepository {
       where: { rolId, permissionId },
       relations: ["rol", "permission"]
     }) as Promise<RolPermissionEntity>;
+  }
+
+  async getPermissions(): Promise<any> {
+    const permissions = await this.permissionRepository.find()
+    return permissions
   }
 }

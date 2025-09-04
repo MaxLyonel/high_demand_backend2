@@ -55,6 +55,7 @@ export class PermissionEntity {
         ? { id: entity.subject.id, name: entity.subject.name }
         : undefined,
       conditions: entity.condition?.map(c => ({
+        id: c.id,
         field: c.field,
         operator: c.operator,
         value: c.value

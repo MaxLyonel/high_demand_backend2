@@ -60,6 +60,7 @@ export class HistoryEntity {
       entity.userId,
       entity.userName,
       entity.rol,
+      entity.rolId,
       entity.workflowState,
       entity.registrationStatus,
       entity.observation

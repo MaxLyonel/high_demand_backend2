@@ -26,6 +26,11 @@ export class PermissionServiceImpl implements PermissionService {
     return newRolPermission
   }
 
+  async updatePermission(obj: any): Promise<any> {
+    const updatedPermission = await this.permissionRepository.updatePermission(obj)
+    return updatedPermission
+  }
+
   async getOperators(): Promise<any> {
     const operators = await this.permissionRepository.getOperators()
     return operators
@@ -39,6 +44,11 @@ export class PermissionServiceImpl implements PermissionService {
   async changePermissionStatus(obj: any): Promise<any> {
     const updatedPermission = await this.permissionRepository.updatePermissionStatus(obj)
     return updatedPermission
+  }
+
+  async getPermissions(): Promise<any> {
+    const permissions = await this.permissionRepository.getPermissions()
+    return permissions
   }
 
 }

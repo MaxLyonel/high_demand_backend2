@@ -10,6 +10,7 @@ export class History {
     public userId: number,
     public userName: string,
     public rol: string,
+    public rolId: number,
     public workflowState: string,
     public registrationStatus: RegistrationStatus,
     public observation: string | null,

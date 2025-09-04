@@ -16,15 +16,8 @@ export class OperativeProgrammingRepositoryImpl implements OperationsProgramming
   ){}
 
   async saveOperative(obj: any): Promise<OperativeEntity> {
-    const operative = await this.operativeRepository.preload(obj);
-
-    if (!operative) {
-      throw new Error(`Operativo con id ${obj.id} no existe`);
-    }
-
-    return await this.operativeRepository.save(operative);
+    return await this.operativeRepository.save(obj);
   }
-
 
   async getOperative(gestionId: number): Promise<Operative | null> {
     const operative = await this.operativeRepository.findOne({

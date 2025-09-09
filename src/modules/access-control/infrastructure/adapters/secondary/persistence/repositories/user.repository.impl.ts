@@ -11,6 +11,9 @@ import { Teacher } from "@access-control/domain/models/teacher.model";
 import { TeacherEntity } from "../entities/teacher.entity";
 
 
+import * as util from "util";
+
+
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
   constructor(
@@ -25,12 +28,14 @@ export class UserRepositoryImpl implements UserRepository {
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.userRoles", "userRol")
       .leftJoinAndSelect("userRol.role", "role")
+      .leftJoinAndSelect("user.person", "person")
       .where("user.username = :username", { username })
       .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48, 50] })
       .andWhere("userRol.esactivo = true")
       .getOne();
 
     if (!userEntity) return null;
+    // console.log(util.inspect(userEntity, { depth: null, colors: true }));
     return UserEntity.toDomain(userEntity);
   }
 

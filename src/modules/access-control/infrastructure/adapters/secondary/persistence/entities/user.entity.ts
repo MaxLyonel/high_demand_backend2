@@ -1,10 +1,11 @@
 // external dependencies
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 // own implementations
 import { User as UserModel } from '@access-control/domain/models/user.model';
 import { RolTypeEntity } from "./rol-type.entity";
 import { Rol } from "@access-control/domain/models/rol.model";
 import { UserRoleEntity } from "./user-rol.entity";
+import { PersonEntity } from "./person.entity";
 
 @Entity({name: 'usuario'})
 export class UserEntity {
@@ -20,6 +21,10 @@ export class UserEntity {
   @Column({name: 'persona_id'})
   personId: number
 
+  @ManyToOne(() => PersonEntity)
+  @JoinColumn({name: 'persona_id'})
+  person: PersonEntity
+
   @Column({name: 'esactivo'})
   isActive: boolean
 
@@ -31,7 +36,8 @@ export class UserEntity {
       id: entity.id,
       username: entity.username,
       password: entity.password,
-      personId: entity.personId,
+      // personId: entity.personId,
+      person: entity.person,
       isActive: entity.isActive,
       roles: entity.userRoles
         .filter(ur => ur.active) // 👈 solo roles activos
@@ -44,7 +50,7 @@ export class UserEntity {
     entity.id = user.id;
     entity.username = user.username;
     entity.password = user.password;
-    entity.personId = user.personId;
+    // entity.personId = user.personId;
     entity.isActive = user.isActive;
 
     entity.userRoles = user.roles?.map(rolDomain =>

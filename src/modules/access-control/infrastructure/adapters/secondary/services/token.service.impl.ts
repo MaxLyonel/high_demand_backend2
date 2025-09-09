@@ -21,7 +21,7 @@ export class TokenServiceImpl implements TokenService {
       {
         userId: user.id,
         username: user.username,
-        personId: user.personId,
+        person: user.person,
         roles: user.roles
       }, { expiresIn: this.expiresIn })
   }
@@ -30,6 +30,5 @@ export class TokenServiceImpl implements TokenService {
     return { userId: '1' }
     // return this.jwtService.verify(token, this.jwtSecret)
     // return this.jwtService.verify(token, this.jwtSecret) as { userId: string }
-
   }
 }

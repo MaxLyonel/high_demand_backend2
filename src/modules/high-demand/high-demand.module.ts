@@ -52,6 +52,7 @@ import { RolTypeEntity } from "@access-control/infrastructure/adapters/secondary
 import { UserEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/user.entity";
 import { TeacherEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/teacher.entity";
 import { GeographicJurisdictionEntity } from "../pre-registration/infrastructure/adapters/secondary/persistence/entities/geographic-jurisdiction.entity";
+import { OperationsProgrammingModule } from "../operations-programming/operations-programming.module";
 
 
 
@@ -144,7 +145,8 @@ import { GeographicJurisdictionEntity } from "../pre-registration/infrastructure
         UserEntity,
         TeacherEntity,
         GeographicJurisdictionEntity
-      ], 'alta_demanda')
+      ], 'alta_demanda'),
+    OperationsProgrammingModule
   ],
   exports: [EducationalInstitutionService]
 })

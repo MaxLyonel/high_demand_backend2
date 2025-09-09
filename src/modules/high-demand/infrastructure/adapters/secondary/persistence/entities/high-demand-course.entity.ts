@@ -5,7 +5,7 @@ import { HighDemandRegistrationCourse as HighDemandRegistrationCourseModel } fro
 import { HighDemandRegistrationEntity } from "./high-demand.entity";
 import { LevelTypeEntity } from "./leve-type.entity";
 import { GradeTypeEntity } from "./grade-type.entity";
-import { ParallelTypeEntity } from "./parallel-type.entity";
+import { ParallelTypeEntity } from './parallel-type.entity';
 
 
 @Entity({ schema: 'alta_demanda', name: 'alta_demanda_curso'})
@@ -54,27 +54,21 @@ export class HighDemandRegistrationCourseEntity {
   deletedAt?: Date;
 
   static toDomain(entity: HighDemandRegistrationCourseEntity): HighDemandRegistrationCourseModel {
-    // return HighDemandRegistrationCourseModel.create({
-    //   id: entity.id,
-    //   highDemandRegistrationId: entity.highDemandRegistrationId,
-    //   levelId: entity.levelId,
-    //   gradeId: entity.gradeId,
-    //   parallelId: entity.parallelId,
-    //   totalQuota: entity.totalQuota
-    // })
     return new HighDemandRegistrationCourseModel(
       entity.id,
       entity.highDemandRegistrationId,
       entity.levelId,
       entity.gradeId,
       entity.parallelId,
-      entity.totalQuota
+      entity.totalQuota,
+      entity.level ? LevelTypeEntity.toDomain(entity.level) : undefined,
+      entity.grade ? GradeTypeEntity.toDomain(entity.grade) : undefined,
+      entity.parallel ? ParallelTypeEntity.toDomain(entity.parallel) : undefined
     )
   }
 
   static fromDomain(highDemandRegistrationCourse: HighDemandRegistrationCourseModel): HighDemandRegistrationCourseEntity {
     const entity = new HighDemandRegistrationCourseEntity()
-    // entity.id = highDemandRegistrationCourse.id;
     entity.highDemandRegistrationId = highDemandRegistrationCourse.highDemandRegistrationId;
     entity.levelId = highDemandRegistrationCourse.levelId;
     entity.gradeId = highDemandRegistrationCourse.gradeId;

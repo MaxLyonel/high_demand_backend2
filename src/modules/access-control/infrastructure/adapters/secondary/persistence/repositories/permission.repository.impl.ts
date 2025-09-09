@@ -74,6 +74,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
       const { action, subject, active, description, conditions, ...rest } = obj
       const newPermission = await queryRunner.manager.save(PermissionEntity,
         {
+          id: obj.id ?? undefined,
           action: action,
           subject: subject,
           active,

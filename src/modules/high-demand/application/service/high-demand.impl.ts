@@ -12,8 +12,9 @@ import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.re
 import { CreateHistoryDto } from "../dtos/create-history.dto";
 import { WorkflowSequenceRepository } from "@high-demand/domain/ports/outbound/workflow-sequence.repository";
 import { RolRepository } from "@access-control/application/ports/outbound/rol.repository";
-import { UserRepository } from '../../../access-control/application/ports/outbound/user.repository';
+import { UserRepository } from '@access-control/application/ports/outbound/user.repository';
 import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository";
+import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
 
 
 @Injectable()
@@ -26,7 +27,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     private readonly workflowSequenceRepository: WorkflowSequenceRepository,
     private readonly rolRepository: RolRepository,
     private readonly userRepository: UserRepository,
-    private readonly educationalInstitutionRepository: EducationalInstitutionRepository
+    private readonly educationalInstitutionRepository: EducationalInstitutionRepository,
+    private readonly operativeRepository: OperationsProgrammingRepository
   ) {}
 
   // ****** Guardar la Alta Demanda *******
@@ -39,6 +41,10 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     const workflowStates = await this.workflowSequenceRepository.getOrderedFlowStates()
     if(workflowStates.length <= 0) {
       throw new Error("No se puede crear la Alta Demanda, falta definir las secuencias")
+    }
+    const operative = await this.operativeRepository.getOperative(2025)
+    if(!operative) {
+      throw new Error("Aún no se definio las fechas para el operativo")
     }
     const firstWorkflowState = workflowStates[0]
 
@@ -53,7 +59,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     obj.workflowStateId = 2 //TODO
     obj.workflowId = workflow.id
     obj.inbox = false
-    obj.operativeId = 1 //TODO
+    obj.operativeId = operative.id
 
     const domain = HighDemandRegistration.create({
       ...obj,
@@ -217,7 +223,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
         workflowState,
         rol,
         user,
-        institution
+        institution,
+        courses: highDemand.courses
       }
       reducer.push(obj)
     }

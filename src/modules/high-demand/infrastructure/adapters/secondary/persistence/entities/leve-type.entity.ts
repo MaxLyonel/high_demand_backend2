@@ -1,3 +1,4 @@
+import { Level as LevelModel } from "@high-demand/domain/models/level.model";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 
@@ -9,4 +10,10 @@ export class LevelTypeEntity {
   @Column({ name: 'nivel'})
   name: string
 
+  static toDomain(entity: LevelTypeEntity): LevelModel {
+    return new LevelModel(
+      entity.id,
+      entity.name
+    )
+  }
 }

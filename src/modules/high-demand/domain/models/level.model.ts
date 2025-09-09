@@ -1,0 +1,10 @@
+
+
+
+
+export class Level {
+  constructor(
+    public readonly id: number,
+    public readonly name: string
+  ) { }
+}

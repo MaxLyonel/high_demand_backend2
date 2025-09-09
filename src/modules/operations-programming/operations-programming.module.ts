@@ -25,6 +25,7 @@ import { DatabaseModule } from "@infrastructure-general/database/database.module
     TypeOrmModule.forFeature([
       OperativeEntity
     ], 'alta_demanda')
-  ]
+  ],
+  exports: [OperationsProgrammingRepository]
 })
 export class OperationsProgrammingModule {}

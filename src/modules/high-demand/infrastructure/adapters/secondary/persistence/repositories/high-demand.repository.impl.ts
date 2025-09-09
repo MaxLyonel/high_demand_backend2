@@ -184,6 +184,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
         rolId: rolId,
         inbox: false,
       },
+      relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
     });
     return highDemands.map(HighDemandRegistrationEntity.toDomain);
   }

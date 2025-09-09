@@ -1,4 +1,7 @@
 import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand-course.entity";
+import { Level } from "./level.model";
+import { Grade } from "./grade.model";
+import { Parallel } from "./parallel.model";
 
 export class HighDemandRegistrationCourse {
   constructor(
@@ -8,6 +11,9 @@ export class HighDemandRegistrationCourse {
     public readonly gradeId: number,
     public readonly parallelId: number,
     public readonly totalQuota: number,
+    public readonly level?: Level,
+    public readonly grade?: Grade,
+    public readonly parallel?: Parallel
   ) {}
 
   static create({

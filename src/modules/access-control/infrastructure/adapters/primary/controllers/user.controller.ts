@@ -11,7 +11,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getAbilities(@Req() req) {
     const user = req.user
-    const roleId = user.roles[0].id
+    // const roleId = user.roles[0].id
+    const roleId = user.roles[0].role.id
     const ability = await this.abilityFactory.createForRole(roleId)
     return { rules: ability.rules }
   }

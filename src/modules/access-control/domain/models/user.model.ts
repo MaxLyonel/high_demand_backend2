@@ -1,4 +1,5 @@
 import { Rol } from "./rol.model"
+import { UserRole } from "./user-role.model"
 
 export class User {
   constructor(
@@ -6,9 +7,9 @@ export class User {
     public readonly username: string,
     public readonly password: string,
     public readonly isActive: boolean,
-    // public readonly personId: number,
     public readonly person: any,
-    public readonly roles: Rol[]
+    // public readonly roles: Rol[]
+    public readonly roles: UserRole[]
   ) {}
 
   static create({
@@ -16,7 +17,6 @@ export class User {
     username,
     password,
     isActive,
-    // personId,
     person,
     roles
   }: {
@@ -24,10 +24,9 @@ export class User {
     username: string,
     password: string,
     isActive: boolean,
-    // personId: number,
     person: any,
-    roles: Rol[]
+    roles: UserRole[]
   }): User {
-    return new User(id, username, password, isActive, person, /*personId,*/ roles)
+    return new User(id, username, password, isActive, person, roles)
   }
 }

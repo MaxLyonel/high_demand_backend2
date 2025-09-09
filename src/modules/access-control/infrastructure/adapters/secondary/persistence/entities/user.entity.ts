@@ -31,33 +31,43 @@ export class UserEntity {
   @OneToMany(() => UserRoleEntity, (userRole) => userRole.user, { eager: true })
   userRoles: UserRoleEntity[];
 
+  // static toDomain(entity: UserEntity): UserModel {
+  //   return UserModel.create({
+  //     id: entity.id,
+  //     username: entity.username,
+  //     password: entity.password,
+  //     person: entity.person,
+  //     isActive: entity.isActive,
+  //     roles: entity.userRoles
+  //       .filter(ur => ur.active) // 👈 solo roles activos
+  //       .map(ur => UserRoleEntity.toDomain(ur))
+  //   });
+  // }
   static toDomain(entity: UserEntity): UserModel {
     return UserModel.create({
       id: entity.id,
       username: entity.username,
       password: entity.password,
-      // personId: entity.personId,
-      person: entity.person,
       isActive: entity.isActive,
+      person: entity.person,
       roles: entity.userRoles
         .filter(ur => ur.active) // 👈 solo roles activos
         .map(ur => UserRoleEntity.toDomain(ur))
-    });
+    })
   }
 
-  static fromDomain(user: UserModel): UserEntity {
-    const entity = new UserEntity();
-    entity.id = user.id;
-    entity.username = user.username;
-    entity.password = user.password;
-    // entity.personId = user.personId;
-    entity.isActive = user.isActive;
+  // static fromDomain(user: UserModel): UserEntity {
+  //   const entity = new UserEntity();
+  //   entity.id = user.id;
+  //   entity.username = user.username;
+  //   entity.password = user.password;
+  //   entity.isActive = user.isActive;
 
-    entity.userRoles = user.roles?.map(rolDomain =>
-      UserRoleEntity.fromDomain(rolDomain, entity)
-    ) || [];
+  //   entity.userRoles = user.roles?.map(rolDomain =>
+  //     UserRoleEntity.fromDomain(rolDomain, entity)
+  //   ) || [];
 
-    return entity;
-  }
+  //   return entity;
+  // }
 
 }

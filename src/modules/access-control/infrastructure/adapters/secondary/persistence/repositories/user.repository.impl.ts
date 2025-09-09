@@ -29,6 +29,8 @@ export class UserRepositoryImpl implements UserRepository {
       .leftJoinAndSelect("user.userRoles", "userRol")
       .leftJoinAndSelect("userRol.role", "role")
       .leftJoinAndSelect("user.person", "person")
+      .leftJoinAndSelect("userRol.placeType", "placeType")
+      .leftJoinAndSelect("placeType.parent", "parentPlace")
       .where("user.username = :username", { username })
       .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48, 50] })
       .andWhere("userRol.esactivo = true")

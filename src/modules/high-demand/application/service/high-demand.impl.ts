@@ -250,7 +250,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
         workflowState,
         rol,
         user,
-        institution
+        institution,
+        courses: highDemand.courses
       }
       reducer.push(obj)
     }

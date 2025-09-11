@@ -30,4 +30,9 @@ export class CatalogsServiceImpl implements CatalogsService {
     const levels = await this.catalogRepository.getLevels()
     return levels
   }
+
+  async listDepartments(): Promise<any> {
+    const departments = await this.catalogRepository.getDepartments()
+    return departments
+  }
 }

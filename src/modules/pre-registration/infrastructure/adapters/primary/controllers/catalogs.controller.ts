@@ -106,4 +106,21 @@ export class CatalogsController {
     }
   }
 
+  @Get('list-departments')
+  async getDepartments() {
+    try {
+      const result = await this.catalogsService.listDepartments()
+      return {
+        status: 'success',
+        message: 'Obtención exitosa de los departamentos',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener los departamentos'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

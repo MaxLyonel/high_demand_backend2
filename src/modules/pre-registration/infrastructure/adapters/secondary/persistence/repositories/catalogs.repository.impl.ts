@@ -57,4 +57,14 @@ export class CatalogsRepositoryImpl implements CatalogsRepository {
     return levels
   }
 
+  // ** obtener el catálogo de departamentos **
+  async getDepartments(): Promise<any> {
+    const departments = await this.placeRepository.find({
+      where: {
+        placeLevelId: 1
+      }
+    })
+    return departments
+  }
+
 }

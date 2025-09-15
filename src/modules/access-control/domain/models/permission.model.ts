@@ -12,7 +12,8 @@ export class Action {
 
 export class Condition {
   field: string;
-  operator: OperatorEnum;
+  // operator: OperatorEnum;
+  operator: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'in';
   value: string | number | string[];
 }
 

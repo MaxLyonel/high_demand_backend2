@@ -1,7 +1,9 @@
-import { Rol } from "@access-control/domain/models/rol.model";
-import { RolService } from "../ports/inbound/rol.service";
+// framework nestjs
 import { Injectable } from "@nestjs/common";
-import { RolRepository } from "../ports/outbound/rol.repository";
+// own implementations
+import { Rol } from "@access-control/domain/models/rol.model";
+import { RolService } from "../../domain/ports/inbound/rol.service";
+import { RolRepository } from "../../domain/ports/outbound/rol.repository";
 
 @Injectable()
 export class RolServiceImpl implements RolService {
@@ -14,9 +16,4 @@ export class RolServiceImpl implements RolService {
     const result = await this.rolRepository.find()
     return result
   }
-
-  getRol(id: number): Promise<Rol> {
-    throw new Error("Method not implemented.");
-  }
-
 }

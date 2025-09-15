@@ -1,5 +1,3 @@
-import e from "express"
-
 export class Teacher {
   constructor(
     public readonly id: number,

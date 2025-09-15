@@ -1,9 +1,7 @@
 // external dependencies
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 // own implementations
 import { User as UserModel } from '@access-control/domain/models/user.model';
-import { RolTypeEntity } from "./rol-type.entity";
-import { Rol } from "@access-control/domain/models/rol.model";
 import { UserRoleEntity } from "./user-rol.entity";
 import { PersonEntity } from "./person.entity";
 
@@ -31,18 +29,6 @@ export class UserEntity {
   @OneToMany(() => UserRoleEntity, (userRole) => userRole.user, { eager: true })
   userRoles: UserRoleEntity[];
 
-  // static toDomain(entity: UserEntity): UserModel {
-  //   return UserModel.create({
-  //     id: entity.id,
-  //     username: entity.username,
-  //     password: entity.password,
-  //     person: entity.person,
-  //     isActive: entity.isActive,
-  //     roles: entity.userRoles
-  //       .filter(ur => ur.active) // 👈 solo roles activos
-  //       .map(ur => UserRoleEntity.toDomain(ur))
-  //   });
-  // }
   static toDomain(entity: UserEntity): UserModel {
     return UserModel.create({
       id: entity.id,
@@ -69,5 +55,4 @@ export class UserEntity {
 
   //   return entity;
   // }
-
 }

@@ -44,9 +44,9 @@ import { TypeOrmUnitOfWork } from "./infrastructure/adapters/secondary/persisten
 import { WorkflowSequenceEntity } from "./infrastructure/adapters/secondary/persistence/entities/workflow-sequence.entity";
 import { WorkflowSequenceRepository } from "./domain/ports/outbound/workflow-sequence.repository";
 import { WorkflowSequenceRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/workflow-sequence.repository.impl";
-import { RolRepository } from "@access-control/application/ports/outbound/rol.repository";
+import { RolRepository } from "@access-control/domain/ports/outbound/rol.repository";
 import { RolRepositoryImpl } from "@access-control/infrastructure/adapters/secondary/persistence/repositories/rol.repository.impl";
-import { UserRepository } from "@access-control/application/ports/outbound/user.repository";
+import { UserRepository } from "@access-control/domain/ports/outbound/user.repository";
 import { UserRepositoryImpl } from "@access-control/infrastructure/adapters/secondary/persistence/repositories/user.repository.impl";
 import { RolTypeEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/rol-type.entity";
 import { UserEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/user.entity";

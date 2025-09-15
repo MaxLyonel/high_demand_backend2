@@ -1,11 +1,8 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { UserEntity } from "./user.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { PermissionEntity } from "./permission.entity";
 import { Rol } from "@access-control/domain/models/rol.model";
 import { UserRoleEntity } from "./user-rol.entity";
 import { RolPermissionEntity } from "./rol-permission.entity";
-
-
 
 
 @Entity({ name: 'rol_tipo'})
@@ -16,7 +13,6 @@ export class RolTypeEntity {
   @Column({ name: 'rol'})
   name: string;
 
-  // Relación hacia la tabla intermedia
   @OneToMany(() => RolPermissionEntity, (rolPermission) => rolPermission.rol, { eager: true })
   rolPermissions: RolPermissionEntity[];
 

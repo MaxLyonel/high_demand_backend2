@@ -1,16 +1,18 @@
 // framework nestjs
 import { Inject, Injectable } from "@nestjs/common";
 // external dependencies
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, DeepPartial, Repository } from 'typeorm';
 import { InjectRepository } from "@nestjs/typeorm";
 // own implementations
 import { RolPermissionEntity } from "../entities/rol-permission.entity";
-import { PermissionRepository } from "@access-control/application/ports/outbound/permission.repository";
-import { Permission } from "@access-control/domain/models/permission.model";
+import { PermissionRepository } from "@access-control/domain/ports/outbound/permission.repository";
+import { Action, Permission, Resource } from "@access-control/domain/models/permission.model";
 import { ActionEntity } from "../entities/action.entity";
 import { ResourceEntity } from "../entities/resource.entity";
 import { PermissionEntity } from "../entities/permission.entity";
 import { ConditionEntity } from "../entities/condition.entity";
+import { ManagePermission } from "@access-control/domain/contracts/permission-manage.input";
+import { RolPermission } from "@access-control/domain/models/rol-permission.model";
 
 
 
@@ -55,22 +57,21 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     })
   }
 
-  async getActions(): Promise<any> {
+  async getActions(): Promise<Action[]> {
     const actions = await this.actionRepository.find()
     return actions
   }
 
-  async getResources(): Promise<any> {
+  async getResources(): Promise<Resource[]> {
     const resources = await this.resourceEntity.find()
     return resources
   }
 
-  async savePermission(obj: any): Promise<any> {
+  async savePermission(obj: ManagePermission): Promise<RolPermission> {
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.startTransaction()
     try {
-      // aqui la logica de guardar condiciones
       const { action, subject, active, description, conditions, ...rest } = obj
       const newPermission = await queryRunner.manager.save(PermissionEntity,
         {
@@ -88,7 +89,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
           {
             ...condition,
             permission: { id: newPermission.id }
-          }
+          } as DeepPartial<ConditionEntity>
         )
         if(!newCondition.id) throw new Error("No se pudo crear la condición")
       }
@@ -101,7 +102,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
       )
       if(!newRolPermission) throw new Error("No se pudo asignar el permiso al rol");
       await queryRunner.commitTransaction()
-      return newRolPermission
+      return RolPermissionEntity.toDomain(newRolPermission)
     } catch(error) {
       await queryRunner.rollbackTransaction()
       throw error
@@ -110,7 +111,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     }
   }
 
-  async updatePermission(obj: any): Promise<any> {
+  async updatePermission(obj: ManagePermission): Promise<Permission> {
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.startTransaction()
@@ -142,7 +143,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
         { where: { id: obj.id } }
       )
       await queryRunner.commitTransaction()
-      return updatedPermission
+      return PermissionEntity.toDomain(updatedPermission!)
     } catch(error) {
       await queryRunner.rollbackTransaction()
       throw error
@@ -151,7 +152,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     }
   }
 
-  async getOperators(): Promise<any> {
+  async getOperators(): Promise<{ unnest: string }[]> {
     const query = await this.dataSource.query(
       `
         SELECT unnest(enum_range(NULL::alta_demanda.operador_enum));
@@ -160,7 +161,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     return query
   }
 
-  async getFields(): Promise<any> {
+  async getFields(): Promise<{ column_name: string}[]> {
     const query = await this.dataSource.query(
       `
         SELECT DISTINCT column_name
@@ -173,7 +174,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     return query
   }
 
-  async updatePermissionStatus(obj: any): Promise<RolPermissionEntity> {
+  async updatePermissionStatus(obj: ManagePermission & {rolId:number}): Promise<RolPermission> {
     const { rolId, id: permissionId } = obj;
 
     const permiso = await this.rolPermissionRepository.findOne({
@@ -185,16 +186,17 @@ export class PermissionRepositoryImpl implements PermissionRepository {
 
     const newActive = !permiso.active;
 
-    const result = await this.rolPermissionRepository.update({ rolId, permissionId }, { active: newActive });
+    await this.rolPermissionRepository.update({ rolId, permissionId }, { active: newActive });
 
-    return this.rolPermissionRepository.findOne({
+    const result = await this.rolPermissionRepository.findOne({
       where: { rolId, permissionId },
       relations: ["rol", "permission"]
-    }) as Promise<RolPermissionEntity>;
+    })
+    return RolPermissionEntity.toDomain(result!)
   }
 
-  async getPermissions(): Promise<any> {
+  async getPermissions(): Promise<Permission[]> {
     const permissions = await this.permissionRepository.find()
-    return permissions
+    return permissions.map(PermissionEntity.toDomain)
   }
 }

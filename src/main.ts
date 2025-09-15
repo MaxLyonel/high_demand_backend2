@@ -19,6 +19,7 @@ async function bootstrap() {
       whitelist: true, // elimina propiedades que no estén en el dto
       forbidNonWhitelisted: false, // lanza error si hay propiedades extra
       transform: true, // conversión de tipos
+      transformOptions: { enableImplicitConversion: true },
     })
   );
 

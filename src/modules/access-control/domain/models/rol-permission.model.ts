@@ -2,10 +2,10 @@ import { Permission } from "./permission.model";
 
 export class RolPermission {
   constructor(
-    public readonly permission: Permission, // el permiso real
-    public readonly active: boolean = true, // corresponde a "activo"
-    public readonly createdBy?: number,     // "creado_por"
-    public readonly createdAt?: Date         // "creado_en"
+    public readonly permission: Permission,
+    public readonly active: boolean = true,
+    public readonly createdBy?: number,
+    public readonly createdAt?: Date
   ) {}
 
   static create(params: {

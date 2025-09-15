@@ -26,13 +26,6 @@ export class UserRoleEntity {
   @JoinColumn({ name: "rol_tipo_id" })
   role: RolTypeEntity;
 
-  // static toDomain(entity: UserRoleEntity): Rol {
-  //   return Rol.create({
-  //     id: entity.role.id,
-  //     name: entity.role.name,
-  //     rolPermissions: entity.role.rolPermissions?.map(rp => RolPermissionEntity.toDomain(rp))
-  //   });
-  // }
   static toDomain(entity: UserRoleEntity): UserRole {
     return UserRole.create({
       id: entity.id,
@@ -66,6 +59,5 @@ export class UserRoleEntity {
     entity.active = true;
     return entity;
   }
-
 
 }

@@ -11,7 +11,6 @@ export class TypenameInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
 
-    // Opcional: excluir endpoints como /user/abilities
     if (req.url.includes('/user/abilities')) {
       return next.handle();
     }

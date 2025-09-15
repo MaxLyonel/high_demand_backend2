@@ -1,4 +1,3 @@
-import { Rol } from "./rol.model"
 import { UserRole } from "./user-role.model"
 
 export class User {
@@ -8,7 +7,6 @@ export class User {
     public readonly password: string,
     public readonly isActive: boolean,
     public readonly person: any,
-    // public readonly roles: Rol[]
     public readonly roles: UserRole[]
   ) {}
 

@@ -1,6 +1,9 @@
-import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
-import { PermissionRepository } from "../ports/outbound/permission.repository";
+// framework
 import { Injectable } from "@nestjs/common";
+// external dependency
+import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
+// own implementation
+import { PermissionRepository } from "../../domain/ports/outbound/permission.repository";
 
 type AppAbility = Ability<[string, string]>;
 
@@ -22,7 +25,6 @@ export class AbilityFactory {
       if (perm.conditions?.length) {
         const conditionsObj: Record<string, any> = {};
         perm.conditions.forEach((c) => {
-          // Podés mapear operadores si quieres más lógica, por ahora asignamos directo
           conditionsObj[c.field] = c.value;
         });
         can(perm.action.name, perm.subject.name, conditionsObj);

@@ -1,16 +1,18 @@
-export interface Resource {
+import { OperatorEnum } from "../enums/operator.enum";
+
+export class Resource {
   id: number;
   name: string;
 }
 
-export interface Action {
+export class Action {
   id: number;
   name: string;
 }
 
-export interface Condition {
+export class Condition {
   field: string;
-  operator: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'in';
+  operator: OperatorEnum;
   value: string | number | string[];
 }
 

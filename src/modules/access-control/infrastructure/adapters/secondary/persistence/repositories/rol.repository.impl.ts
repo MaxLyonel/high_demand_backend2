@@ -1,12 +1,10 @@
-import { RolRepository } from "@access-control/application/ports/outbound/rol.repository";
+import { RolRepository } from "@access-control/domain/ports/outbound/rol.repository";
 import { Rol } from "@access-control/domain/models/rol.model";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { RolTypeEntity } from "../entities/rol-type.entity";
-import { In, Repository } from "typeorm";
-import { PermissionEntity } from "../entities/permission.entity";
+import { Repository } from "typeorm";
 import { RolPermissionEntity } from "../entities/rol-permission.entity";
-import { RolPermission } from "@access-control/domain/models/rol-permission.model";
 
 
 @Injectable()

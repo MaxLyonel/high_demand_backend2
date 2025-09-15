@@ -11,8 +11,8 @@ import { WorkflowStateRepository } from "@high-demand/domain/ports/outbound/work
 import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
 import { CreateHistoryDto } from "../dtos/create-history.dto";
 import { WorkflowSequenceRepository } from "@high-demand/domain/ports/outbound/workflow-sequence.repository";
-import { RolRepository } from "@access-control/application/ports/outbound/rol.repository";
-import { UserRepository } from '@access-control/application/ports/outbound/user.repository';
+import { RolRepository } from "@access-control/domain/ports/outbound/rol.repository";
+import { UserRepository } from '@access-control/domain/ports/outbound/user.repository';
 import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository";
 import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
 

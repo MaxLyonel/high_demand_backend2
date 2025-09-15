@@ -5,7 +5,7 @@ import { JwtService } from "@nestjs/jwt";
 // own implementations
 import { envs } from "@infrastructure-general/config"
 import { User } from "@access-control/domain/models/user.model"
-import { TokenService } from '@access-control/application/ports/outbound/token.service';
+import { TokenService } from '@access-control/domain/ports/outbound/token.service';
 
 
 @Injectable()
@@ -29,6 +29,5 @@ export class TokenServiceImpl implements TokenService {
   verifyToken(token: string): { userId: string } {
     return { userId: '1' }
     // return this.jwtService.verify(token, this.jwtSecret)
-    // return this.jwtService.verify(token, this.jwtSecret) as { userId: string }
   }
 }

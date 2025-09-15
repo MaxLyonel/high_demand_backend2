@@ -4,9 +4,9 @@ import { Injectable } from "@nestjs/common";
 import { createHash } from "crypto";
 // own implementations
 import { User } from "@access-control/domain/models/user.model";
-import { UserRepository } from "../ports/outbound/user.repository";
-import { AuthService } from "../ports/inbound/auth.service";
-import { TokenService } from "../ports/outbound/token.service";
+import { UserRepository } from "../../domain/ports/outbound/user.repository";
+import { AuthService } from "../../domain/ports/inbound/auth.service";
+import { TokenService } from "../../domain/ports/outbound/token.service";
 import { Teacher } from "@access-control/domain/models/teacher.model";
 
 

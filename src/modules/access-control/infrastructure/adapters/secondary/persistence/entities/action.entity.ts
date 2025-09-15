@@ -1,7 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
-
 @Entity({ schema: 'alta_demanda', name: 'acciones'})
 export class ActionEntity {
   @PrimaryGeneratedColumn()

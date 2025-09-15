@@ -6,14 +6,12 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 
 // onw implementations
 import { envs } from "@infrastructure-general/config"
-import { AuthService } from "@access-control/application/ports/inbound/auth.service"
-import { TokenService } from "@access-control/application/ports/outbound/token.service"
+import { AuthService } from "@access-control/domain/ports/inbound/auth.service"
 
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly tokenService: TokenService,
     private readonly authService: AuthService
   ) {
     super({

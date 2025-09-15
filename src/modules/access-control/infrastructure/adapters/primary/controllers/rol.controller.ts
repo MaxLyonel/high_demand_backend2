@@ -1,5 +1,6 @@
-import { RolService } from "@access-control/application/ports/inbound/rol.service";
+import { RolService } from "@access-control/domain/ports/inbound/rol.service";
 import { Controller, Get, HttpException, HttpStatus } from "@nestjs/common";
+import { RolesResponseDto } from "../dtos/response/roles-response.dto";
 
 
 @Controller('rol')
@@ -10,7 +11,7 @@ export class RolController {
   ) {}
 
   @Get('all')
-  async getRoles() {
+  async getRoles(): Promise<RolesResponseDto> {
     try {
       const result = await this.rolService.getRoles()
       return {
@@ -19,7 +20,6 @@ export class RolController {
         data: result
       }
     } catch (error) {
-      console.log(error)
       throw new HttpException({
         status: 'error',
         message: error.message || 'Error al obtener los roles'

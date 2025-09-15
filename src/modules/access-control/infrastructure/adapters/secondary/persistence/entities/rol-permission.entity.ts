@@ -35,7 +35,6 @@ export class RolPermissionEntity {
       createdBy: entity.createBy,
       createdAt: entity.createAt
     });
-    // console.log(JSON.stringify(res, null, 2));
     return res
   }
 

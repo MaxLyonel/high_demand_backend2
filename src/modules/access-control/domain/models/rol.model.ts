@@ -1,4 +1,3 @@
-import { Permission } from "./permission.model";
 import { RolPermission } from "./rol-permission.model";
 
 export class Rol {

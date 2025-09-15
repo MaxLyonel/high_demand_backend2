@@ -1,7 +1,6 @@
 import { Rol } from "./rol.model";
 
 
-
 export class UserRole {
   constructor(
     public readonly id: number,

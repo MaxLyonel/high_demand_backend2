@@ -9,9 +9,21 @@ type AppAbility = Ability<[string, string]>;
 
 @Injectable()
 export class AbilityFactory {
-  constructor(private permissionRepo: PermissionRepository) {}
+
+  constructor(
+    private permissionRepo: PermissionRepository
+  ) {}
 
   async createForRole(roleId: number): Promise<AppAbility> {
+    const operatorMap: Record<string, string | null> = {
+      '=': null,
+      '>': '$gt',
+      '<': '$lt',
+      '>=': '$gte',
+      '<=': '$lte',
+      'in': '$in'
+    };
+
     const { can, build } = new AbilityBuilder<Ability<[string, string]>>(
       Ability as AbilityClass<AppAbility>
     );
@@ -19,18 +31,25 @@ export class AbilityFactory {
     const permissions = await this.permissionRepo.findByRoleId(roleId);
 
     permissions.forEach((perm) => {
-      // Solo si action y subject existen
-      if (!perm.action || !perm.subject) return;
+      if (!perm.action || !perm.subject) return; // no debería existir permisos sin una acción o recurso asignado
+
+      let conditionsObj: Record<string, any> | undefined;
 
       if (perm.conditions?.length) {
-        const conditionsObj: Record<string, any> = {};
+        conditionsObj = {};
         perm.conditions.forEach((c) => {
-          conditionsObj[c.field] = c.value;
-        });
-        can(perm.action.name, perm.subject.name, conditionsObj);
-      } else {
-        can(perm.action.name, perm.subject.name);
+          if(!conditionsObj![c.field]) conditionsObj![c.field] = {};
+
+          const op = operatorMap[c.operator]
+
+          if(op === null) {
+            conditionsObj![c.field] = c.value
+          } else {
+            conditionsObj![c.field][op] = c.value
+          }
+        })
       }
+      can(perm.action.name, perm.subject.name, conditionsObj)
     });
 
     return build();

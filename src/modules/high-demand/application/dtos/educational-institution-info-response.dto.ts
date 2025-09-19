@@ -5,4 +5,6 @@ export interface EducationalInstitutionDto {
   scope: string;
   dependency: string;
   direction: string;
+  district: string;
+  department: string;
 }

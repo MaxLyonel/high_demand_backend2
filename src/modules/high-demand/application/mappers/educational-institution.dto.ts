@@ -7,6 +7,8 @@ export function mapToDto(row: any): EducationalInstitutionDto {
     state: row.state,
     scope: row.scope,
     dependency: row.dependency,
-    direction: row.direction
+    direction: row.direction,
+    district: row.district,
+    department: row.department
   };
 }

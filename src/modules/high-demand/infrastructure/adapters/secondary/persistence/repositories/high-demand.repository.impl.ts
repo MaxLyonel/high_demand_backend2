@@ -12,6 +12,7 @@ import { HistoryRepository } from '@high-demand/domain/ports/outbound/history.re
 import { CreateHistoryDto } from '@high-demand/application/dtos/create-history.dto';
 import { HighDemandRegistrationCourseEntity } from '../entities/high-demand-course.entity';
 import { HighDemandRegistrationCourse } from '@high-demand/domain/models/high-demand-registration-course.model';
+import { PlaceTypeEntity } from '../entities/place-type.entity';
 
 interface Course {
   id: number;
@@ -44,6 +45,8 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     private readonly highDemandRepository: Repository<HighDemandRegistrationEntity>,
     @InjectRepository(HighDemandRegistrationCourseEntity, 'alta_demanda')
     private readonly highDemandCourseRepository: Repository<HighDemandRegistrationCourseEntity>,
+    @InjectRepository(PlaceTypeEntity, 'alta_demanda')
+    private readonly placeTypeRepository: Repository<PlaceTypeEntity>,
     private readonly _history: HistoryRepository,
   ) {}
 
@@ -173,29 +176,46 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity);
   }
 
-  // ** busca altas demandas que esten en la bandeja **
-  async searchByInbox(
+  // ** busca altas demandas por distrito que esten en la bandeja de entrada **
+  async searchInbox(
     rolId: number,
     stateId: number,
+    placeTypeId: number
   ): Promise<HighDemandRegistration[]> {
     const highDemands = await this.highDemandRepository.find({
       where: {
         workflowStateId: stateId,
         rolId: rolId,
         inbox: false,
+        placeDistrict: { id: placeTypeId }
       },
       relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
     });
     return highDemands.map(HighDemandRegistrationEntity.toDomain);
   }
 
-  // ** busca altas demandas que esten recepcionadas **
-  async searchByReceived(rolId: number): Promise<any> {
+  // ** busca altas demandas por departamento que esten en la bandeja de entrada **
+  async searchInboxByDepartment(rolId: number, stateId: number, placeTypeIds: number[]): Promise<HighDemandRegistration[]> {
+    const highDemands = await this.highDemandRepository.find({
+      where: {
+        workflowStateId: stateId,
+        rolId: rolId,
+        inbox: true,
+        placeDistrict: In(placeTypeIds)
+      },
+      relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
+    });
+    return highDemands.map(HighDemandRegistrationEntity.toDomain)
+  }
+
+  // ** busca altas demandas por distrito que esten recepcionadas **
+  async searchReceived(rolId: number, placeTypeId: number): Promise<any> {
     const highDemands = await this.highDemandRepository.find({
       where: {
         workflowStateId: 2,
         rolId: rolId,
         inbox: true,
+        placeDistrict: { id: placeTypeId }
       },
       relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
     });
@@ -316,6 +336,21 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
       ]
     })
     return highDemandsAproved
+  }
+
+  async searchFather(placeTypeId: number): Promise<any> {
+    return this.placeTypeRepository
+      .createQueryBuilder('hijo')
+      .innerJoinAndSelect('hijo.parent', 'padre')
+      .where('hijo.id = :id', { id: placeTypeId })
+      .getOne()
+      .then(result => result?.parent ?? null)
+  }
+
+  async searchChildren(parentId: number): Promise<PlaceTypeEntity[]> {
+    return this.placeTypeRepository.find({
+      where: { parentId: parentId },
+    });
   }
 
 }

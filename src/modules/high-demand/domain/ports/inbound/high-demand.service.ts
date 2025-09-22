@@ -1,5 +1,6 @@
 import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto"
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model"
+import { PlaceTypeEntity } from "@pre-registration/infrastructure/adapters/secondary/persistence/entities/place-type.entity"
 
 export abstract class HighDemandService {
 
@@ -14,13 +15,15 @@ export abstract class HighDemandService {
   abstract declineHighDemand(obj:any): Promise<any>;
   abstract getRolesToGo(rolId): Promise<any>;
   abstract cancelHighDemand(obj: any): Promise<any>;
-  // listar
-  abstract listInbox(rolId: number, stateId: number): Promise<any[]>;
-  abstract listReceived(rolId: number, stateId: number): Promise<any[]>;
+  // listar por distrito
+  abstract listInbox(rolId: number, stateId: number, placeTypeId: number): Promise<any[]>;
+  abstract listReceived(rolId: number, placeTypeId: number): Promise<any[]>;
+  // listar por departamento
+  abstract listInboxDepartment(rolId: number, stateId: number, placeTypeId: number): Promise<any[]>;
+
   // altas demandas para la pre-inscripción
   abstract listHighDemandsApproved(): Promise<any[]>
 
   abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
   abstract modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
-
 }

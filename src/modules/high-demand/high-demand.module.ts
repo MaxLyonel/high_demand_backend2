@@ -53,6 +53,7 @@ import { UserEntity } from "@access-control/infrastructure/adapters/secondary/pe
 import { TeacherEntity } from "@access-control/infrastructure/adapters/secondary/persistence/entities/teacher.entity";
 import { GeographicJurisdictionEntity } from "../pre-registration/infrastructure/adapters/secondary/persistence/entities/geographic-jurisdiction.entity";
 import { OperationsProgrammingModule } from "../operations-programming/operations-programming.module";
+import { PlaceTypeEntity } from "@pre-registration/infrastructure/adapters/secondary/persistence/entities/place-type.entity";
 
 
 
@@ -144,7 +145,8 @@ import { OperationsProgrammingModule } from "../operations-programming/operation
         RolTypeEntity,
         UserEntity,
         TeacherEntity,
-        GeographicJurisdictionEntity
+        GeographicJurisdictionEntity,
+        PlaceTypeEntity
       ], 'alta_demanda'),
     OperationsProgrammingModule
   ],

@@ -9,8 +9,12 @@ export abstract class HighDemandRepository {
   abstract deriveHighDemand(id: number, rolId: number): Promise<any>;
   abstract approveHighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration>;
   abstract declinehighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration>;
-  abstract searchByInbox(rolId: number, stateId: number): Promise<HighDemandRegistration[]>;
-  abstract searchByReceived(rolId: number): Promise<any>;
+  // distrito
+  abstract searchInbox(rolId: number, stateId: number, placeTypeId: number): Promise<HighDemandRegistration[]>;
+  abstract searchReceived(rolId: number, placeTypeId: number): Promise<any>;
+  // departamental
+  abstract searchInboxByDepartment(rolId: number, stateId: number, placeTypeId: number[]): Promise<HighDemandRegistration[]>;
+
   abstract getHighDemandsApproved(): Promise<any[]>;
   abstract cancelHighDemand(obj: any, registrationStatus: RegistrationStatus): Promise<any>;
 
@@ -19,4 +23,7 @@ export abstract class HighDemandRepository {
   abstract findInscriptions(obj: HighDemandRegistration): Promise<HighDemandRegistration[]>;
   abstract findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
   abstract updateWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
+
+  abstract searchFather(placeTypeId: number): Promise<any>;
+  abstract searchChildren(parentId: number): Promise<any>;
 }

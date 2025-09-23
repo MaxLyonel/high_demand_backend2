@@ -311,6 +311,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
         'educationalInstitution.educationalInstitutionType',
         'educationalInstitution.dependencyType',
         'educationalInstitution.jurisdiction',
+        'educationalInstitution.jurisdiction.districtPlaceType',
         'educationalInstitution.jurisdiction.localityPlaceType',
         'educationalInstitution.jurisdiction.localityPlaceType.parent.parent',
         'educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent',

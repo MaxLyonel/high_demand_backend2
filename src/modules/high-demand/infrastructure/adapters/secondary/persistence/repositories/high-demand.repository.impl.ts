@@ -180,42 +180,28 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   async searchInbox(
     rolId: number,
     stateId: number,
-    placeTypeId: number
+    placeTypes: number[]
   ): Promise<HighDemandRegistration[]> {
     const highDemands = await this.highDemandRepository.find({
       where: {
         workflowStateId: stateId,
         rolId: rolId,
         inbox: false,
-        placeDistrict: { id: placeTypeId }
+        placeDistrict: In(placeTypes)
       },
       relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
     });
     return highDemands.map(HighDemandRegistrationEntity.toDomain);
   }
 
-  // ** busca altas demandas por departamento que esten en la bandeja de entrada **
-  async searchInboxByDepartment(rolId: number, stateId: number, placeTypeIds: number[]): Promise<HighDemandRegistration[]> {
-    const highDemands = await this.highDemandRepository.find({
-      where: {
-        workflowStateId: stateId,
-        rolId: rolId,
-        inbox: true,
-        placeDistrict: In(placeTypeIds)
-      },
-      relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
-    });
-    return highDemands.map(HighDemandRegistrationEntity.toDomain)
-  }
-
   // ** busca altas demandas por distrito que esten recepcionadas **
-  async searchReceived(rolId: number, placeTypeId: number): Promise<any> {
+  async searchReceived(rolId: number, placeTypes: number[]): Promise<any> {
     const highDemands = await this.highDemandRepository.find({
       where: {
         workflowStateId: 2,
         rolId: rolId,
         inbox: true,
-        placeDistrict: { id: placeTypeId }
+        placeDistrict: In(placeTypes)
       },
       relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
     });
@@ -348,9 +334,10 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   }
 
   async searchChildren(parentId: number): Promise<PlaceTypeEntity[]> {
-    return this.placeTypeRepository.find({
+    const result = await this.placeTypeRepository.find({
       where: { parentId: parentId },
     });
+    return result
   }
 
 }

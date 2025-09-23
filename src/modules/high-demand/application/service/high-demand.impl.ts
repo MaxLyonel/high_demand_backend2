@@ -206,7 +206,17 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
   // ****** Listar Altas Demandas de la Bandeja de Entrada ******
   async listInbox(rolId: number, stateId: number, placeTypeId: number): Promise<any[]> {
-    const highDemands = await this.highDemandRepository.searchInbox(rolId, stateId, placeTypeId)
+    let placeTypes:Array<number> = []
+    switch(parseInt(rolId.toString())) {
+      case 37: // distrital
+        placeTypes.push(placeTypeId)
+        break;
+      case 38: // departamental
+        const places = await this.highDemandRepository.searchChildren(placeTypeId)
+        placeTypes = places.map(p => p.id)
+        break;
+    }
+    const highDemands = await this.highDemandRepository.searchInbox(rolId, stateId, placeTypes)
     const reducer:any = []
     for(let highDemand of highDemands) {
       const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand
@@ -233,35 +243,17 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
   // ****** Listar Altas Demandas de la Bandeja de Recibidos *****
   async listReceived(rolId: number, placeTypeId: number): Promise<any[]> {
-    const highDemands = await this.highDemandRepository.searchReceived(rolId, placeTypeId)
-    const reducer:any = []
-    for(let highDemand of highDemands) {
-      const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand
-      const workflowState = await this.workflowStateRepository.findById(workflowStateId)
-      const rol = await this.rolRepository.findById(rolId)
-      const user = await this.userRepository.findById(userId)
-      const institution = await this.educationalInstitutionRepository.findBySie(educationalInstitutionId)
-      const obj = {
-        id: highDemand.id,
-        workflowId: highDemand.workflowId,
-        inbox: highDemand.inbox,
-        operativeId: highDemand.operativeId,
-        registrationStatus: highDemand.registrationStatus,
-        workflowState,
-        rol,
-        user,
-        institution,
-        courses: highDemand.courses
-      }
-      reducer.push(obj)
+    let placeTypes:Array<number> = []
+    switch(parseInt(rolId.toString())) {
+      case 37:
+        placeTypes.push(placeTypeId)
+        break;
+      case 38:
+        const places = await this.highDemandRepository.searchChildren(placeTypeId)
+        placeTypes = places.map(p => p.id)
+        break;
     }
-    return reducer
-  }
-
-  // ****** Listar Altas Demandas por departamento en la Bandeja de Entrada ******
-  async listInboxDepartment(rolId: number, stateId: number, placeTypeId: number): Promise<any[]> {
-    const placeTypeIds = await this.highDemandRepository.searchChildren(placeTypeId)
-    const highDemands = await this.highDemandRepository.searchInboxByDepartment(rolId, stateId, placeTypeIds)
+    const highDemands = await this.highDemandRepository.searchReceived(rolId, placeTypes)
     const reducer:any = []
     for(let highDemand of highDemands) {
       const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand

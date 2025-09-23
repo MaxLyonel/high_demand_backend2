@@ -18,8 +18,6 @@ export abstract class HighDemandService {
   // listar por distrito
   abstract listInbox(rolId: number, stateId: number, placeTypeId: number): Promise<any[]>;
   abstract listReceived(rolId: number, placeTypeId: number): Promise<any[]>;
-  // listar por departamento
-  abstract listInboxDepartment(rolId: number, stateId: number, placeTypeId: number): Promise<any[]>;
 
   // altas demandas para la pre-inscripción
   abstract listHighDemandsApproved(): Promise<any[]>

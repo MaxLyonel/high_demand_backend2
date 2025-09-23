@@ -10,10 +10,8 @@ export abstract class HighDemandRepository {
   abstract approveHighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration>;
   abstract declinehighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration>;
   // distrito
-  abstract searchInbox(rolId: number, stateId: number, placeTypeId: number): Promise<HighDemandRegistration[]>;
-  abstract searchReceived(rolId: number, placeTypeId: number): Promise<any>;
-  // departamental
-  abstract searchInboxByDepartment(rolId: number, stateId: number, placeTypeId: number[]): Promise<HighDemandRegistration[]>;
+  abstract searchInbox(rolId: number, stateId: number, placeTypeId: number[]): Promise<HighDemandRegistration[]>;
+  abstract searchReceived(rolId: number, placeTypes: number[]): Promise<HighDemandRegistration[]>;
 
   abstract getHighDemandsApproved(): Promise<any[]>;
   abstract cancelHighDemand(obj: any, registrationStatus: RegistrationStatus): Promise<any>;

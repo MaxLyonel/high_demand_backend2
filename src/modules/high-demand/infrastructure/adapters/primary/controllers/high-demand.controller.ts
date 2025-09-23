@@ -122,24 +122,6 @@ export class HighDemandController {
     }
   }
 
-  @Get('list-inbox-department')
-  async listDepartmentInbox(@Query() params: any) {
-    try {
-      const { rolId, stateId, placeTypeId } = params
-      const result = await this.highDemandService.listInboxDepartment(rolId, stateId, placeTypeId)
-      return {
-        status: 'success',
-        message: 'Listado por departamento Altas demandas exitoso',
-        data: result
-      }
-    } catch(error) {
-      throw new HttpException({
-        status: 'error',
-        message: error.message || 'Error la bandeja de entrada de altas demandas por departamento'
-      }, HttpStatus.BAD_REQUEST)
-    }
-  }
-
   @Get('list-receive')
   async listReceiveHighDemands(@Query() params: any) {
     try {

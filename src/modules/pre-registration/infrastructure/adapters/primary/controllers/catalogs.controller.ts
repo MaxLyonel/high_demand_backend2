@@ -1,5 +1,7 @@
-import { Controller, Get, HttpException, HttpStatus, Query } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Query, Res, UseInterceptors } from "@nestjs/common";
 import { StudentService } from "@pre-registration/domain/ports/inbound/student.service";
+import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service";
+import { Response } from "express";
 import { CatalogsService } from "src/modules/pre-registration/domain/ports/inbound/catalogs.service";
 
 
@@ -9,7 +11,8 @@ export class CatalogsController {
 
   constructor(
     private readonly catalogsService: CatalogsService,
-    private readonly studentService: StudentService
+    private readonly studentService: StudentService,
+    private readonly pdfService: PdfService
   ) {}
 
   @Get('list-relationship')
@@ -120,6 +123,34 @@ export class CatalogsController {
         status: 'error',
         message: error.message || 'Error al obtener los departamentos'
       }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('print')
+  async print(@Res() res: Response) {
+    try {
+      console.log("Solicitud PDF recibida");
+      
+      // ✅ Solo llamar al servicio, sin return
+      await this.pdfService.generateRegistrationForm({ campo: 1 }, res);
+      // return "Hola"
+      
+      console.log("PDF enviado exitosamente");
+      
+    } catch(error) {
+      console.error('Error generando PDF:', error);
+      
+      // ✅ Solo enviar error si los headers no se enviaron
+      if (!res.headersSent) {
+        // Puedes usar throw o res.status().json()
+        res.status(HttpStatus.BAD_REQUEST).json({
+          status: 'error',
+          message: error.message || 'Error al descargar PDF'
+        });
+      } else {
+        // Si ya se enviaron headers, solo logear el error
+        console.error('Error después de enviar headers PDF');
+      }
     }
   }
 

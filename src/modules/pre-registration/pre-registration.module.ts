@@ -26,6 +26,8 @@ import { SegipServiceImpl } from "./infrastructure/adapters/secondary/services/s
 import { HttpModule } from "@nestjs/axios";
 import { LevelEntity } from "./infrastructure/adapters/secondary/persistence/entities/level.entity";
 import { HistoryPreRegistrationEntity } from "./infrastructure/adapters/secondary/persistence/entities/history-pre-registration.entity";
+import { PdfService } from "./domain/ports/outbound/pdf.service";
+import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf/pdf.service.impl";
 
 
 
@@ -59,6 +61,10 @@ import { HistoryPreRegistrationEntity } from "./infrastructure/adapters/secondar
     {
       provide: SegipService,
       useClass: SegipServiceImpl
+    },
+    {
+      provide: PdfService,
+      useClass: PdfServiceImpl
     }
   ],
   imports : [

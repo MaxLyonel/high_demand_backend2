@@ -11,7 +11,10 @@ export class TypenameInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
 
-    if (req.url.includes('/user/abilities')) {
+    if (req.url.includes('/user/abilities') ||
+      req.url.includes('/print') ||
+      req.headers['content-type'] === 'application/pdf'
+    ) {
       return next.handle();
     }
 

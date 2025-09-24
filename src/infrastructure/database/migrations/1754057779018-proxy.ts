@@ -13,6 +13,7 @@ export class Proxy1754057779018 implements MigrationInterface {
                 nombre VARCHAR(100) NOT NULL,
                 fecha_nacimiento DATE NOT NULL,
                 nacionalidad BOOLEAN NOT NULL DEFAULT FALSE,
+                celular VARCHAR(100),
                 parentesco_tipo_id BIGINT REFERENCES alta_demanda.parentesco(id),
                 creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

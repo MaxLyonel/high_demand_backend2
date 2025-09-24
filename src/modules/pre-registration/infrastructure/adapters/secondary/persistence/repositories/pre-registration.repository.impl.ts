@@ -42,6 +42,20 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         justification
       } = obj
 
+      const postulantSEGIP = {
+        nombres: postulant.name.trim().toUpperCase(),
+        paterno: postulant.lastName.trim().toUpperCase(),
+        materno: (postulant.mothersLastName || '').trim().toUpperCase(),
+        ci: postulant.identityCard.trim().toUpperCase(),
+        fechaNacimiento: postulant.dateBirth,
+        complemento: (postulant.complement || '').trim().toUpperCase()
+      }
+      const postulantTypeCI = postulant.nationality
+      const validationResult = await this.segipService.contrastar(postulantSEGIP, postulantTypeCI || 1)
+      if(!validationResult.finalizado) {
+        throw new Error(validationResult.mensaje)
+      }
+
       const personSEGIP = {
         nombres: guardian.name.trim().toUpperCase(),
         paterno: guardian.lastName.trim().toUpperCase(),
@@ -66,7 +80,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       // Creamos o usamos el existente
       const newPostulant = existsPostulant ?? await queryRunner.manager.save(PostulantEntity, {
         identityCard: postulant.identityCard,
-        // complement: postulant.complement ?? '', // evita null
+        complement: postulant.complement ?? '', // evita null
         lastName: postulant.lastName,
         mothersLastName: postulant.mothersLastName,
         name: postulant.name,
@@ -93,7 +107,8 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         name: guardian.name,
         nationality: guardian.nationality,
         dateBirth: guardian.dateBirth,
-        relationshipType: guardian.relationship
+        relationshipType: guardian.relationship,
+        cellphone: guardian.cellphone
       })
       if(justification === 3) { //! Guardar trabajo del apoderado
         const newWorkRepresentative = await queryRunner.manager.save(WorkRepresentativeEntity, {
@@ -155,7 +170,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
 
       const history = {
         preRegistration: { id: newPreRegistration.id},
-        rol: { id: 49 }, // Rol postulante
+        rol: { id: 49 }, //TODO Rol postulante
         state: newPreRegistration.state,
         observation: '',
       }

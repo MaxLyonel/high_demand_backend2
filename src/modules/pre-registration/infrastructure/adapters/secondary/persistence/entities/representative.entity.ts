@@ -30,6 +30,9 @@ export class RepresentativeEntity {
   @Column({ name: 'nacionalidad'})
   nationality: boolean
 
+  @Column({ name: 'celular'})
+  cellphone: string
+
   @ManyToOne(() => RelationshipEntity, { eager: false })
   @JoinColumn({ name: 'parentesco_tipo_id'})
   relationshipType: RelationshipEntity

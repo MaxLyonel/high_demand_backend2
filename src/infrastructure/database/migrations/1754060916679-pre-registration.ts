@@ -22,6 +22,7 @@ export class PreRegistration1754060916679 implements MigrationInterface {
                 postulante_id BIGINT REFERENCES alta_demanda.postulante(id),
                 criterio_id BIGINT REFERENCES alta_demanda.criterio(id),
                 estado alta_demanda.estado_pre_inscripcion_enum NOT NULL,
+                codigo VARCHAR NOT NULL,
                 creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 eliminado_en TIMESTAMP DEFAULT NULL

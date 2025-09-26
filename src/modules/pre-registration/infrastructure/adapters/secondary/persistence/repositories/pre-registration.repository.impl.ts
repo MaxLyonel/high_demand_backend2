@@ -12,6 +12,7 @@ import { PostulantResidence } from "../entities/postulant-residence.entity";
 import { SegipService } from "@pre-registration/domain/ports/outbound/segip.service";
 import { HistoryPreRegistrationEntity } from "../entities/history-pre-registration.entity";
 import { PreRegistration } from "@pre-registration/domain/models/pre-registration.model";
+import { PreRegistrationBrotherEntity } from "../entities/pre-registration-brother.entity";
 
 
 
@@ -41,7 +42,9 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         courseId,
         justification
       } = obj
+      console.log("obj: ", obj)
 
+      // *** Validación SEGIP - POSTULANTE ***
       const postulantSEGIP = {
         nombres: postulant.name.trim().toUpperCase(),
         paterno: postulant.lastName.trim().toUpperCase(),
@@ -55,7 +58,9 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       if(!validationResult.finalizado) {
         throw new Error(validationResult.mensaje)
       }
+      // ****************************************
 
+      // *** Validación SEGIP - APODERADO ***
       const personSEGIP = {
         nombres: guardian.name.trim().toUpperCase(),
         paterno: guardian.lastName.trim().toUpperCase(),
@@ -65,19 +70,19 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         complemento: (guardian.complement || '').trim().toUpperCase()
       }
       const typeCI = guardian.guardianNationality
-
       const result = await this.segipService.contrastar(personSEGIP, typeCI || 1)
       if(!result.finalizado) {
         throw new Error(result.mensaje)
       }
+      // ****************************************
 
+      // **** Buscando o creando al POSTULANTE ****
       const existsPostulant = await queryRunner.manager.findOne(PostulantEntity, {
         where: {
           identityCard: postulant.identityCard,
         }
       });
 
-      // Creamos o usamos el existente
       const newPostulant = existsPostulant ?? await queryRunner.manager.save(PostulantEntity, {
         identityCard: postulant.identityCard,
         complement: postulant.complement ?? '', // evita null
@@ -89,7 +94,14 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         gender: postulant.gender
       });
 
-      if(justification === 2) { //! Guardar residencia del postulante
+      // if(justification === 1) {
+      //   const preRegistrationBrother = await queryRunner.manager.save(PreRegistrationBrotherEntity, {
+      //     codeRude: 
+      //   })
+      // }
+
+      // **** Guardando VIVIENDA del POSTULANTE ***
+      if(justification === 2) {
         const newPostulantResidence = await queryRunner.manager.save(PostulantResidence, {
           postulant: newPostulant,
           municipality: postulantResidence.municipality,
@@ -98,7 +110,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           telephone: postulantResidence.telephone
         })
       }
-      // 3. Guardar apoderado
+      // ***** Guardando APODERADO *****
       const newRepresentative = await queryRunner.manager.save(RepresentativeEntity, {
         identityCard: guardian.identityCard,
         complement: guardian.complement,
@@ -110,6 +122,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         relationshipType: guardian.relationship,
         cellphone: guardian.cellphone
       })
+      // ***** Guardando LUGAR TRABAJO APODERADO ******
       if(justification === 3) { //! Guardar trabajo del apoderado
         const newWorkRepresentative = await queryRunner.manager.save(WorkRepresentativeEntity, {
           representative: newRepresentative,
@@ -168,6 +181,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         highDemandCourse: searchCourse
       })
 
+      // ***** Guardando HISTORICO ******
       const history = {
         preRegistration: { id: newPreRegistration.id},
         rol: { id: 49 }, //TODO Rol postulante

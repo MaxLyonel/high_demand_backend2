@@ -50,14 +50,35 @@ export class HighDemandController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('receive')
+  async receiveHighDemand(
+    @Body('highDemandIds') highDemandIds: number[],
+    @User('id') userId: number
+  ) {
+    try {
+      const result = await this.highDemandService.receiveHighDemands(highDemandIds, userId)
+      return {
+        status: 'success',
+        message: 'Se recepcionó exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al recepcionar'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Post('derive')
   async deriveHighDemand(@Body() body: any) {
     try {
-      const { highDemand, rolId, observation } = body
-      const result = await this.highDemandService.deriveHighDemand(highDemand, rolId, observation)
+      const { highDemandIds, rolId, observation } = body
+      const result = await this.highDemandService.deriveHighDemands(highDemandIds, rolId, observation)
       return {
         status: 'success',
-        message: 'Derivacion exitosa',
+        message: '¡Derivación exitosa!',
         data: result
       }
     } catch(error) {
@@ -176,26 +197,7 @@ export class HighDemandController {
 
 
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':id/receive')
-  async receiveHighDemand(
-    @Param('id', ParseIntPipe) id: number,
-    @User('id') userId: number
-  ) {
-    try {
-      const result = await this.highDemandService.receiveHighDemand(id, userId)
-      return {
-        status: 'success',
-        message: 'Se recepcionó exitosamente',
-        data: result
-      }
-    } catch(error) {
-      throw new HttpException({
-        status: 'error',
-        message: error.message || 'Error al recepcionar'
-      }, HttpStatus.BAD_REQUEST)
-    }
-  }
+
 
 
 

@@ -110,12 +110,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   }
 
   // ****** Recibir la Alta Demanda *****
-  async receiveHighDemand(id: number, userId: number): Promise<any> {
-    const highDemandFound = await this.highDemandRepository.findById(id)
-    if(!highDemandFound) throw new Error('No existe la alta demanda')
-
-    const saved = await this.highDemandRepository.updatedInbox(highDemandFound.id, 2)
-
+  async receiveHighDemands(highDemandIds: number[], userId: number): Promise<any> {
+    const saved = await this.highDemandRepository.receiveHighDemands(highDemandIds, 2)
     const newHistory = {
       highDemandRegistrationId: saved.id,
       workflowStateId: saved.workflowStateId,
@@ -125,12 +121,12 @@ export class HighDemandRegistrationImpl implements HighDemandService {
       observation: ''
     }
     this.historyRepository.updatedHistory(newHistory)
-    return highDemandFound
+    return saved
   }
 
   // ** Derivar alta demanda **
-  async deriveHighDemand(obj: any, rolId: number, observation: string | null): Promise<any> {
-    const saved = await this.highDemandRepository.deriveHighDemand(obj.id, rolId)
+  async deriveHighDemands(highDemandIds: number[], rolId: number, observation: string | null): Promise<any> {
+    const saved = await this.highDemandRepository.deriveHighDemands(highDemandIds, rolId)
     const newHistory = {
       highDemandRegistrationId: saved.id,
       workflowStateId: saved.workflowStateId,

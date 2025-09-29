@@ -209,35 +209,35 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   }
 
   // ** recibir la alta demanda **
-  async updatedInbox(id: number, nextStateId: number): Promise<HighDemandRegistration> {
+  async receiveHighDemands(highDemandIds: number[], nextStateId: number): Promise<HighDemandRegistration> {
     const result = await this.highDemandRepository.update(
-      { id: id },
+      { id: In(highDemandIds) },
       { inbox: true, workflowStateId: nextStateId },
     );
     if (result.affected && result.affected <= 0) {
-      throw new Error('No se actualiza el inbox');
+      throw new Error('No se recepcionaron las altas demandas');
     }
     const highDemandEntity = await this.highDemandRepository.findOne({
       where: {
-        id: id,
+        id: In(highDemandIds),
       },
     });
     if (!highDemandEntity) throw new Error('No existe la Alta Demanda');
     return HighDemandRegistrationEntity.toDomain(highDemandEntity);
   }
 
-  // ** derivar la alta demanda **
-  async deriveHighDemand(id: number, rolId: number): Promise<any> {
+  // ** derivar la altas demandas **
+  async deriveHighDemands(highDemandIds: number[], rolId: number): Promise<any> {
     const result = await this.highDemandRepository.update(
-      { id: id },
+      { id: In(highDemandIds) },
       { inbox: false, workflowStateId: 1, rolId: rolId }
     )
     if(result.affected && result.affected <= 0) {
-      throw new Error('No se actualizo el derive')
+      throw new Error('No se realizó la derivación')
     }
     const highDemandEntity = await this.highDemandRepository.findOne({
       where: {
-        id: id
+        id: In(highDemandIds)
       }
     })
     if(!highDemandEntity) throw new Error('No existe la Alta demanda')

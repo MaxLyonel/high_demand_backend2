@@ -54,6 +54,11 @@ import { TeacherEntity } from "@access-control/infrastructure/adapters/secondary
 import { GeographicJurisdictionEntity } from "../pre-registration/infrastructure/adapters/secondary/persistence/entities/geographic-jurisdiction.entity";
 import { OperationsProgrammingModule } from "../operations-programming/operations-programming.module";
 import { PlaceTypeEntity } from "@pre-registration/infrastructure/adapters/secondary/persistence/entities/place-type.entity";
+import { MainInboxRepository } from "./domain/ports/outbound/main-inbox.repository";
+import { MainInboxRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/main-inbox.repository.impl";
+import { MainInboxController } from "./infrastructure/adapters/primary/controllers/main-inbox.controller";
+import { MainInboxService } from "./domain/ports/inbound/main-inbox.service";
+import { MainInboxImpl } from "./application/service/main-inbox.impl";
 
 
 
@@ -64,6 +69,7 @@ import { PlaceTypeEntity } from "@pre-registration/infrastructure/adapters/secon
     HighDemandController,
     HighDemandCourseController,
     HistoryController,
+    MainInboxController
   ],
   providers: [
     {
@@ -130,23 +136,31 @@ import { PlaceTypeEntity } from "@pre-registration/infrastructure/adapters/secon
       provide: UserRepository,
       useClass: UserRepositoryImpl
     },
+    {
+      provide: MainInboxRepository,
+      useClass: MainInboxRepositoryImpl
+    },
+    {
+      provide: MainInboxService,
+      useClass: MainInboxImpl
+    }
   ],
   imports: [
     TypeOrmModule.forFeature(
       [
-        EducationalInstitutionEntity,
         EducationalInstitutionCourseEntity,
-        HighDemandRegistrationEntity,
-        HighDemandRegistrationCourseEntity,
-        WorkflowEntity,
-        WorkflowStateEntity,
-        WorkflowSequenceEntity,
-        HistoryEntity,
-        RolTypeEntity,
-        UserEntity,
-        TeacherEntity,
+        EducationalInstitutionEntity,
         GeographicJurisdictionEntity,
-        PlaceTypeEntity
+        HighDemandRegistrationCourseEntity,
+        HighDemandRegistrationEntity,
+        HistoryEntity,
+        PlaceTypeEntity,
+        RolTypeEntity,
+        TeacherEntity,
+        UserEntity,
+        WorkflowEntity,
+        WorkflowSequenceEntity,
+        WorkflowStateEntity,
       ], 'alta_demanda'),
     OperationsProgrammingModule
   ],

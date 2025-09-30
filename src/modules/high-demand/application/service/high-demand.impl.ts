@@ -7,12 +7,9 @@ import { HighDemandRepository } from "../../domain/ports/outbound/high-demand.re
 import { HighDemandService } from "../../domain/ports/inbound/high-demand.service";
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum";
 import { WorkflowRepository } from "@high-demand/domain/ports/outbound/workflow.repository";
-import { WorkflowStateRepository } from "@high-demand/domain/ports/outbound/workflow-state.repository";
 import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
 import { CreateHistoryDto } from "../dtos/create-history.dto";
 import { WorkflowSequenceRepository } from "@high-demand/domain/ports/outbound/workflow-sequence.repository";
-import { RolRepository } from "@access-control/domain/ports/outbound/rol.repository";
-import { UserRepository } from '@access-control/domain/ports/outbound/user.repository';
 import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository";
 import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
 
@@ -22,11 +19,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   constructor(
     private readonly highDemandRepository: HighDemandRepository,
     private readonly workflowRepository: WorkflowRepository,
-    private readonly workflowStateRepository: WorkflowStateRepository,
     private readonly historyRepository: HistoryRepository,
     private readonly workflowSequenceRepository: WorkflowSequenceRepository,
-    private readonly rolRepository: RolRepository,
-    private readonly userRepository: UserRepository,
     private readonly educationalInstitutionRepository: EducationalInstitutionRepository,
     private readonly operativeRepository: OperationsProgrammingRepository
   ) {}
@@ -103,72 +97,6 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return saved
   }
 
-  // ** Obtener los roles a donde ir **
-  async getRolesToGo(rolId: number): Promise<any> {
-    const workflowSequences = await this.workflowSequenceRepository.findNextStates(rolId)
-    return workflowSequences
-  }
-
-  // ****** Recibir la Alta Demanda *****
-  async receiveHighDemands(highDemandIds: number[], userId: number): Promise<any> {
-    const saved = await this.highDemandRepository.receiveHighDemands(highDemandIds, 2)
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: userId,
-      rolId: saved.rolId,
-      observation: ''
-    }
-    this.historyRepository.updatedHistory(newHistory)
-    return saved
-  }
-
-  // ** Derivar alta demanda **
-  async deriveHighDemands(highDemandIds: number[], rolId: number, observation: string | null): Promise<any> {
-    const saved = await this.highDemandRepository.deriveHighDemands(highDemandIds, rolId)
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: saved.userId,
-      rolId: saved.rolId,
-      observation: observation
-    }
-    this.historyRepository.updatedHistory(newHistory)
-    return saved
-  }
-
-  // ** aprobar alta demanda **
-  async approveHighDemand(obj: any): Promise<any> {
-    const saved = await this.highDemandRepository.approveHighDemand(obj.id, RegistrationStatus.APPROVED)
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: saved.userId,
-      rolId: saved.rolId,
-      observation: ''
-    }
-    this.historyRepository.updatedHistory(newHistory)
-    return saved
-  }
-
-  // ** rechazar alta demanda **
-  async declineHighDemand(obj: any): Promise<any> {
-    const saved = await this.highDemandRepository.declinehighDemand(obj.id, RegistrationStatus.REJECTED)
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: saved.userId,
-      rolId: saved.rolId,
-      observation: ''
-    }
-    this.historyRepository.updatedHistory(newHistory)
-    return saved
-  }
-
   // ** modificar estado inscripción alta demanda **
   async cancelHighDemand(obj: any): Promise<any> {
     const updated = await this.highDemandRepository.cancelHighDemand(obj, RegistrationStatus.CANCELED)
@@ -184,13 +112,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return updated
   }
 
-
   async modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration> {
-    // 1: buscamos su estado siguiente
-
-    // 2: Actualizamos el estado del tramite
-    //  - rolId, estado_id
-    // const workflowSequence = await this.workflowStateRepository.findByRolId(obj.rolId, workflowState.id)
     const updatedHighDemand = await this.highDemandRepository.updateWorkflowStatus(obj)
     return updatedHighDemand
   }
@@ -198,80 +120,6 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   async getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration | null> {
     const highDemand = await this.highDemandRepository.findByInstitutionId(educationalInstitutionId)
     return highDemand
-  }
-
-  // ****** Listar Altas Demandas de la Bandeja de Entrada ******
-  async listInbox(rolId: number, stateId: number, placeTypeId: number): Promise<any[]> {
-    let placeTypes:Array<number> = []
-    switch(parseInt(rolId.toString())) {
-      case 37: // distrital
-        placeTypes.push(placeTypeId)
-        break;
-      case 38: // departamental
-        const places = await this.highDemandRepository.searchChildren(placeTypeId)
-        placeTypes = places.map(p => p.id)
-        break;
-    }
-    const highDemands = await this.highDemandRepository.searchInbox(rolId, stateId, placeTypes)
-    const reducer:any = []
-    for(let highDemand of highDemands) {
-      const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand
-      const workflowState = await this.workflowStateRepository.findById(workflowStateId)
-      const rol = await this.rolRepository.findById(rolId)
-      const user = await this.userRepository.findById(userId)
-      const institution = await this.educationalInstitutionRepository.findBySie(educationalInstitutionId)
-      const obj = {
-        id: highDemand.id,
-        workflowId: highDemand.workflowId,
-        inbox: highDemand.inbox,
-        operativeId: highDemand.operativeId,
-        registrationStatus: highDemand.registrationStatus,
-        workflowState,
-        rol,
-        user,
-        institution,
-        courses: highDemand.courses
-      }
-      reducer.push(obj)
-    }
-    return reducer
-  }
-
-  // ****** Listar Altas Demandas de la Bandeja de Recibidos *****
-  async listReceived(rolId: number, placeTypeId: number): Promise<any[]> {
-    let placeTypes:Array<number> = []
-    switch(parseInt(rolId.toString())) {
-      case 37:
-        placeTypes.push(placeTypeId)
-        break;
-      case 38:
-        const places = await this.highDemandRepository.searchChildren(placeTypeId)
-        placeTypes = places.map(p => p.id)
-        break;
-    }
-    const highDemands = await this.highDemandRepository.searchReceived(rolId, placeTypes)
-    const reducer:any = []
-    for(let highDemand of highDemands) {
-      const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand
-      const workflowState = await this.workflowStateRepository.findById(workflowStateId)
-      const rol = await this.rolRepository.findById(rolId)
-      const user = await this.userRepository.findById(userId)
-      const institution = await this.educationalInstitutionRepository.findBySie(educationalInstitutionId)
-      const obj = {
-        id: highDemand.id,
-        workflowId: highDemand.workflowId,
-        inbox: highDemand.inbox,
-        operativeId: highDemand.operativeId,
-        registrationStatus: highDemand.registrationStatus,
-        workflowState,
-        rol,
-        user,
-        institution,
-        courses: highDemand.courses
-      }
-      reducer.push(obj)
-    }
-    return reducer
   }
 
   // ****** Listar Altas Demandas Aprobadas *****

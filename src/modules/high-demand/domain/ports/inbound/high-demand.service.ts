@@ -8,7 +8,7 @@ export abstract class HighDemandService {
     course: any
   ): Promise<HighDemandRegistration>;
   abstract sendHighDemand(obj: any): Promise<HighDemandRegistration>;
-  abstract listHighDemandsApproved(): Promise<any[]>
+  abstract listHighDemandsApproved(departmentId: number): Promise<any[]>
   abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
   abstract modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
   abstract cancelHighDemand(obj: any): Promise<any>;

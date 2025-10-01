@@ -123,8 +123,8 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   }
 
   // ****** Listar Altas Demandas Aprobadas *****
-  async listHighDemandsApproved(): Promise<any[]> {
-    const highDemandsApproved = await this.highDemandRepository.getHighDemandsApproved()
+  async listHighDemandsApproved(departmentId: number): Promise<any[]> {
+    const highDemandsApproved = await this.highDemandRepository.getHighDemandsApproved(departmentId)
     return highDemandsApproved
   }
 }

@@ -50,7 +50,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     private readonly placeTypeRepository: Repository<PlaceTypeEntity>,
     private readonly _history: HistoryRepository,
     @InjectRepository(OperativeEntity, 'alta_demanda')
-    private readonly opeartiveRepository: Repository<OperativeEntity>
+    private readonly operativeRepository: Repository<OperativeEntity>
   ) {}
 
   // ** guarda la alta demanda **
@@ -160,11 +160,11 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   async findByInstitutionId(
     educationalInstitutionId: number,
   ): Promise<HighDemandRegistration | null> {
-    const operative = await this.opeartiveRepository.findOne({
+    const operative = await this.operativeRepository.findOne({
       where: { gestionId: 2025 },
       select: { id: true }
     })
-    if(!operative) throw new Error("Falta definir los períodos. Por favor contactese con el administrador")
+    if(!operative) throw new Error("Períodos no definidos. Por favor contactese con el administrador")
     const highDemandRegistrationEntity =
       await this.highDemandRepository.findOne({
         where: {
@@ -203,11 +203,31 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   }
 
   // ** obtener altas demandas aprobadas **
-  async getHighDemandsApproved(): Promise<any[]> {
+  async getHighDemandsApproved(departmentId: number): Promise<any[]> {
+    const operative = await this.operativeRepository.findOne({
+      where: { gestionId: 2025 },
+      select: { id: true }
+    })
+    if(!operative) throw new Error("Períodos no definidos. Por favor contáctese con el administrador")
     const highDemandsAproved = await this.highDemandRepository.find({
       where: {
         registrationStatus: RegistrationStatus.APPROVED,
-        operativeId: 1 //TODO
+        operativeId: operative.id,
+        educationalInstitution: {
+          jurisdiction: {
+            localityPlaceType: {
+              parent: {
+                parent: {
+                  parent: {
+                    parent: {
+                      id: departmentId
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       relations: [
         'educationalInstitution',
@@ -238,6 +258,10 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
       .then(result => result?.parent ?? null)
   }
 
-
-
+  async searchChildren(parentId: number): Promise<PlaceTypeEntity[]> {
+    const result = await this.placeTypeRepository.find({
+      where: { parentId: parentId },
+    });
+    return result
+  }
 }

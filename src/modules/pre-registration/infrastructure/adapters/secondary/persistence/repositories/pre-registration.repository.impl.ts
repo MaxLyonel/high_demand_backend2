@@ -13,6 +13,8 @@ import { SegipService } from "@pre-registration/domain/ports/outbound/segip.serv
 import { HistoryPreRegistrationEntity } from "../entities/history-pre-registration.entity";
 import { PreRegistration } from "@pre-registration/domain/models/pre-registration.model";
 import { PreRegistrationBrotherEntity } from "../entities/pre-registration-brother.entity";
+import { PreRegistrationLocationEntity } from "../entities/pre-registration-location.entity";
+import { LocationType } from "@pre-registration/domain/enums/location-type.enum";
 
 
 
@@ -40,11 +42,11 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         guardian,
         guardianWork,
         courseId,
-        justification
+        justification,
+        postulantSiblings
       } = obj
-      console.log("obj: ", obj)
 
-      // *** Validación SEGIP - POSTULANTE ***
+      // *************** Validación SEGIP - POSTULANTE ***************
       const postulantSEGIP = {
         nombres: postulant.name.trim().toUpperCase(),
         paterno: postulant.lastName.trim().toUpperCase(),
@@ -58,9 +60,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       if(!validationResult.finalizado) {
         throw new Error(validationResult.mensaje)
       }
-      // ****************************************
-
-      // *** Validación SEGIP - APODERADO ***
+      // *************** Validación SEGIP - APODERADO ***************
       const personSEGIP = {
         nombres: guardian.name.trim().toUpperCase(),
         paterno: guardian.lastName.trim().toUpperCase(),
@@ -74,9 +74,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       if(!result.finalizado) {
         throw new Error(result.mensaje)
       }
-      // ****************************************
-
-      // **** Buscando o creando al POSTULANTE ****
+      // *************** Buscando o creando al POSTULANTE ***************
       const existsPostulant = await queryRunner.manager.findOne(PostulantEntity, {
         where: {
           identityCard: postulant.identityCard,
@@ -94,23 +92,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         gender: postulant.gender
       });
 
-      // if(justification === 1) {
-      //   const preRegistrationBrother = await queryRunner.manager.save(PreRegistrationBrotherEntity, {
-      //     codeRude: 
-      //   })
-      // }
-
-      // **** Guardando VIVIENDA del POSTULANTE ***
-      if(justification === 2) {
-        const newPostulantResidence = await queryRunner.manager.save(PostulantResidence, {
-          postulant: newPostulant,
-          municipality: postulantResidence.municipality,
-          area: postulantResidence.area,
-          address: postulantResidence.address,
-          telephone: postulantResidence.telephone
-        })
-      }
-      // ***** Guardando APODERADO *****
+      // *************** Guardando APODERADO ***************
       const newRepresentative = await queryRunner.manager.save(RepresentativeEntity, {
         identityCard: guardian.identityCard,
         complement: guardian.complement,
@@ -122,30 +104,20 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         relationshipType: guardian.relationship,
         cellphone: guardian.cellphone
       })
-      // ***** Guardando LUGAR TRABAJO APODERADO ******
-      if(justification === 3) { //! Guardar trabajo del apoderado
-        const newWorkRepresentative = await queryRunner.manager.save(WorkRepresentativeEntity, {
-          representative: newRepresentative,
-          address: guardianWork.address,
-          municipalityId: guardianWork.municipality.id,
-          area: guardianWork.area,
-          workPlaceName: guardianWork.placeName,
-          phone: guardianWork.telephone
-        })
-      }
 
+      // *************** Guardando la PREINSCRIPCION ***************
+      // 1. Validación de existencia de curso
       const searchCourse = await queryRunner.manager.findOne(HighDemandRegistrationCourseEntity, {
-        where: {
-          id: courseId
-        }
+        where: { id: courseId }
       })
       if(!searchCourse) throw new Error("Curso no encontrado para la pre-inscripción");
 
+      // 2. Validación de existencia de preinscripción
       const existingPreRegistrations = await queryRunner.manager.find(PreRegistrationEntity, {
         where: { postulant: { id: newPostulant.id } },
         relations: ['highDemandCourse', 'postulant']
       })
-      // 2. Construir modelo de dominio y validar regla de negocio
+      // 3. Construir modelo de dominio y validar regla de negocio
       PreRegistration.create({
         id: 0, // aún no existe en BD
         highDemandCourseId: searchCourse, // entidad del curso
@@ -164,7 +136,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           )
         )
       })
-      // Verificar la cantidad de cupos
+      // 4. Verificar la cantidad de cupos
       const numberPreRegistrations = await queryRunner.manager.find(PreRegistrationEntity, {
         where: { highDemandCourse: { id: courseId }}
       })
@@ -172,14 +144,66 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         throw new Error("Ya se alcanzó el cupo máximo para este curso")
       }
 
+      // obtener el último registro ordenado por id
+      const [lastPreReg] = await queryRunner.manager.find(PreRegistrationEntity, {
+        order: { id: 'DESC' },
+        take: 1
+      });
+
+      let nextNumber = 1;
+      if (lastPreReg) {
+        // extraer número desde el code anterior, asumiendo formato HD-000001
+        const lastCode = lastPreReg.code;
+        const lastNumber = parseInt(lastCode.split('-')[1]);
+        nextNumber = lastNumber + 1;
+      }
+
+      // generar el nuevo código
+      const newCode = `HD-${nextNumber.toString().padStart(6, '0')}`;
 
       const newPreRegistration = await queryRunner.manager.save(PreRegistrationEntity, {
         representative: newRepresentative,
         postulant: newPostulant,
         criteria: justification,
         state: PreRegistrationStatus.REGISTER,
-        highDemandCourse: searchCourse
-      })
+        highDemandCourse: searchCourse,
+        code: newCode
+      });
+
+      // *************** Guardando HERMANO ***************
+      if(justification === 1) {
+        for(let sibling of postulantSiblings) {
+          const preRegistrationBrother = await queryRunner.manager.save(PreRegistrationBrotherEntity, {
+            codeRude: sibling.codeRude,
+            preRegistration: newPreRegistration
+          })
+        }
+      }
+
+      // *************** Guardando VIVIENDA del POSTULANTE ***************
+      if(justification === 2) {
+        const preRegistrationLocation = await queryRunner.manager.save(PreRegistrationLocationEntity, {
+          preRegistration: newPreRegistration,
+          avenueStreetNro: postulantResidence.address,
+          zoneVilla: postulantResidence.area,
+          telephone: postulantResidence.telephone,
+          municipality: postulantResidence.municipality,
+          type: LocationType.DWELLING
+        })
+      }
+
+      // *************** Guardando LUGAR TRABAJO APODERADO ***************
+      if(justification === 3) { //! Guardar trabajo del apoderado
+        const preRegistrationLocation = await queryRunner.manager.save(PreRegistrationLocationEntity, {
+          preRegistration: newPreRegistration,
+          avenueStreetNro: guardianWork.addressJob,
+          zoneVilla: guardianWork.area,
+          telephone: guardianWork.phoneJob,
+          municipality: guardianWork.municipality,
+          nameWorkPlace: guardianWork.placeName,
+          type: LocationType.WORK_PLACE
+        })
+      }
 
       // ***** Guardando HISTORICO ******
       const history = {

@@ -48,10 +48,10 @@ export class HighDemandController {
     }
   }
 
-  @Get('list-high-demands-approved')
-  async getHighDemandsApproved() {
+  @Get('list-high-demands-approved/:departmentId')
+  async getHighDemandsApproved(@Param('departmentId') departmentId: number) {
     try {
-      const result = await this.highDemandService.listHighDemandsApproved()
+      const result = await this.highDemandService.listHighDemandsApproved(departmentId)
       return {
         status: 'success',
         message: 'Se ha obtenido las Altas Demandas aprobadas exitosamente',

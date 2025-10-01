@@ -37,6 +37,9 @@ export class PreRegistrationEntity {
   })
   state: PreRegistrationStatus;
 
+  @Column({ name: 'codigo'})
+  code: string
+
   @CreateDateColumn({ name: 'creado_en', type: 'timestamp'})
   createdAt: Date;
 

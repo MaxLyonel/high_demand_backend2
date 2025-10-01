@@ -6,7 +6,7 @@ import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-r
 export abstract class HighDemandRepository {
   abstract saveHighDemandRegistration(obj: any): Promise<HighDemandRegistration>;
   abstract cancelHighDemand(obj: any, registrationStatus: RegistrationStatus): Promise<any>;
-  abstract getHighDemandsApproved(): Promise<any[]>;
+  abstract getHighDemandsApproved(departmentId: number): Promise<any[]>;
 
 
   abstract findById(id: number): Promise<HighDemandRegistration | null>;
@@ -15,5 +15,6 @@ export abstract class HighDemandRepository {
   abstract updateWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
 
   abstract searchFather(placeTypeId: number): Promise<any>;
+  abstract searchChildren(placeTypeId: number): Promise<any>;
 
 }

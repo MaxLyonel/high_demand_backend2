@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToO
 import { PlaceTypeEntity } from "./place-type.entity";
 import { PreRegistration } from "@pre-registration/domain/models/pre-registration.model";
 import { LocationType } from "@pre-registration/domain/enums/location-type.enum";
+import { PreRegistrationEntity } from "./pre-registration.entity";
 
 
 
@@ -11,6 +12,10 @@ export class PreRegistrationLocationEntity {
   @PrimaryGeneratedColumn()
   id: number
 
+  @ManyToOne(() => PreRegistrationEntity, { eager: true })
+  @JoinColumn({ name: 'pre_inscripcion_id'})
+  preRegistration: PreRegistrationEntity
+
   @Column({ name: 'zona_avenida'})
   zoneVilla: string
 
@@ -19,6 +24,9 @@ export class PreRegistrationLocationEntity {
 
   @Column({ name: 'telefono_celular'})
   telephone: string
+
+  @Column({ name: 'nombre_trabajo_lugar'})
+  nameWorkPlace: string
 
   @Column({
     name: 'tipo',

@@ -1,6 +1,7 @@
 import { RolRepository } from "@access-control/domain/ports/outbound/rol.repository";
 import { UserRepository } from "@access-control/domain/ports/outbound/user.repository";
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum";
+import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model";
 import { MainInboxService } from "@high-demand/domain/ports/inbound/main-inbox.service";
 import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository";
 import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.repository";
@@ -25,33 +26,37 @@ export class MainInboxImpl implements MainInboxService {
   ){}
 
   // ****** Recibir la Alta Demanda *****
-  async receiveHighDemands(highDemandIds: number[], userId: number): Promise<any> {
-    const saved = await this.mainInboxRepository.receiveHighDemands(highDemandIds, 2)
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: userId,
-      rolId: saved.rolId,
-      observation: ''
+  async receiveHighDemands(highDemandIds: number[], userId: number): Promise<HighDemandRegistration[]> {
+    const highDemands = await this.mainInboxRepository.receiveHighDemands(highDemandIds)
+    for(let highDemand of highDemands) {
+      const newHistory = {
+        highDemandRegistrationId: highDemand.id,
+        workflowStateId: highDemand.workflowStateId,
+        registrationStatus: highDemand.registrationStatus,
+        userId: userId,
+        rolId: highDemand.rolId,
+        observation: ''
+      }
+      this.historyRepository.updatedHistory(newHistory)
     }
-    this.historyRepository.updatedHistory(newHistory)
-    return saved
+    return highDemands
   }
 
   // ** Derivar alta demanda **
-  async deriveHighDemands(highDemandIds: number[], rolId: number, observation: string | null): Promise<any> {
-    const saved = await this.mainInboxRepository.deriveHighDemands(highDemandIds, rolId)
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: saved.userId,
-      rolId: saved.rolId,
-      observation: observation
+  async deriveHighDemands(highDemandIds: number[], rolId: number, observation: string | null): Promise<HighDemandRegistration[]> {
+    const highDemands = await this.mainInboxRepository.deriveHighDemands(highDemandIds, rolId)
+    for(let highDemand of highDemands){
+      const newHistory = {
+        highDemandRegistrationId: highDemand.id,
+        workflowStateId: highDemand.workflowStateId,
+        registrationStatus: highDemand.registrationStatus,
+        userId: highDemand.userId,
+        rolId: highDemand.rolId,
+        observation: observation
+      }
+      this.historyRepository.updatedHistory(newHistory)
     }
-    this.historyRepository.updatedHistory(newHistory)
-    return saved
+    return highDemands
   }
 
   // ** aprobar alta demanda **

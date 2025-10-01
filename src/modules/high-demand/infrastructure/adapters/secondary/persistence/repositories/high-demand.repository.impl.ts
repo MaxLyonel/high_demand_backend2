@@ -13,6 +13,7 @@ import { CreateHistoryDto } from '@high-demand/application/dtos/create-history.d
 import { HighDemandRegistrationCourseEntity } from '../entities/high-demand-course.entity';
 import { HighDemandRegistrationCourse } from '@high-demand/domain/models/high-demand-registration-course.model';
 import { PlaceTypeEntity } from '../entities/place-type.entity';
+import { OperativeEntity } from 'src/modules/operations-programming/infrastructure/adapters/secondary/persistence/entities/operations-programming.entity';
 
 interface Course {
   id: number;
@@ -48,6 +49,8 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     @InjectRepository(PlaceTypeEntity, 'alta_demanda')
     private readonly placeTypeRepository: Repository<PlaceTypeEntity>,
     private readonly _history: HistoryRepository,
+    @InjectRepository(OperativeEntity, 'alta_demanda')
+    private readonly opeartiveRepository: Repository<OperativeEntity>
   ) {}
 
   // ** guarda la alta demanda **
@@ -157,11 +160,16 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   async findByInstitutionId(
     educationalInstitutionId: number,
   ): Promise<HighDemandRegistration | null> {
+    const operative = await this.opeartiveRepository.findOne({
+      where: { gestionId: 2025 },
+      select: { id: true }
+    })
+    if(!operative) throw new Error("Falta definir los períodos. Por favor contactese con el administrador")
     const highDemandRegistrationEntity =
       await this.highDemandRepository.findOne({
         where: {
           educationalInstitutionId: educationalInstitutionId,
-          operativeId: 1,
+          operativeId: operative.id,
         },
         withDeleted: true
       });

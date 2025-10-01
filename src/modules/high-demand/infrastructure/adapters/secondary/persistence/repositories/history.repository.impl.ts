@@ -51,7 +51,10 @@ export class HistoryRepositoryImpl implements HistoryRepository {
   async getHistories(): Promise<History[]> {
     const histories = await this._historyRepository.find({
       withDeleted: true,
-      relations: ['highDemandRegistration.educationalInstitution', 'user', 'workflowState', 'rol']
+      relations: ['highDemandRegistration.educationalInstitution', 'user', 'workflowState', 'rol'],
+      order: {
+        id: 'DESC'
+      }
     })
     return histories.map(entity => {
       return new History(

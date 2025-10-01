@@ -6,6 +6,7 @@ import { In, Repository } from "typeorm";
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model";
 import { RegistrationStatus } from "@high-demand/domain/enums/registration-status.enum";
 import { PlaceTypeEntity } from "../entities/place-type.entity";
+import { WorkflowStateEntity } from "../entities/workflow-state.entity";
 
 
 @Injectable()
@@ -15,48 +16,63 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
     private readonly highDemandRepository: Repository<HighDemandRegistrationEntity>,
     @InjectRepository(PlaceTypeEntity, 'alta_demanda')
     private readonly placeTypeRepository: Repository<PlaceTypeEntity>,
+    @InjectRepository(WorkflowStateEntity, 'alta_demanda')
+    private readonly workflowStateRepository: Repository<WorkflowStateEntity>
   ) {}
 
   // ** derivar la altas demandas **
   async deriveHighDemands(
     highDemandIds: number[],
     rolId: number
-  ): Promise<any> {
+  ): Promise<HighDemandRegistration[]> {
+    const workflowState = await this.workflowStateRepository.findOne({
+      where: { name: 'ENVIADO' },
+      select: { id: true }
+    })
+    if(!workflowState?.id) throw new Error(
+      "No existe estado de flujos para derivar, porfavor contactese con el administrador"
+    )
     const result = await this.highDemandRepository.update(
       { id: In(highDemandIds) },
-      { inbox: false, workflowStateId: 1, rolId: rolId }
+      { inbox: false, workflowStateId: workflowState.id, rolId: rolId }
     )
     if(result.affected && result.affected <= 0) {
       throw new Error('No se realizó la derivación')
     }
-    const highDemandEntity = await this.highDemandRepository.findOne({
+    const highDemandEntities = await this.highDemandRepository.find({
       where: {
         id: In(highDemandIds)
       }
     })
-    if(!highDemandEntity) throw new Error('No existe la Alta demanda')
-    return HighDemandRegistrationEntity.toDomain(highDemandEntity)
+    if(!highDemandEntities.length) throw new Error('No existe las Altas demandas')
+    return highDemandEntities.map(HighDemandRegistrationEntity.toDomain)
   }
 
   // ** recibir la alta demanda **
   async receiveHighDemands(
-    highDemandIds: number[],
-    nextStateId: number
-  ): Promise<HighDemandRegistration> {
+    highDemandIds: number[]
+  ): Promise<HighDemandRegistration[]> {
+    const workflowState = await this.workflowStateRepository.findOne({
+      where: { name: 'EN REVISION' },
+      select: { id: true }
+    })
+    if(!workflowState?.id) throw new Error(
+      "No existe estado de flujos para recepcionar, porfavor contactese con el administrador"
+    )
     const result = await this.highDemandRepository.update(
       { id: In(highDemandIds) },
-      { inbox: true, workflowStateId: nextStateId },
+      { inbox: true, workflowStateId: workflowState.id },
     );
     if (result.affected && result.affected <= 0) {
       throw new Error('No se recepcionaron las altas demandas');
     }
-    const highDemandEntity = await this.highDemandRepository.findOne({
+    const highDemandEntities = await this.highDemandRepository.find({
       where: {
         id: In(highDemandIds),
       },
     });
-    if (!highDemandEntity) throw new Error('No existe la Alta Demanda');
-    return HighDemandRegistrationEntity.toDomain(highDemandEntity);
+    if (!highDemandEntities.length) throw new Error('No existe las Altas Demandas');
+    return highDemandEntities.map(HighDemandRegistrationEntity.toDomain)
   }
 
   // ** aprobar la alta demanda **
@@ -114,7 +130,10 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
         inbox: false,
         placeDistrict: In(placeTypes)
       },
-      relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
+      relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel'],
+      order: {
+        id: 'DESC'
+      }
     });
     return highDemands.map(HighDemandRegistrationEntity.toDomain);
   }
@@ -131,7 +150,10 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
         inbox: true,
         placeDistrict: In(placeTypes)
       },
-      relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel']
+      relations: ['courses', 'courses.level', 'courses.grade', 'courses.parallel'],
+      order: {
+        id: 'DESC'
+      }
     });
     return highDemands.map(HighDemandRegistrationEntity.toDomain);
   }

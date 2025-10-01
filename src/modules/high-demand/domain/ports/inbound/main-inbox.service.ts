@@ -1,10 +1,11 @@
+import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model";
 
 
 
 
 export abstract class MainInboxService {
-  abstract receiveHighDemands(highDemandIds: number[], userId: number): Promise<any>;
-  abstract deriveHighDemands(highDemandIds: number[], rolId: number, observation?: string | null): Promise<any>;
+  abstract receiveHighDemands(highDemandIds: number[], userId: number): Promise<HighDemandRegistration[]>;
+  abstract deriveHighDemands(highDemandIds: number[], rolId: number, observation?: string | null): Promise<HighDemandRegistration[]>;
   abstract approveHighDemand(obj: any): Promise<any>;
   abstract declineHighDemand(obj:any): Promise<any>;
   abstract getRolesToGo(rolId: number): Promise<any>;

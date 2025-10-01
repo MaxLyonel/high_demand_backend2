@@ -59,6 +59,7 @@ import { MainInboxRepositoryImpl } from "./infrastructure/adapters/secondary/per
 import { MainInboxController } from "./infrastructure/adapters/primary/controllers/main-inbox.controller";
 import { MainInboxService } from "./domain/ports/inbound/main-inbox.service";
 import { MainInboxImpl } from "./application/service/main-inbox.impl";
+import { OperativeEntity } from "../operations-programming/infrastructure/adapters/secondary/persistence/entities/operations-programming.entity";
 
 
 
@@ -154,6 +155,7 @@ import { MainInboxImpl } from "./application/service/main-inbox.impl";
         HighDemandRegistrationCourseEntity,
         HighDemandRegistrationEntity,
         HistoryEntity,
+        OperativeEntity,
         PlaceTypeEntity,
         RolTypeEntity,
         TeacherEntity,

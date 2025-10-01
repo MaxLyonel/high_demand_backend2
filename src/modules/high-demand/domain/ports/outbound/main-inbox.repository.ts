@@ -2,8 +2,8 @@ import { RegistrationStatus } from "@high-demand/domain/enums/registration-statu
 import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-registration.model";
 
 export abstract class MainInboxRepository {
-  abstract receiveHighDemands(highDemandIds: number[], nextStateId: number): Promise<HighDemandRegistration>;
-  abstract deriveHighDemands(highDemandIds: number[], rolId: number): Promise<any>;
+  abstract receiveHighDemands(highDemandIds: number[]): Promise<HighDemandRegistration[]>;
+  abstract deriveHighDemands(highDemandIds: number[], rolId: number): Promise<HighDemandRegistration[]>;
   abstract approveHighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration>;
   abstract declinehighDemand(id: number, registrationStatus: RegistrationStatus): Promise<HighDemandRegistration>;
   abstract searchInbox(rolId: number, stateId: number, placeTypeId: number[]): Promise<HighDemandRegistration[]>;

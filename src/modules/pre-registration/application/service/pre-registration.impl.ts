@@ -56,4 +56,9 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     const result = await this.preRegistrationRepository.getApplicantsAcceptedStatus()
     return result
   }
+
+  async obtainPreRegistrationInformation(postulantId: number): Promise<any> {
+    const result = await this.preRegistrationRepository.getPreRegistrationInfo(postulantId)
+    return result
+  }
 }

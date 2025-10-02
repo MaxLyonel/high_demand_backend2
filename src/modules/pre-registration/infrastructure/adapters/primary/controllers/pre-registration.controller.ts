@@ -163,4 +163,21 @@ export class PreRegistrationController {
       }, HttpStatus.BAD_REQUEST)
     }
   }
+
+  @Get('full-info/:postulantId')
+  async getPreRegistrationInfo(@Param('postulantId', ParseIntPipe) postulantId: number) {
+    try {
+      const result = await this.preRegistrationService.obtainPreRegistrationInformation(postulantId)
+      return {
+        status: 'success',
+        message: 'Información de la preinscripción obtenido exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener información del pre registro'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
 }

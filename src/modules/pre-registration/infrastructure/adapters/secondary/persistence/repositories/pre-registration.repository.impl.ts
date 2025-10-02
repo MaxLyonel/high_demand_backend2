@@ -5,16 +5,15 @@ import { PreRegistrationEntity } from "../entities/pre-registration.entity";
 import { DataSource, In, Repository } from "typeorm";
 import { RepresentativeEntity } from "../entities/representative.entity";
 import { PostulantEntity } from "../entities/postulant.entity";
-import { WorkRepresentativeEntity } from "../entities/work-representative.entity";
 import { PreRegistrationStatus } from "@pre-registration/domain/enums/pre-registration-status.enum";
 import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand-course.entity";
-import { PostulantResidence } from "../entities/postulant-residence.entity";
 import { SegipService } from "@pre-registration/domain/ports/outbound/segip.service";
 import { HistoryPreRegistrationEntity } from "../entities/history-pre-registration.entity";
 import { PreRegistration } from "@pre-registration/domain/models/pre-registration.model";
 import { PreRegistrationBrotherEntity } from "../entities/pre-registration-brother.entity";
 import { PreRegistrationLocationEntity } from "../entities/pre-registration-location.entity";
 import { LocationType } from "@pre-registration/domain/enums/location-type.enum";
+import { StudentRepository } from "@pre-registration/domain/ports/outbound/student.repository";
 
 
 
@@ -28,7 +27,10 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     private readonly preRegistrationRepository: Repository<PreRegistrationEntity>,
     private readonly segipService: SegipService,
     @InjectRepository(PostulantEntity, 'alta_demanda')
-    private readonly postulantRepository: Repository<PostulantEntity>
+    private readonly postulantRepository: Repository<PostulantEntity>,
+    @InjectRepository(PreRegistrationBrotherEntity, 'alta_demanda')
+    private readonly preRegistrationBrotherRepository: Repository<PreRegistrationBrotherEntity>,
+    private readonly studentRepository: StudentRepository
   ){}
 
   async savePreRegistration(obj: any): Promise<any> {
@@ -452,6 +454,115 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       relations: ['postulant', 'highDemandCourse', 'highDemandCourse.level', 'highDemandCourse.grade']
     })
     return preRegistrations
+  }
+
+  async getPreRegistrationInfo(postulantId: number): Promise<any> {
+    const prereg = await this.preRegistrationRepository.findOne({
+      where: { postulant: { id: postulantId } },
+      relations: [
+        'postulant',
+        'criteria',
+        'representative.relationshipType',
+        'highDemandCourse.level',
+        'highDemandCourse.grade',
+        'highDemandCourse.highDemandRegistration.educationalInstitution.dependencyType',
+        'highDemandCourse.highDemandRegistration.educationalInstitution.jurisdiction.districtPlaceType.parent'
+      ]
+    });
+
+    if (!prereg) return null;
+
+    // pre registro de hermano
+    const preregBrother = await this.preRegistrationBrotherRepository.findOne({
+      where: { preRegistration: { id: prereg.id } },
+      select: { id: true, codeRude: true }
+    })
+
+    const sie = prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.id
+
+    const educationBrother = await this.studentRepository.searchByRUDE(sie, preregBrother?.codeRude || '')
+
+    // pre registro de localidad
+    // const preregLocation = await this.preRegistrationBrotherRepository.findOne({
+    //   where: { preRegistration: { id: prereg.id } },
+    //   select: { id: true, codeRude: true }
+    // })
+
+    const now = new Date().getFullYear()
+
+    return {
+      id: prereg.id,
+      state: prereg.state,
+      code: prereg.code,
+      institution: {
+        id: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.id,
+        name: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.name,
+        dependency: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.dependencyType?.dependency,
+        area: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.jurisdiction?.area,
+        district: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.jurisdiction?.districtPlaceType?.place,
+        department: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.jurisdiction?.districtPlaceType?.parent?.place,
+      },
+      postulant: {
+        id: prereg.postulant.id,
+        lastName: prereg.postulant.lastName,
+        mothersLastName: prereg.postulant.mothersLastName,
+        name: prereg.postulant.name,
+        identityCard: prereg.postulant.identityCard,
+        birthDate: prereg.postulant.dateBirth,
+        placeBirth: prereg.postulant.placeBirth,
+        gender: prereg.postulant.gender,
+        age: now - new Date(prereg.postulant.dateBirth).getFullYear(),
+        months: this.getAgeWithMonths(prereg.postulant.dateBirth),
+      },
+      representative: {
+        id: prereg.representative?.id,
+        lastName: prereg.representative.lastName,
+        mothersLastName: prereg.representative.mothersLastName,
+        name: prereg.representative?.name,
+        identityCard: prereg.representative.identityCard,
+        relation: prereg.representative?.relationshipType?.name,
+      },
+      registration: {
+        criteria: {
+          id: prereg.criteria.id,
+          name: prereg.criteria.name,
+        },
+        course: {
+          id: prereg.highDemandCourse?.id,
+          level: prereg.highDemandCourse?.level?.name,
+          grade: prereg.highDemandCourse?.grade?.name,
+        }
+      },
+      registrationBrother: {
+        id: preregBrother?.id,
+        codeRude: preregBrother?.codeRude,
+        educationBrother: {
+          id: educationBrother.id,
+          level: educationBrother.nivel,
+          grade: educationBrother.grado
+        }
+      }
+    };
+  }
+
+  getAgeWithMonths(dateBirth: Date) {
+    const now = new Date();
+    const birth = new Date(dateBirth);
+
+    let years = now.getFullYear() - birth.getFullYear();
+    let months = now.getMonth() - birth.getMonth();
+    const days = now.getDate() - birth.getDate();
+
+    if (days < 0) {
+      months -= 1;
+    }
+
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    return months
   }
 
 }

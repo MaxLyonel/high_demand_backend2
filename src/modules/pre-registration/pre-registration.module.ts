@@ -28,6 +28,7 @@ import { LevelEntity } from "./infrastructure/adapters/secondary/persistence/ent
 import { HistoryPreRegistrationEntity } from "./infrastructure/adapters/secondary/persistence/entities/history-pre-registration.entity";
 import { PdfService } from "./domain/ports/outbound/pdf.service";
 import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf/pdf.service.impl";
+import { PreRegistrationBrotherEntity } from "./infrastructure/adapters/secondary/persistence/entities/pre-registration-brother.entity";
 
 
 
@@ -75,6 +76,7 @@ import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf
       PlaceTypeEntity,
       StudentEntity,
       PreRegistrationEntity,
+      PreRegistrationBrotherEntity,
       RepresentativeEntity,
       PostulantEntity,
       LevelEntity,

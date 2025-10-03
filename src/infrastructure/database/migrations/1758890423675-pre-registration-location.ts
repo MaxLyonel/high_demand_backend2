@@ -14,6 +14,7 @@ export class PreRegistrationLocation1758890423675 implements MigrationInterface 
         await queryRunner.query(`
             CREATE TABLE alta_demanda.pre_inscripcion_ubicacion (
                 id SERIAL PRIMARY KEY,
+                pre_inscripcion_id BIGINT REFERENCES alta_demanda.pre_inscripcion(id),
                 municipio_id BIGINT REFERENCES lugar_tipo(id) NOT NULL,
                 zona_villa VARCHAR(255),
                 avenida_calle_nro VARCHAR(255),

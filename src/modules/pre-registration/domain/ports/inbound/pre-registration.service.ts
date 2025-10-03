@@ -15,4 +15,5 @@ export abstract class PreRegistrationService {
   abstract getPostulantsDrawn(): Promise<any>;
 
   abstract obtainPreRegistrationInformation(postulantId: number): Promise<any>;
+  abstract getPreRegistration(postulantId: number): Promise<any>
 }

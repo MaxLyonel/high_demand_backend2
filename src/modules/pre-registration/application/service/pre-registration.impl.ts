@@ -9,7 +9,7 @@ import { PreRegistrationRepository } from "@pre-registration/domain/ports/outbou
 export class PreRegistrationServiceImpl implements PreRegistrationService {
 
   constructor(
-    private readonly preRegistrationRepository: PreRegistrationRepository
+    private readonly preRegistrationRepository: PreRegistrationRepository,
   ) {}
 
   async savePreRegistration(obj: any): Promise<any> {
@@ -60,5 +60,10 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
   async obtainPreRegistrationInformation(postulantId: number): Promise<any> {
     const result = await this.preRegistrationRepository.getPreRegistrationInfo(postulantId)
     return result
+  }
+
+  async getPreRegistration(postulantId: number): Promise<any> {
+    const info = await this.preRegistrationRepository.getPreRegistrationInfo(postulantId)
+    return info
   }
 }

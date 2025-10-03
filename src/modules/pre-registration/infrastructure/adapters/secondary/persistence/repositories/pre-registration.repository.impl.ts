@@ -30,6 +30,8 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     private readonly postulantRepository: Repository<PostulantEntity>,
     @InjectRepository(PreRegistrationBrotherEntity, 'alta_demanda')
     private readonly preRegistrationBrotherRepository: Repository<PreRegistrationBrotherEntity>,
+    @InjectRepository(PreRegistrationLocationEntity, 'alta_demanda')
+    private readonly preRegistrationLocationRepository: Repository<PreRegistrationLocationEntity>,
     private readonly studentRepository: StudentRepository
   ){}
 
@@ -481,11 +483,11 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     const sie = prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.id
 
     const educationBrother = await this.studentRepository.searchByRUDE(sie, preregBrother?.codeRude || '')
+    console.log("hasta aca", educationBrother)
 
     // pre registro de localidad
-    // const preregLocation = await this.preRegistrationBrotherRepository.findOne({
-    //   where: { preRegistration: { id: prereg.id } },
-    //   select: { id: true, codeRude: true }
+    // const preregLocation = await this.preRegistrationLocationRepository.findOne({
+    //   where: { preRegistration: { id: prereg.id }, type: LocationType.DWELLING },
     // })
 
     const now = new Date().getFullYear()
@@ -537,11 +539,12 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         id: preregBrother?.id,
         codeRude: preregBrother?.codeRude,
         educationBrother: {
-          id: educationBrother.id,
-          level: educationBrother.nivel,
-          grade: educationBrother.grado
+          id: educationBrother?.id,
+          level: educationBrother?.nivel,
+          grade: educationBrother?.grado
         }
-      }
+      },
+      // registrationLocation: preregLocation
     };
   }
 

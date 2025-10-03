@@ -1,5 +1,7 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Res } from "@nestjs/common";
 import { PreRegistrationService } from "@pre-registration/domain/ports/inbound/pre-registration.service";
+import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service";
+import { Response } from "express";
 
 
 
@@ -7,7 +9,8 @@ import { PreRegistrationService } from "@pre-registration/domain/ports/inbound/p
 export class PreRegistrationController {
 
   constructor(
-    private readonly preRegistrationService: PreRegistrationService
+    private readonly preRegistrationService: PreRegistrationService,
+    private readonly pdfService: PdfService
   ) {}
 
   @Post('create')
@@ -178,6 +181,23 @@ export class PreRegistrationController {
         status: 'error',
         message: error.message || 'Error al obtener información del pre registro'
       }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('print/:postulantId')
+  async printPreRegistration(@Param('postulantId', ParseIntPipe) postulanId: number, @Res() res: Response) {
+    try {
+      const response = await this.getPreRegistrationInfo(postulanId)
+      await this.pdfService.generateRegistrationForm(response.data, res)
+    } catch(error) {
+      if(!res.headersSent) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          status: 'error',
+          message: error.message || 'Error al descargar PDF'
+        })
+      } else {
+        console.error('Error después de enviar headers PDF')
+      }
     }
   }
 }

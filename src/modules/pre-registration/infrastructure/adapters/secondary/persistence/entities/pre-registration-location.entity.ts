@@ -16,7 +16,7 @@ export class PreRegistrationLocationEntity {
   @JoinColumn({ name: 'pre_inscripcion_id'})
   preRegistration: PreRegistrationEntity
 
-  @Column({ name: 'zona_avenida'})
+  @Column({ name: 'zona_villa'})
   zoneVilla: string
 
   @Column({ name: 'avenida_calle_nro'})

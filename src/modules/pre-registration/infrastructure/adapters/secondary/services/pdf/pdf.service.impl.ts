@@ -71,32 +71,32 @@ export class PdfServiceImpl implements PdfService {
   private generateSchoolData(doc: PDFKit.PDFDocument, data:any) {
     const { institution } = data
     this.generateSectionTitle(doc, 'I. DATOS DE LA UNIDAD EDUCATIVA A LA QUE POSTULA', 100);
-    this.generateField(doc, 'NOMBRE DE LA UNIDAD EDUCATIVA:', `${institution?.id} - ${institution?.name}` || '81480018 - JOSE ALONSO DE IBAÑEZ A', 55, 180, 112, 380);
-    this.generateField(doc, 'TURNO DE LA UNIDAD EDUCATIVA:', institution.shift || 'MAÑANA', 55, 180, 124);
-    this.generateField(doc, 'DEPENDENCIA DE LA UNIDAD EDUCATIVA:', institution?.dependency || 'FISCAL', 305, 430, 124, 130);
-    this.generateField(doc, 'DEPARTAMENTO:', institution?.department || 'CHUQUISACA', 55, 120, 136, 50);
-    this.generateField(doc, 'DISTRITO:', institution?.district || 'POTOSÍ', 180, 220, 136, 120);
-    this.generateField(doc, 'ZONA/BARRIO/VILLA:', institution?.area || 'BOLIVAR Nro 997', 350, 415, 136, 145);
+    this.generateField(doc, 'NOMBRE DE LA UNIDAD EDUCATIVA:', `${institution?.id} - ${institution?.name}`, 55, 180, 112, 380);
+    this.generateField(doc, 'TURNO DE LA UNIDAD EDUCATIVA:', institution?.shift, 55, 180, 124);
+    this.generateField(doc, 'DEPENDENCIA DE LA UNIDAD EDUCATIVA:', institution?.dependency, 305, 430, 124, 130);
+    this.generateField(doc, 'DEPARTAMENTO:', institution?.department , 55, 120, 136, 50);
+    this.generateField(doc, 'DISTRITO:', institution?.district, 180, 220, 136, 120);
+    this.generateField(doc, 'ZONA/BARRIO/VILLA:', institution?.area, 350, 415, 136, 145);
   }
 
   private generateParentData(doc: PDFKit.PDFDocument, data: any) {
-    const { representative, registration } = data
+    const { representative, registration, registrationLocationWorkPlace } = data
     this.generateSectionTitle(doc, 'II. DATOS DEL PADRE, MADRE O TUTOR(a) DE LA O EL ESTUDIANTE', 150);
     this.drawTable(doc, 50, 160, 250, 80);
-    this.generateField(doc, 'Apellido Paterno:', representative?.lastName || 'VARGAS', 55, 175, 166);
-    this.generateField(doc, 'Apellido Materno:', representative?.mothersLastName || 'RAMIREZ', 55, 175, 178);
-    this.generateField(doc, 'Nombre(s):', representative?.name || 'LEONEL MAXIMO', 55, 175, 190);
-    this.generateField(doc, 'Cédula de Identidad:', representative?.identityCard || '9101918', 55, 175, 202);
-    this.generateField(doc, 'Dirección de su residencia:', data.parentAddress || 'VILLA EL CARMEN, PEDRO PADILLA, CALLE 4', 55, 175, 214);
-    this.generateField(doc, 'En caso de tutor(s) ¿Cuál es el parentesco?:', registration?.criteria?.name  || 'PADRE', 55, 175, 226);
+    this.generateField(doc, 'Apellido Paterno:', representative?.lastName, 55, 175, 166);
+    this.generateField(doc, 'Apellido Materno:', representative?.mothersLastName, 55, 175, 178);
+    this.generateField(doc, 'Nombre(s):', representative?.name, 55, 175, 190);
+    this.generateField(doc, 'Cédula de Identidad:', representative?.identityCard, 55, 175, 202);
+    this.generateField(doc, 'Dirección de su residencia:', representative?.parentAddress, 55, 175, 214);
+    this.generateField(doc, 'En caso de tutor(s) ¿Cuál es el parentesco?:', registration?.criteria?.name, 55, 175, 226);
 
     // Dirección actual del trabajo del padre, madre y/o tutor
     this.generateSectionSubTitle(doc, 'DIRECCIÓN ACTUAL DEL PADRE, MADRE Y/O TUTOR', 310, 150)
     this.generateField(doc, 'Nombre del lugar de trabajo:', 'TIENDA DE EQUIPOS DE COMPUTACIÓN', 310, 400, 166, 160)
-    this.generateField(doc, 'Municipio:', 'POTOSÍ', 310, 400, 178, 160)
-    this.generateField(doc, 'Zona / Villa:', 'ZONA CENTRAL', 310, 400, 190, 160)
-    this.generateField(doc, 'Avenida / Calle / N°:', 'CALLE FRIAS / N° 18', 310, 400, 202, 160)
-    this.generateField(doc, 'Teléfono / Celular:', '60469641', 310, 400, 214, 160)
+    this.generateField(doc, 'Municipio:', registrationLocationWorkPlace?.municipality, 310, 400, 178, 160)
+    this.generateField(doc, 'Zona / Villa:', registrationLocationWorkPlace?.zoneVilla, 310, 400, 190, 160)
+    this.generateField(doc, 'Avenida / Calle / N°:', registrationLocationWorkPlace?.avenueStreetNro, 310, 400, 202, 160)
+    this.generateField(doc, 'Teléfono / Celular:', registrationLocationWorkPlace?.telephone, 310, 400, 214, 160)
     // Texto
     doc.font('./fonts/Lato-Regular.ttf')
        .fontSize(5)
@@ -126,11 +126,12 @@ export class PdfServiceImpl implements PdfService {
   }
 
   private generateAddressData(doc: PDFKit.PDFDocument, data: any) {
+    const { registrationLocationDwelling } = data
     this.generateSectionTitle(doc, 'IV. DIRECCIÓN ACTUAL DE RESIDENCIA DE LA O EL ESTUDIANTE', 325)
-    this.generateField(doc, 'Municipio:', 'POTOSÍ', 55, 175, 340)
-    this.generateField(doc, 'Zona / Villa:', 'ZONA CENTRAL', 55, 175, 352)
-    this.generateField(doc, 'Avenida / Calle / N°:', 'MEDINACELLI', 55, 175, 364)
-    this.generateField(doc, 'Teléfono / Celular:', '67612212', 55, 175, 376)
+    this.generateField(doc, 'Municipio:', registrationLocationDwelling?.municipality, 55, 175, 340)
+    this.generateField(doc, 'Zona / Villa:', registrationLocationDwelling?.zoneVilla, 55, 175, 352)
+    this.generateField(doc, 'Avenida / Calle / N°:', registrationLocationDwelling?.avenueStreetNro, 55, 175, 364)
+    this.generateField(doc, 'Teléfono / Celular:', registrationLocationDwelling?.telephone, 55, 175, 376)
 
     // texto
     doc.fontSize(5)
@@ -150,9 +151,10 @@ export class PdfServiceImpl implements PdfService {
   }
 
   private generateRegistrationData(doc: PDFKit.PDFDocument, data: any) {
+    const { registration } = data
     this.generateSectionTitle(doc, 'VI. DATOS DE PREINSCRIPCIÓN (POSTULANTES) EN LA GESTIÓN 2025', 440)
-    this.generateField(doc, 'Educación Secundaria Comunitaria Productiva:', 'X', 55, 185, 455, 10)
-    this.generateField(doc, 'Primer año de escolaridad:', 'X', 220, 295, 455, 10)
+    this.generateField(doc, registration?.course?.level, 'X', 55, 185, 455, 10)
+    this.generateField(doc, registration?.course?.grade, 'X', 220, 295, 455, 10)
     this.generateField(doc, 'Justificativo', 'X', 55, 100, 470, 10)
     doc.text('Hermanos', 115, 470)
     this.generateField(doc, '', '', 125, 170, 470, 10)
@@ -174,7 +176,7 @@ export class PdfServiceImpl implements PdfService {
     // Datos de la unidad educativa
     this.generateSectionSubTitle(doc, 'DATOS DE LA UNIDAD EDUCATIVA A LA QUE POSTULA', 50, 590)
     this.generateField(doc, 'NOMBRE DE LA UNIDAD EDUCATIVA:', `${institution?.id} - ${institution?.name}` , 50, 160, 605, 180)
-    this.generateField(doc, 'TURNO DE LA UNIDAD EDUCATIVA:', 'MAÑANA', 50, 160, 620, 180)
+    this.generateField(doc, 'TURNO DE LA UNIDAD EDUCATIVA:', institution?.shift, 50, 160, 620, 180)
     this.generateField(doc, 'DEPARTAMENTO:', institution?.department, 50, 160, 635, 180)
     this.generateField(doc, 'DISTRITO:', institution?.district, 50, 160, 650, 180)
     this.generateField(doc, 'ZONA / BARRIO / VILLA', institution?.area, 50, 160, 665, 180)

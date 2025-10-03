@@ -483,12 +483,17 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     const sie = prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.id
 
     const educationBrother = await this.studentRepository.searchByRUDE(sie, preregBrother?.codeRude || '')
-    console.log("hasta aca", educationBrother)
 
     // pre registro de localidad
-    // const preregLocation = await this.preRegistrationLocationRepository.findOne({
-    //   where: { preRegistration: { id: prereg.id }, type: LocationType.DWELLING },
-    // })
+    const preregLocationDwelling = await this.preRegistrationLocationRepository.findOne({
+      where: { preRegistration: { id: prereg.id }, type: LocationType.DWELLING },
+      relations: ['municipality']
+    })
+
+    const preregLocationWorkPlace = await this.preRegistrationLocationRepository.findOne({
+      where: { preRegistration: { id: prereg.id }, type: LocationType.WORK_PLACE },
+      relations: ['municipality']
+    })
 
     const now = new Date().getFullYear()
 
@@ -544,7 +549,14 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           grade: educationBrother?.grado
         }
       },
-      // registrationLocation: preregLocation
+      registrationLocationDwelling: {
+        ...preregLocationDwelling,
+        municipality: preregLocationDwelling?.municipality?.place
+      },
+      registrationLocationWorkPlace: {
+        ...preregLocationWorkPlace,
+        municipality: preregLocationWorkPlace?.municipality?.place
+      }
     };
   }
 

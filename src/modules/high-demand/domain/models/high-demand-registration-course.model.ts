@@ -42,14 +42,14 @@ export class HighDemandRegistrationCourse {
 
     // Regla: No puede haber cursos duplicados en la misma inscripción
     const alreadyExists = existingCourses.some(c =>
-      c.highDemandRegistrationId === highDemandRegistrationId &&
+      // c.highDemandRegistrationId === highDemandRegistrationId &&
       c.levelId === levelId &&
       c.gradeId === gradeId &&
       c.parallelId === parallelId
     );
 
     if (alreadyExists) {
-      throw new Error('Ya existe un curso con el mismo nivel, grado y paralelo para esta inscripción');
+      throw new Error('Ya existe un curso con el mismo nivel educativo, año de escolaridad y paralelo para esta inscripción');
     }
 
     return new HighDemandRegistrationCourse(

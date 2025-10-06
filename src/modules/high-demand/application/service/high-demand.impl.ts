@@ -12,6 +12,7 @@ import { CreateHistoryDto } from "../dtos/create-history.dto";
 import { WorkflowSequenceRepository } from "@high-demand/domain/ports/outbound/workflow-sequence.repository";
 import { EducationalInstitutionRepository } from "@high-demand/domain/ports/outbound/educational-institution.repository";
 import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
+import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-demand-registration-course.model";
 
 
 @Injectable()
@@ -29,17 +30,14 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   async saveHighDemandRegistration(obj: HighDemandRegistration, coursesParam: any): Promise<HighDemandRegistration> {
 
     const workflow = await this.workflowRepository.findLastActive()
-    if(!workflow) {
-      throw new Error("No se puede crear la Alta Demanda, falta definir el flujo")
-    }
+    if(!workflow) throw new Error("No se puede crear la Alta Demanda, falta definir el flujo")
+
     const workflowStates = await this.workflowSequenceRepository.getOrderedFlowStates()
-    if(workflowStates.length <= 0) {
-      throw new Error("No se puede crear la Alta Demanda, falta definir las secuencias")
-    }
+    if(workflowStates.length <= 0) throw new Error("No se puede crear la Alta Demanda, falta definir las secuencias")
+
     const operative = await this.operativeRepository.getOperative(2025)
-    if(!operative) {
-      throw new Error("Aún no se definio las fechas para el operativo")
-    }
+    if(!operative) throw new Error("Aún no se definio las fechas para el operativo")
+
     const firstWorkflowState = workflowStates[0]
 
     // buscamos su distrito
@@ -48,6 +46,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     obj.placeDistrict = jurisdiction.districtPlaceType
 
     const existingRegistrations = await this.highDemandRepository.findInscriptions(obj)
+
     obj.registrationStatus = RegistrationStatus.REGISTER
     obj.rolId = firstWorkflowState.currentState
     obj.workflowStateId = 2 //TODO
@@ -55,9 +54,21 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     obj.inbox = false
     obj.operativeId = operative.id
 
+    const highDemandCourses = coursesParam.map((c, index) =>
+      HighDemandRegistrationCourse.create({
+        id: c.id ?? null,
+        highDemandRegistrationId: obj.id ?? 0,
+        levelId: c.levelId,
+        gradeId: c.gradeId,
+        parallelId: c.parallelId,
+        totalQuota: c.totalQuota,
+        existingCourses: coursesParam.slice(0, index)
+      })
+    )
+
     const domain = HighDemandRegistration.create({
       ...obj,
-      courses: coursesParam,
+      courses: highDemandCourses,
       existingRegistrations
     });
 

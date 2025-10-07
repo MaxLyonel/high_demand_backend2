@@ -6,7 +6,6 @@ import { OperationsProgrammingService } from "./domain/ports/inbound/operations-
 import { OperationsProgrammingServiceImpl } from "./application/service/operations-programming.impl";
 import { OperationsProgrammingRepository } from "./domain/ports/outbound/operations-programming.repository";
 import { OperativeProgrammingRepositoryImpl } from './infrastructure/adapters/secondary/persistence/repositories/operative-programming.service.impl';
-import { DatabaseModule } from "@infrastructure-general/database/database.module";
 
 
 @Module({

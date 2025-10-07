@@ -41,6 +41,7 @@ interface NewHighDemandRegistration {
 @Injectable()
 export class HighDemandRepositoryImpl implements HighDemandRepository {
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     @Inject('DATA_SOURCE') private readonly dataSource: DataSource,
     @InjectRepository(HighDemandRegistrationEntity, 'alta_demanda')
     private readonly highDemandRepository: Repository<HighDemandRegistrationEntity>,
@@ -160,8 +161,9 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
   async findByInstitutionId(
     educationalInstitutionId: number,
   ): Promise<HighDemandRegistration | null> {
+    const { CURRENT_YEAR } = this.constants
     const operative = await this.operativeRepository.findOne({
-      where: { gestionId: 2025 },
+      where: { gestionId: CURRENT_YEAR },
       select: { id: true }
     })
     if(!operative) throw new Error("Períodos no definidos. Por favor contactese con el administrador")
@@ -186,9 +188,11 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
 
   // ** anular inscripción alta demanda
   async cancelHighDemand(obj: any, registrationStatus: RegistrationStatus): Promise<any> {
+    const { ROLES } = this.constants
+    const { DIRECTOR_ROLE, DISTRICT_ROLE } = ROLES
     const { highDemandRegistrationId: id } = obj
     const result = await this.highDemandRepository.update(
-      { id: id, rolId: In([37, 9]), inbox: false, workflowStateId: 1 },
+      { id: id, rolId: In([DISTRICT_ROLE, DIRECTOR_ROLE]), inbox: false, workflowStateId: 1 },
       { registrationStatus: registrationStatus, deletedAt: new Date() }
     )
     if(result.affected! <= 0) {
@@ -204,8 +208,9 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
 
   // ** obtener altas demandas aprobadas **
   async getHighDemandsApproved(departmentId: number): Promise<any[]> {
+    const { CURRENT_YEAR } = this.constants
     const operative = await this.operativeRepository.findOne({
-      where: { gestionId: 2025 },
+      where: { gestionId: CURRENT_YEAR },
       select: { id: true }
     })
     if(!operative) throw new Error("Períodos no definidos. Por favor contáctese con el administrador")

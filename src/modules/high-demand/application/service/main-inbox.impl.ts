@@ -8,7 +8,7 @@ import { HistoryRepository } from "@high-demand/domain/ports/outbound/history.re
 import { MainInboxRepository } from "@high-demand/domain/ports/outbound/main-inbox.repository";
 import { WorkflowSequenceRepository } from "@high-demand/domain/ports/outbound/workflow-sequence.repository";
 import { WorkflowStateRepository } from "@high-demand/domain/ports/outbound/workflow-state.repository";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 
 
 
@@ -16,6 +16,7 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class MainInboxImpl implements MainInboxService {
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     private readonly mainInboxRepository: MainInboxRepository,
     private readonly historyRepository: HistoryRepository,
     private readonly workflowSequenceRepository: WorkflowSequenceRepository,
@@ -91,12 +92,14 @@ export class MainInboxImpl implements MainInboxService {
 
   // ****** Listar Altas Demandas de la Bandeja de Entrada ******
   async listInbox(rolId: number, stateId: number, placeTypeId: number): Promise<any[]> {
+    const { ROLES } = this.constants
+    const { DISTRICT_ROLE, DEPARTMENT_ROLE } = ROLES
     let placeTypes:Array<number> = []
     switch(parseInt(rolId.toString())) {
-      case 37: // distrital
+      case DISTRICT_ROLE:
         placeTypes.push(placeTypeId)
         break;
-      case 38: // departamental
+      case DEPARTMENT_ROLE:
         const places = await this.mainInboxRepository.searchChildren(placeTypeId)
         placeTypes = places.map(p => p.id)
         break;
@@ -128,12 +131,14 @@ export class MainInboxImpl implements MainInboxService {
 
   // ****** Listar Altas Demandas de la Bandeja de Recibidos *****
   async listReceived(rolId: number, placeTypeId: number): Promise<any[]> {
+    const { ROLES } = this.constants
+    const { DISTRICT_ROLE, DEPARTMENT_ROLE } = ROLES
     let placeTypes:Array<number> = []
     switch(parseInt(rolId.toString())) {
-      case 37:
+      case DISTRICT_ROLE:
         placeTypes.push(placeTypeId)
         break;
-      case 38:
+      case DEPARTMENT_ROLE:
         const places = await this.mainInboxRepository.searchChildren(placeTypeId)
         placeTypes = places.map(p => p.id)
         break;

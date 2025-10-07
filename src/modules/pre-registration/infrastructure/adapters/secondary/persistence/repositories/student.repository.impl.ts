@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { StudentRepository } from "@pre-registration/domain/ports/outbound/student.repository";
 import { StudentEntity } from "../entities/student.entity";
@@ -10,10 +10,13 @@ export class StudentRepositoryImpl implements StudentRepository {
 
   constructor(
     @InjectRepository(StudentEntity, 'alta_demanda')
-    private readonly _studentRepository: Repository<StudentEntity>
+    private readonly _studentRepository: Repository<StudentEntity>,
+    @Inject('APP_CONSTANTS') private readonly constants
   ) {}
 
   async searchByRUDE(sie: number, codeRude: string): Promise<any> {
+    const { CURRENT_YEAR } = this.constants
+    const currentYear = CURRENT_YEAR
     const query = await this._studentRepository.query(
       `
       SELECT i.id, e.codigo_rude, e.nombre, e.paterno, e.materno, nt.id, nt.nivel, gt.id, gt.grado, pt.id, pt.paralelo
@@ -26,9 +29,9 @@ export class StudentRepositoryImpl implements StudentRepository {
       JOIN paralelo_tipo pt ON ic.paralelo_tipo_id = pt.id
       WHERE i.id = $1
       AND e.codigo_rude = $2
-      --AND ic.gestion_tipo_id = 2025
+      --AND ic.gestion_tipo_id = $3
 
-      `, [sie, codeRude]
+      `, [sie, codeRude, currentYear]
     )
     return query[0]
   }

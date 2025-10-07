@@ -1,4 +1,4 @@
-import { Injectable, Controller, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { StudentService } from "@pre-registration/domain/ports/inbound/student.service";
 import { StudentRepository } from '@pre-registration/domain/ports/outbound/student.repository';
 

@@ -1,5 +1,5 @@
 // nestjs
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 // external dependencies
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from "@nestjs/typeorm";
@@ -17,6 +17,7 @@ import * as util from "util";
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constanst,
     @InjectRepository(UserEntity, 'alta_demanda')
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(TeacherEntity, 'alta_demanda')
@@ -24,6 +25,8 @@ export class UserRepositoryImpl implements UserRepository {
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
+    const { ROLES } = this.constanst
+    const { DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE } = ROLES
     const userEntity = await this.userRepository
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.userRoles", "userRol")
@@ -32,7 +35,7 @@ export class UserRepositoryImpl implements UserRepository {
       .leftJoinAndSelect("userRol.placeType", "placeType")
       .leftJoinAndSelect("placeType.parent", "parentPlace")
       .where("user.username = :username", { username })
-      .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48, 50] })
+      .andWhere("role.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, 50] })
       .andWhere("userRol.esactivo = true")
       .getOne();
 
@@ -46,7 +49,7 @@ export class UserRepositoryImpl implements UserRepository {
       where: {
         personId: personId,
         gestionId: gestionId,
-        positionTypeId: In([1, 12]),
+        positionTypeId: In([1, 12]), // Directores
         isVigentAdmin: true
       }
     })
@@ -55,12 +58,14 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findById(id: number): Promise<User | null> {
+    const { ROLES } = this.constanst
+    const { DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE } = ROLES
     const userEntity = await this.userRepository
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.userRoles", "userRol")
       .leftJoinAndSelect("userRol.role", "role")
       .where("user.id = :id", { id })
-      .andWhere("role.id IN (:...ids)", { ids: [9, 37, 38, 48, 50] })
+      .andWhere("role.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, 50] })
       .andWhere("userRol.esactivo = true")
       .getOne();
 

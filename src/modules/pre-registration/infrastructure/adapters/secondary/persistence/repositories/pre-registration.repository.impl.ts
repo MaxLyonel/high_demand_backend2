@@ -22,6 +22,7 @@ import { StudentRepository } from "@pre-registration/domain/ports/outbound/stude
 export class PreRegistrationRepositoryImpl implements PreRegistrationRepository {
 
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     @Inject('DATA_SOURCE') private readonly dataSource: DataSource,
     @InjectRepository(PreRegistrationEntity, 'alta_demanda')
     private readonly preRegistrationRepository: Repository<PreRegistrationEntity>,
@@ -173,9 +174,10 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         highDemandCourse: searchCourse,
         code: newCode
       });
+      const { BROTHER_JUSTIFICATION, HOUSING_JUSTIFICATION, WORKPLACE_JUSTIFICATION } = this.constants
 
       // *************** Guardando HERMANO ***************
-      if(justification === 1) {
+      if(justification === BROTHER_JUSTIFICATION) {
         for(let sibling of postulantSiblings) {
           const preRegistrationBrother = await queryRunner.manager.save(PreRegistrationBrotherEntity, {
             codeRude: sibling.codeRude,
@@ -185,7 +187,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       }
 
       // *************** Guardando VIVIENDA del POSTULANTE ***************
-      if(justification === 2) {
+      if(justification === HOUSING_JUSTIFICATION) {
         const preRegistrationLocation = await queryRunner.manager.save(PreRegistrationLocationEntity, {
           preRegistration: newPreRegistration,
           avenueStreetNro: postulantResidence.address,
@@ -197,7 +199,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       }
 
       // *************** Guardando LUGAR TRABAJO APODERADO ***************
-      if(justification === 3) { //! Guardar trabajo del apoderado
+      if(justification === WORKPLACE_JUSTIFICATION) { //! Guardar trabajo del apoderado
         const preRegistrationLocation = await queryRunner.manager.save(PreRegistrationLocationEntity, {
           preRegistration: newPreRegistration,
           avenueStreetNro: guardianWork.addressJob,

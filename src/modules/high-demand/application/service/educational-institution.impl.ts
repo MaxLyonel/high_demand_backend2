@@ -1,7 +1,6 @@
 // framework nestjs
 import { Injectable } from "@nestjs/common";
 // own implementations
-import { EducationalInstitution } from "../../domain/models/educational-institution.model";
 import { EducationalInstitutionService } from "../../domain/ports/inbound/educational-institution.service";
 import { EducationalInstitutionRepository } from "../../domain/ports/outbound/educational-institution.repository";
 import { EducationalInstitutionDto } from "../dtos/educational-institution-info-response.dto";

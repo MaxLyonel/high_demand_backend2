@@ -1,6 +1,6 @@
 import { RolRepository } from "@access-control/domain/ports/outbound/rol.repository";
 import { Rol } from "@access-control/domain/models/rol.model";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { RolTypeEntity } from "../entities/rol-type.entity";
 import { Repository } from "typeorm";
@@ -11,11 +11,20 @@ import { RolPermissionEntity } from "../entities/rol-permission.entity";
 export class RolRepositoryImpl implements RolRepository {
 
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     @InjectRepository(RolTypeEntity, 'alta_demanda')
     private readonly _rolRepository: Repository<RolTypeEntity>
   ) {}
 
   async find(): Promise<Rol[]> {
+    const { ROLES } = this.constants
+    const {
+      DIRECTOR_ROLE,
+      DISTRICT_ROLE,
+      DEPARTMENT_ROLE,
+      VER_ROLE,
+      ADMIN_ROLE
+    } = ROLES
     const roles = await this._rolRepository
       .createQueryBuilder("rol")
       .leftJoinAndSelect("rol.rolPermissions", "rolPerm")
@@ -23,7 +32,7 @@ export class RolRepositoryImpl implements RolRepository {
       .leftJoinAndSelect("perm.action", "action")
       .leftJoinAndSelect("perm.subject", "subject")
       .leftJoinAndSelect("perm.condition", "conditions")
-      .where("rol.id IN (:...ids)", { ids: [9, 37, 38, 48, 49] })
+      .where("rol.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, ADMIN_ROLE] })
       .getMany();
 
     const res = roles.map(rol => ({

@@ -74,7 +74,6 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
       parallelId: course.parallel.id,
       totalQuota: course.totalQuota
     }));
-    // return courses.map(HighDemandRegistrationCourseEntity.toDomain)
   }
 
 }

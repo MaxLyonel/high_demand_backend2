@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 // own implementations
 import { EducationalInstitutionCourseService } from "../../domain/ports/inbound/educational-institution-course.service";
 import { EducationalInstitutionCourseRepository } from '../../domain/ports/outbound/educational-institution-course.repository';
-import { EducationalInstitutionCourseResponse, GroupedEducationalInstitutionCourses } from "../dtos/educational-institution-course-response.dto";
+import { GroupedEducationalInstitutionCourses } from "../dtos/educational-institution-course-response.dto";
 
 
 

@@ -13,7 +13,7 @@ import { Global, Module } from "@nestjs/common";
         ROLES: {
           DIRECTOR_ROLE: 9,
           DISTRICT_ROLE: 37,
-          DEPARTAMENT_ROLE: 38,
+          DEPARTMENT_ROLE: 38,
           VER_ROLE: 48,
           ADMIN_ROLE: 49
         }

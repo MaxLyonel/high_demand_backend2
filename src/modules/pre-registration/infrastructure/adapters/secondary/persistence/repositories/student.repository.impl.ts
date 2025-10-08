@@ -29,7 +29,7 @@ export class StudentRepositoryImpl implements StudentRepository {
       JOIN paralelo_tipo pt ON ic.paralelo_tipo_id = pt.id
       WHERE i.id = $1
       AND e.codigo_rude = $2
-      --AND ic.gestion_tipo_id = $3
+      AND ic.gestion_tipo_id = $3
 
       `, [sie, codeRude, currentYear]
     )

@@ -11,23 +11,33 @@ import * as QRCode from 'qrcode'
 export class PdfServiceImpl implements PdfService {
 
   async generateRegistrationForm(formData: any, res: Response): Promise<void> {
-    const doc = new PDFDocument({ margin: 1 })
-    // Configurar headers para descarga
-    res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', 'inline; filename=alta.pdf')
-    doc.pipe(res);
-    doc.strokeColor('#0D9488');
-    await this.generateHeader(doc, 0, 50, 40, 35, 520, 35)
-    this.generateSchoolData(doc, formData);
-    this.generateParentData(doc, formData);
-    this.generateStudentData(doc, formData);
-    this.generateAddressData(doc, formData);
-    this.generateSiblingsData(doc, formData);
-    this.generateRegistrationData(doc, formData);
-    this.drawDashedLine(doc, 50, 510, 562, 510, { color: '#0D9488'})
-    await this.generateHeader(doc, 0, 545, 40, 530, 520, 530)
-    this.generateSummaryData(doc, formData);
-    doc.end()
+    try {
+      const doc = new PDFDocument({ margin: 1 })
+      // Configurar headers para descarga
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', 'inline; filename=alta.pdf')
+      doc.pipe(res);
+      doc.strokeColor('#0D9488');
+      await this.generateHeader(doc, 0, 50, 40, 35, 520, 35)
+      this.generateSchoolData(doc, formData);
+      this.generateParentData(doc, formData);
+      this.generateStudentData(doc, formData);
+      this.generateAddressData(doc, formData);
+      this.generateSiblingsData(doc, formData);
+      this.generateRegistrationData(doc, formData);
+      this.drawDashedLine(doc, 50, 510, 562, 510, { color: '#0D9488'})
+      await this.generateHeader(doc, 0, 545, 40, 530, 520, 530)
+      this.generateSummaryData(doc, formData);
+      doc.end()
+      doc.on('error', (err) => {
+        console.error('Error durante el envío del PDF: ', err)
+      })
+    } catch(error) {
+      console.error('Error antes de enviar PDF: ', error)
+      if(!res.headersSent) {
+        res.status(500).json({ status: 'error', message: error.message })
+      }
+    }
   }
 
   private async generateHeader(

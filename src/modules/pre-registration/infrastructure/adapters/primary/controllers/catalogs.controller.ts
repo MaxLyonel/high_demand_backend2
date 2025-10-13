@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Query, Res, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Query, Res, UseInterceptors } from "@nestjs/common";
 import { StudentService } from "@pre-registration/domain/ports/inbound/student.service";
 import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service";
 import { Response } from "express";
@@ -88,6 +88,31 @@ export class CatalogsController {
       throw new HttpException({
         status: 'error',
         message: error.message || 'Error al buscar al estudiante'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('search-student/:codeRude')
+  async searchStudentByRUDE(@Param('codeRude') codeRude: string) {
+    try {
+      const result = await this.studentService.searchByRUDE(codeRude)
+      if(result) {
+        return {
+          status: 'success',
+          message: 'Estudiante encontrado exitosamente',
+          data: result
+        }
+      } else {
+        return {
+          status: 'success',
+          message: 'No se encontró al estudiante',
+          data: {}
+        }
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener al estudiante por código rude'
       }, HttpStatus.BAD_REQUEST)
     }
   }

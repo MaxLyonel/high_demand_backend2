@@ -16,5 +16,9 @@ export class StudentServiceImpl implements StudentService {
     return student
   }
 
+  async searchByRUDE(codeRude: string): Promise<any> {
+    const student = await this.studenRepository.searchByRude(codeRude)
+    return student
+  }
 
 }

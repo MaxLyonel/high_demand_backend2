@@ -35,4 +35,25 @@ export class StudentRepositoryImpl implements StudentRepository {
     )
     return query[0]
   }
+
+  async searchByRude(codeRude: string): Promise<any> {
+    const query = await this._studentRepository.query(
+      `
+      SELECT
+        e.carnet_identidad,
+        e.complemento,
+        e.paterno,
+        e.materno,
+        e.nombre,
+        gt.genero,
+        lt.lugar,
+        e.fecha_nacimiento
+      FROM estudiante e
+      JOIN genero_tipo gt ON e.genero_tipo_id = gt.id
+      JOIN lugar_tipo lt ON e.lugar_nac_tipo_id = lt.id
+      WHERE e.codigo_rude = $1
+      `, [codeRude]
+    )
+    return query[0]
+  }
 }

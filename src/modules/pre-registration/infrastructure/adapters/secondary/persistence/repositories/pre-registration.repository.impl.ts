@@ -381,6 +381,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         'highDemandCourse.grade',
         'highDemandCourse.parallel',
         'representative',
+        'representative.relationshipType',
         'postulant',
         'criteria'
       ]

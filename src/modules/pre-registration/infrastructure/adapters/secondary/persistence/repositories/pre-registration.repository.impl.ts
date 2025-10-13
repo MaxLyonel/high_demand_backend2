@@ -94,7 +94,8 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         name: postulant.name,
         dateBirth: postulant.dateBirth,
         placeBirth: postulant.placeBirth,
-        gender: postulant.gender
+        gender: postulant.gender,
+        codeRude: postulant.codeRude
       });
 
       // *************** Guardando APODERADO ***************
@@ -461,6 +462,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
   }
 
   async getPreRegistrationInfo(postulantId: number): Promise<any> {
+    try {
     const prereg = await this.preRegistrationRepository.findOne({
       where: { postulant: { id: postulantId } },
       relations: [
@@ -477,14 +479,22 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     if (!prereg) return null;
 
     // pre registro de hermano
-    const preregBrother = await this.preRegistrationBrotherRepository.findOne({
+    const preregBrother = await this.preRegistrationBrotherRepository.find({
       where: { preRegistration: { id: prereg.id } },
       select: { id: true, codeRude: true }
     })
 
     const sie = prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.id
 
-    const educationBrother = await this.studentRepository.searchByRUDE(sie, preregBrother?.codeRude || '')
+    let brothers:any = []
+    for(let bro of preregBrother) {
+      const objAux:any = {}
+      objAux.id = bro.id
+      objAux.codeRude = bro.codeRude
+      const educationBrother = await this.studentRepository.searchByRUDE(sie, bro?.codeRude || '')
+      objAux.educationBrother = educationBrother
+      brothers.push(objAux)
+    }
 
     // pre registro de localidad
     const preregLocationDwelling = await this.preRegistrationLocationRepository.findOne({
@@ -503,6 +513,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       id: prereg.id,
       state: prereg.state,
       code: prereg.code,
+      createdAt: prereg.createdAt,
       institution: {
         id: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.id,
         name: prereg.highDemandCourse?.highDemandRegistration?.educationalInstitution?.name,
@@ -517,6 +528,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         mothersLastName: prereg.postulant.mothersLastName,
         name: prereg.postulant.name,
         identityCard: prereg.postulant.identityCard,
+        codeRude: prereg?.postulant?.codeRude,
         birthDate: prereg.postulant.dateBirth,
         placeBirth: prereg.postulant.placeBirth,
         gender: prereg.postulant.gender,
@@ -530,6 +542,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         name: prereg.representative?.name,
         identityCard: prereg.representative.identityCard,
         relation: prereg.representative?.relationshipType?.name,
+        cellPhone: prereg.representative?.cellphone
       },
       registration: {
         criteria: {
@@ -542,15 +555,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           grade: prereg.highDemandCourse?.grade?.name,
         }
       },
-      registrationBrother: {
-        id: preregBrother?.id,
-        codeRude: preregBrother?.codeRude,
-        educationBrother: {
-          id: educationBrother?.id,
-          level: educationBrother?.nivel,
-          grade: educationBrother?.grado
-        }
-      },
+      registrationBrother: brothers,
       registrationLocationDwelling: {
         ...preregLocationDwelling,
         municipality: preregLocationDwelling?.municipality?.place
@@ -560,6 +565,11 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         municipality: preregLocationWorkPlace?.municipality?.place
       }
     };
+
+    } catch(error) {
+      console.log(error)
+      throw error
+    }
   }
 
   getAgeWithMonths(dateBirth: Date) {

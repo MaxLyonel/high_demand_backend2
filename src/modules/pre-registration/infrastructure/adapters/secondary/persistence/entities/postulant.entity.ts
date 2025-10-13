@@ -28,8 +28,8 @@ export class PostulantEntity {
   @Column({ name: 'genero'})
   gender: string
 
-  // @Column({ name: 'codigo_rude'})
-  // codeRude: string
+  @Column({ name: 'codigo_rude'})
+  codeRude: string
 
   @CreateDateColumn({ name: 'creado_en', type: 'timestamp'})
   createdAt: Date;

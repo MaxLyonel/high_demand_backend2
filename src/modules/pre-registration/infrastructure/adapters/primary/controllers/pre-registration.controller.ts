@@ -185,7 +185,10 @@ export class PreRegistrationController {
   }
 
   @Get('print/:postulantId')
-  async printPreRegistration(@Param('postulantId', ParseIntPipe) postulanId: number, @Res() res: Response) {
+  async printPreRegistration(
+    @Param('postulantId', ParseIntPipe) postulanId: number,
+    @Res() res: Response
+  ) {
     try {
       const response = await this.getPreRegistrationInfo(postulanId)
       await this.pdfService.generateRegistrationForm(response.data, res)

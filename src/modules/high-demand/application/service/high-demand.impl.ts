@@ -138,4 +138,10 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     const highDemandsApproved = await this.highDemandRepository.getHighDemandsApproved(departmentId)
     return highDemandsApproved
   }
+
+  // ****** Obtener Alta Demanda Registrada *****
+  async getHighDemandRegistered(highDemandId: number): Promise<any> {
+    const highDemandAproved = await this.highDemandRepository.getHighDemandRegistered(highDemandId)
+    return highDemandAproved
+  }
 }

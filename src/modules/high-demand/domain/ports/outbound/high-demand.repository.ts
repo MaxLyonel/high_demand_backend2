@@ -7,6 +7,7 @@ export abstract class HighDemandRepository {
   abstract saveHighDemandRegistration(obj: any): Promise<HighDemandRegistration>;
   abstract cancelHighDemand(obj: any, registrationStatus: RegistrationStatus): Promise<any>;
   abstract getHighDemandsApproved(departmentId: number): Promise<any[]>;
+  abstract getHighDemandRegistered(highDemandId: number): Promise<any>;
 
 
   abstract findById(id: number): Promise<HighDemandRegistration | null>;

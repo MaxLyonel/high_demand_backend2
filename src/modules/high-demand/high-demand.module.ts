@@ -60,6 +60,8 @@ import { MainInboxController } from "./infrastructure/adapters/primary/controlle
 import { MainInboxService } from "./domain/ports/inbound/main-inbox.service";
 import { MainInboxImpl } from "./application/service/main-inbox.impl";
 import { OperativeEntity } from "../operations-programming/infrastructure/adapters/secondary/persistence/entities/operations-programming.entity";
+import { PdfService } from "./domain/ports/outbound/pdf.service";
+import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf/pdf.service";
 
 
 
@@ -73,6 +75,10 @@ import { OperativeEntity } from "../operations-programming/infrastructure/adapte
     MainInboxController
   ],
   providers: [
+    {
+      provide: PdfService,
+      useClass: PdfServiceImpl
+    },
     {
       provide: EducationalInstitutionRepository,
       useClass: EducationalInstitutionRepositoryImpl

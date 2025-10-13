@@ -254,6 +254,40 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     return highDemandsAproved
   }
 
+  // ** obtener la alta demanda registrada **
+  async getHighDemandRegistered(highDemandId: number): Promise<any> {
+    const { CURRENT_YEAR } = this.constants
+    const operative = await this.operativeRepository.findOne({
+      where: { gestionId: CURRENT_YEAR },
+      select: { id: true }
+    })
+    if(!operative) throw new Error("Periódos no definidos. Por favor contáctese con el administrador");
+    const highDemandAproved = await this.highDemandRepository.findOne({
+      where: {
+        id: highDemandId,
+        // registrationStatus: RegistrationStatus.APPROVED,
+        operativeId: operative.id,
+      },
+      relations: [
+        'educationalInstitution',
+        'educationalInstitution.state',
+        'educationalInstitution.educationalInstitutionType',
+        'educationalInstitution.dependencyType',
+        'educationalInstitution.jurisdiction',
+        'educationalInstitution.jurisdiction.districtPlaceType',
+        'educationalInstitution.jurisdiction.localityPlaceType',
+        'educationalInstitution.jurisdiction.localityPlaceType.parent.parent',
+        'educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent',
+        'educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent.parent',
+        'courses',
+        'courses.level',
+        'courses.grade',
+        'courses.parallel'
+      ]
+    })
+    return highDemandAproved
+  }
+
   async searchFather(placeTypeId: number): Promise<any> {
     return this.placeTypeRepository
       .createQueryBuilder('hijo')

@@ -9,7 +9,8 @@ export class Operative {
     public readonly dateRevDepEnd: Date,
     public readonly dateOpeIni: Date,
     public readonly dateOpeEnd: Date,
-    public readonly dateLottery: Date,
+    public readonly dateLotteryIni: Date,
+    public readonly dateLotteryEnd: Date,
     public readonly gestionId: number
   ) {}
 
@@ -24,7 +25,8 @@ export class Operative {
     dateRevDepEnd,
     dateOpeIni,
     dateOpeEnd,
-    dateLottery,
+    dateLotteryIni,
+    dateLotteryEnd,
     gestionId
   }: {
     id: number
@@ -36,7 +38,8 @@ export class Operative {
     dateRevDepEnd: Date,
     dateOpeIni: Date,
     dateOpeEnd: Date,
-    dateLottery: Date,
+    dateLotteryIni: Date,
+    dateLotteryEnd: Date,
     gestionId: number
   }): Operative {
     return new Operative(
@@ -49,7 +52,8 @@ export class Operative {
       dateRevDepEnd,
       dateOpeIni,
       dateOpeEnd,
-      dateLottery,
+      dateLotteryIni,
+      dateLotteryEnd,
       gestionId
     )
   }

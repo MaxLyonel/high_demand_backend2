@@ -14,9 +14,10 @@ export class Operative1754059188591 implements MigrationInterface {
                 fec_rev_dep_fin TIMESTAMP,
                 fec_ope_ini TIMESTAMP,
                 fec_ope_fin TIMESTAMP,
-                fecha_sorteo TIMESTAMP,
+                fecha_sorteo_ini TIMESTAMP,
+                fecha_sorteo_fin TIMESTAMP,
                 gestion_id INT,
-                es_activo BOOLEAN
+                es_activo BOOLEAN DEFAULT TRUE
             )
         `)
     }

@@ -33,8 +33,11 @@ export class OperativeEntity {
   @Column({ name: 'fec_ope_fin'})
   dateOpeEnd: Date
 
-  @Column({ name: 'fecha_sorteo'})
-  dateLottery: Date
+  @Column({ name: 'fecha_sorteo_ini'})
+  dateLotteryIni: Date
+
+  @Column({ name: 'fecha_sorteo_fin'})
+  dateLotteryEnd: Date
 
   @Column({ name: 'gestion_id'})
   gestionId: number
@@ -51,7 +54,8 @@ export class OperativeEntity {
       entity.dateRevDepEnd,
       entity.dateOpeIni,
       entity.dateOpeEnd,
-      entity.dateLottery,
+      entity.dateLotteryIni,
+      entity.dateLotteryEnd,
       entity.gestionId
     )
   }

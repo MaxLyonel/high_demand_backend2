@@ -16,7 +16,7 @@ export class PdfServiceImpl implements PdfService {
       res.setHeader('Content-Disposition', 'inline; filename=declaracion.pdf')
       doc.pipe(res);
       doc.strokeColor('#0D9488')
-      await this.generateHeader(doc, 0, 50, 40, 35)
+      this.generateHeader(doc, 0, 50, 40, 35)
       let currentY = 120;
       currentY = this.generateSchoolData(doc, formData, currentY)
       currentY = this.generateRequirement(doc, formData, currentY + 10);

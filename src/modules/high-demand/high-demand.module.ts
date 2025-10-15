@@ -62,6 +62,8 @@ import { MainInboxImpl } from "./application/service/main-inbox.impl";
 import { OperativeEntity } from "../operations-programming/infrastructure/adapters/secondary/persistence/entities/operations-programming.entity";
 import { PdfService } from "./domain/ports/outbound/pdf.service";
 import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf/pdf.service";
+import { DistrictReportImpl } from "./infrastructure/adapters/secondary/services/pdf/district-report.service";
+import { DistrictReportService } from "./domain/ports/outbound/district-report.service";
 
 
 
@@ -75,6 +77,10 @@ import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf
     MainInboxController
   ],
   providers: [
+    {
+      provide: DistrictReportService,
+      useClass: DistrictReportImpl
+    },
     {
       provide: PdfService,
       useClass: PdfServiceImpl

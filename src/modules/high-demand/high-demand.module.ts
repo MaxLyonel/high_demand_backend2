@@ -64,6 +64,8 @@ import { PdfService } from "./domain/ports/outbound/pdf.service";
 import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf/pdf.service";
 import { DistrictReportImpl } from "./infrastructure/adapters/secondary/services/pdf/district-report.service";
 import { DistrictReportService } from "./domain/ports/outbound/district-report.service";
+import { DepartmentReportService } from "./domain/ports/outbound/department-report.service";
+import { DepartmentReportImpl } from "./infrastructure/adapters/secondary/services/pdf/department-report.service";
 
 
 
@@ -80,6 +82,10 @@ import { DistrictReportService } from "./domain/ports/outbound/district-report.s
     {
       provide: DistrictReportService,
       useClass: DistrictReportImpl
+    },
+    {
+      provide: DepartmentReportService,
+      useClass: DepartmentReportImpl
     },
     {
       provide: PdfService,

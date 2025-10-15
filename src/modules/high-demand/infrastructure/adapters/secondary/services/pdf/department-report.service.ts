@@ -1,12 +1,12 @@
-import { DistrictReportService } from "@high-demand/domain/ports/outbound/district-report.service";
+import { DepartmentReportService } from "@high-demand/domain/ports/outbound/department-report.service";
 import { Injectable } from "@nestjs/common";
 import { Response } from "express";
 import * as PDFDocument from 'pdfkit';
 
 @Injectable()
-export class DistrictReportImpl implements DistrictReportService {
+export class DepartmentReportImpl implements DepartmentReportService {
 
-  async generateDistrictReport(formData: any, res: Response) {
+  async generateDepartmentReport(formData: any, res: Response) {
     try {
       const doc = new PDFDocument({
         margin: 50,
@@ -15,7 +15,7 @@ export class DistrictReportImpl implements DistrictReportService {
       });
 
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'inline; filename=reporte-distrito.pdf');
+      res.setHeader('Content-Disposition', 'inline; filename=reporte-departamento.pdf');
       doc.pipe(res);
       doc.strokeColor('#0d9488');
 
@@ -30,38 +30,45 @@ export class DistrictReportImpl implements DistrictReportService {
       this.generateHeader(doc, 0, currentY, 40, 35);
       currentY += 40;
       this.generateDistrictInfo(doc, currentY, formData);
-      currentY += 30;
+      currentY += 42;
 
-      for (let i = 0; i < formData.length; i++) {
-        const tableData = formData[i];
+      for (let d = 0; d < formData.districts.length; d++) {
+        const districtName = formData.districts[d].districtName
+        currentY = currentY + 12
+        const pageWidth = 740;
+        const tableWidth = 640;
+        const startX = (pageWidth - tableWidth) / 2;
+        doc.font('./fonts/Montserrat-Bold.ttf')
+          .fontSize(9)
+          .text(`Distrito Educativo: ${districtName}`, startX, currentY - 12);
+        for (let i = 0; i < formData.districts[d].institutions.length; i++) {
+          const tableData = formData.districts[d].institutions[i];
 
-        // Calcular altura EXACTA de esta tabla específica
-        const tableHeight = this.calculateTableHeight(formData.length);
+          // Calcular altura EXACTA de esta tabla específica
+          const tableHeight = this.calculateTableHeight(formData.districts[d].institutions.length);
 
-        // Verificar si la tabla cabe en la página actual
-        if (currentY + tableHeight >= PAGE_HEIGHT - BOTTOM_MARGIN) {
-          doc.addPage();
-          doc.strokeColor('#0d9488');
-          currentY = 50;
+          // Verificar si la tabla cabe en la página actual
+          if (currentY + tableHeight >= PAGE_HEIGHT - BOTTOM_MARGIN) {
+            doc.addPage();
+            doc.strokeColor('#0d9488');
+            currentY = 50;
 
-          this.generateSecondaryHeader(doc, currentY);
-          currentY += 30;
+            this.generateSecondaryHeader(doc, currentY);
+            currentY += 30;
+          }
+
+
+          // Generar la tabla con el número específico de filas
+          currentY = this.generateTable(doc, currentY, i + 1, tableData);
+
+          // Agregar espacio entre tablas (excepto después de la última)
+          if (i < formData.districts[d].institutions[i].length - 1) {
+            currentY += SPACE_BETWEEN_TABLES;
+          }
         }
 
-        // Generar la tabla con el número específico de filas
-        currentY = this.generateTable(doc, currentY, i + 1, tableData);
-
-        // Agregar espacio entre tablas (excepto después de la última)
-        if (i < formData.length - 1) {
-          currentY += SPACE_BETWEEN_TABLES;
-        }
       }
 
-      // if(currentY + BOTTOM_MARGIN >= PAGE_HEIGHT) {
-      //   doc.addPage()
-      //   currentY = 80
-      // }
-      // Generar footer en la última posición disponible
       this.generateFooter(doc, currentY);
 
       doc.end();
@@ -119,7 +126,7 @@ export class DistrictReportImpl implements DistrictReportService {
 
     doc.fontSize(10)
       .font('./fonts/Montserrat-Bold.ttf')
-      .text('REPORTE DE REGISTRO Y VALIDACIÓN DISTRITAL DE', x, y, { align: 'center' })
+      .text('REPORTE DE REGISTRO Y VALIDACIÓN DEPARTAMENTAL DE', x, y, { align: 'center' })
       .moveDown(0.2)
       .text('UNIDADES EDUCATIVAS DE ALTA DEMANDA', { align: 'center' })
       .moveDown(0.5);
@@ -135,11 +142,8 @@ export class DistrictReportImpl implements DistrictReportService {
 
     doc.font('./fonts/Montserrat-Bold.ttf')
       .fontSize(9)
-      .text(`Departamento: ${data?.[0]?.department}`, startX, y + rowHeight);
+      .text(`Departamento: ${data?.department}`, startX, y + rowHeight);
 
-    doc.font('./fonts/Montserrat-Bold.ttf')
-      .fontSize(9)
-      .text(`Distrito Educativo: ${data?.[0]?.district}`, startX + 200, y + rowHeight);
   }
 
   private drawTable(
@@ -244,6 +248,7 @@ export class DistrictReportImpl implements DistrictReportService {
   }
 
   private generateTable(doc: PDFKit.PDFDocument, y: number, tableNumber: number = 1, data: any) {
+
     const pageWidth = 740;
     const tableWidth = 640;
     const startX = (pageWidth - tableWidth) / 2;
@@ -252,9 +257,9 @@ export class DistrictReportImpl implements DistrictReportService {
     const columnWidthSubHeaders = [210, 30, 60, 100, 40, 80, 220];
 
     const headers = [
-      `Unidad Educativa: ${data.institution.name}`,
-      `Código RUE: ${data.institution.rude}`,
-      `Dependencia: ${data.institution.dependency}`,
+      `Unidad Educativa: ${data.name}`,
+      `Código RUE: ${data.rude}`,
+      `Dependencia: ${data.dependency}`,
     ];
     const subHeaders = [
       'Nivel de educación',
@@ -296,4 +301,5 @@ export class DistrictReportImpl implements DistrictReportService {
       .fontSize(7)
       .text('Esta documentación constituye una declaración jurada', startX - 585, y + 86, { align: 'center' });
   }
+
 }

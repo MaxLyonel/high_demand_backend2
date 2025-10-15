@@ -7,4 +7,5 @@ export abstract class HistoryRepository {
   abstract getHistory(highDemandRegistrationId: number): Promise<History[]>;
   abstract getHistories(): Promise<History[]>;
   abstract getHighDemands(districtId: number): Promise<any[]>;
+  abstract getHighDemandsByDepartment(departmentId: number): Promise<any[]>;
 }

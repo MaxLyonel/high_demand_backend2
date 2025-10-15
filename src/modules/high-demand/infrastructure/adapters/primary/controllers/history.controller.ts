@@ -1,4 +1,5 @@
 import { HistoryService } from "@high-demand/domain/ports/inbound/history.service";
+import { DepartmentReportService } from "@high-demand/domain/ports/outbound/department-report.service";
 import { DistrictReportService } from "@high-demand/domain/ports/outbound/district-report.service";
 import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Res } from "@nestjs/common";
 import { Response } from "express";
@@ -9,7 +10,8 @@ export class HistoryController {
 
   constructor(
     private readonly historyService: HistoryService,
-    private readonly districtReportService: DistrictReportService
+    private readonly districtReportService: DistrictReportService,
+    private readonly departmentReportService: DepartmentReportService
   ) {}
 
   @Get('list/:highDemandRegistrationId')
@@ -55,6 +57,24 @@ export class HistoryController {
       const result = await this.historyService.getHighDemandsByDistrict(districtId)
       await this.districtReportService.generateDistrictReport(result, res)
     } catch (error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener el listado de altas demandas'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('list-high-demands-by-department/:departmentId')
+  async getHighDemandsByDepartment(
+    @Param('departmentId', ParseIntPipe) departmentId: number,
+    @Res() res: Response
+  ) {
+    try {
+      const result = await this.historyService.getHighDemandsByDepartment(departmentId)
+      console.log(result)
+      await this.departmentReportService.generateDepartmentReport(result, res)
+      return result
+    } catch(error) {
       throw new HttpException({
         status: 'error',
         message: error.message || 'Error al obtener el listado de altas demandas'

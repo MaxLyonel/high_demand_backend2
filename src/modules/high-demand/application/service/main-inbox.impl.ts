@@ -60,6 +60,36 @@ export class MainInboxImpl implements MainInboxService {
     return highDemands
   }
 
+  // ** Devolver alta demanda **
+  async returnHighDemand(highDemandId: number, rolId: number, observation: string | null): Promise<HighDemandRegistration> {
+    const highDemand = await this.mainInboxRepository.returnHighDemands(highDemandId, rolId)
+    const newHistory = {
+      highDemandRegistrationId: highDemand.id,
+      workflowStateId: highDemand.workflowStateId,
+      registrationStatus: highDemand.registrationStatus,
+      userId: highDemand.userId,
+      rolId: highDemand.rolId,
+      observation: observation
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return highDemand
+  }
+
+  // ** rechazar alta demanda **
+  async declineHighDemand(highDemandId: number, observation: string | null): Promise<any> {
+    const saved = await this.mainInboxRepository.declinehighDemand(highDemandId)
+    const newHistory = {
+      highDemandRegistrationId: saved.id,
+      workflowStateId: saved.workflowStateId,
+      registrationStatus: saved.registrationStatus,
+      userId: saved.userId,
+      rolId: saved.rolId,
+      observation: observation
+    }
+    this.historyRepository.updatedHistory(newHistory)
+    return saved
+  }
+
   // ** aprobar alta demanda **
   async approveHighDemand(obj: any): Promise<any> {
     const saved = await this.mainInboxRepository.approveHighDemand(obj.id, RegistrationStatus.APPROVED)
@@ -75,23 +105,8 @@ export class MainInboxImpl implements MainInboxService {
     return saved
   }
 
-  // ** rechazar alta demanda **
-  async declineHighDemand(obj: any): Promise<any> {
-    const saved = await this.mainInboxRepository.declinehighDemand(obj.id, RegistrationStatus.REJECTED)
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: saved.userId,
-      rolId: saved.rolId,
-      observation: ''
-    }
-    this.historyRepository.updatedHistory(newHistory)
-    return saved
-  }
-
   // ****** Listar Altas Demandas de la Bandeja de Entrada ******
-  async listInbox(rolId: number, stateId: number, placeTypeId: number): Promise<any[]> {
+  async listInbox(rolId: number, placeTypeId: number): Promise<any[]> {
     const { ROLES } = this.constants
     const { DISTRICT_ROLE, DEPARTMENT_ROLE } = ROLES
     let placeTypes:Array<number> = []
@@ -104,7 +119,7 @@ export class MainInboxImpl implements MainInboxService {
         placeTypes = places.map(p => p.id)
         break;
     }
-    const highDemands = await this.mainInboxRepository.searchInbox(rolId, stateId, placeTypes)
+    const highDemands = await this.mainInboxRepository.searchInbox(rolId, placeTypes)
     const reducer:any = []
     for(let highDemand of highDemands) {
       const { educationalInstitutionId, userId, workflowStateId, rolId } = highDemand

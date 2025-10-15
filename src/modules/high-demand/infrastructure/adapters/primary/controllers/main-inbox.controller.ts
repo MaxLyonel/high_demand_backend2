@@ -48,6 +48,24 @@ export class MainInboxController {
     }
   }
 
+  @Post('return')
+  async returnHighDemand(@Body() body: any) {
+    try {
+      const { highDemandIds, rolId, observation } = body
+      const result = await this.mainInboxService.returnHighDemand(highDemandIds[0], rolId, observation)
+      return {
+        status: 'success',
+        message: '¡Acción exitosa!',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al devolver la alta demanda'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Post('approve')
   async approveHighDemand(@Body() body: any) {
     try {
@@ -69,8 +87,8 @@ export class MainInboxController {
   @Post('decline')
   async declineHighDemand(@Body() body: any) {
     try {
-      const { highDemand } = body
-      const result = await this.mainInboxService.declineHighDemand(highDemand)
+      const { highDemand, observation } = body
+      const result = await this.mainInboxService.declineHighDemand(highDemand, observation)
       return {
         status: 'success',
         message: 'Alta demanda rechazada',
@@ -87,8 +105,8 @@ export class MainInboxController {
   @Get('list-inbox')
   async getHighDemandsRolState(@Query() params: any) {
     try {
-      const { rolId, stateId, placeTypeId } = params
-      const result = await this.mainInboxService.listInbox(rolId, stateId, placeTypeId)
+      const { rolId, placeTypeId } = params
+      const result = await this.mainInboxService.listInbox(rolId, placeTypeId)
       return {
         status: 'succes',
         message: 'Listado de Altas demandas exitoso',

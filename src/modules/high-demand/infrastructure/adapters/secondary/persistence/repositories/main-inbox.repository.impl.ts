@@ -20,35 +20,7 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
     private readonly workflowStateRepository: Repository<WorkflowStateEntity>
   ) {}
 
-  // ** derivar la altas demandas **
-  async deriveHighDemands(
-    highDemandIds: number[],
-    rolId: number
-  ): Promise<HighDemandRegistration[]> {
-    const workflowState = await this.workflowStateRepository.findOne({
-      where: { name: 'ENVIADO' },
-      select: { id: true }
-    })
-    if(!workflowState?.id) throw new Error(
-      "No existe estado de flujos para derivar, porfavor contactese con el administrador"
-    )
-    const result = await this.highDemandRepository.update(
-      { id: In(highDemandIds) },
-      { inbox: false, workflowStateId: workflowState.id, rolId: rolId }
-    )
-    if(result.affected && result.affected <= 0) {
-      throw new Error('No se realizó la derivación')
-    }
-    const highDemandEntities = await this.highDemandRepository.find({
-      where: {
-        id: In(highDemandIds)
-      }
-    })
-    if(!highDemandEntities.length) throw new Error('No existe las Altas demandas')
-    return highDemandEntities.map(HighDemandRegistrationEntity.toDomain)
-  }
-
-  // ** recibir la alta demanda **
+  // ** recibir las altas demandas **
   async receiveHighDemands(
     highDemandIds: number[]
   ): Promise<HighDemandRegistration[]> {
@@ -75,6 +47,77 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
     return highDemandEntities.map(HighDemandRegistrationEntity.toDomain)
   }
 
+  // ** derivar las altas demandas **
+  async deriveHighDemands(
+    highDemandIds: number[],
+    rolId: number
+  ): Promise<HighDemandRegistration[]> {
+    const workflowState = await this.workflowStateRepository.findOne({
+      where: { name: 'ENVIADO' },
+      select: { id: true }
+    })
+    if(!workflowState?.id) throw new Error(
+      "No existe estado de flujos para derivar, porfavor contáctese con el administrador"
+    )
+    const result = await this.highDemandRepository.update(
+      { id: In(highDemandIds) },
+      { inbox: false, workflowStateId: workflowState.id, rolId: rolId }
+    )
+    if(result.affected && result.affected <= 0) {
+      throw new Error('No se realizó la derivación')
+    }
+    const highDemandEntities = await this.highDemandRepository.find({
+      where: {
+        id: In(highDemandIds)
+      }
+    })
+    if(!highDemandEntities.length) throw new Error('No existe las Altas demandas')
+    return highDemandEntities.map(HighDemandRegistrationEntity.toDomain)
+  }
+
+  // ** devolver una alta demanda **
+  async returnHighDemands(highDemandId: number, rolId: number): Promise<HighDemandRegistration> {
+    const workflowState = await this.workflowStateRepository.findOne({
+      where: { name: 'DEVUELTO'},
+      select: { id: true }
+    })
+    if(!workflowState?.id) throw new Error(
+      "No existe estado de flujos para devolver, por favor contáctese con el administrador"
+    )
+
+    const updateData: Partial<HighDemandRegistrationEntity> = {
+      inbox: false,
+      workflowStateId: workflowState.id
+    }
+
+    if(rolId === 9) {
+      Object.assign(updateData, {
+        registrationStatus: RegistrationStatus.REJECTED
+      })
+    } else {
+      Object.assign(updateData, {
+        rolId
+      })
+    }
+    const { affected } = await this.highDemandRepository.update(
+      { id: highDemandId },
+      updateData
+    )
+    if(!affected || affected <= 0) {
+      throw new Error('No se realizó la devolución')
+    }
+
+    const highDemandEntity = await this.highDemandRepository.findOne({
+      where: { id: highDemandId }
+    });
+
+    if (!highDemandEntity) {
+      throw new Error('No existe la Alta demanda');
+    }
+
+    return HighDemandRegistrationEntity.toDomain(highDemandEntity);
+  }
+
   // ** aprobar la alta demanda **
   async approveHighDemand(
     id: number,
@@ -98,19 +141,31 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
 
   // ** rechazar la alta demanda
   async declinehighDemand(
-    id: number,
-    registrationStatus: RegistrationStatus
+    highDemandId: number,
   ): Promise<HighDemandRegistration> {
+
+    const workflowState = await this.workflowStateRepository.findOne({
+      where: { name: 'ENVIADO'},
+      select: { id: true }
+    })
+    if(!workflowState?.id) throw new Error(
+      "No existe estado de flujos para rechazar, por favor contáctese con el administrdor"
+    )
+
     const result = await this.highDemandRepository.update(
-      { id: id },
-      { registrationStatus: registrationStatus }
+      { id: highDemandId },
+      {
+        inbox: false,
+        workflowStateId: workflowState.id,
+        registrationStatus: RegistrationStatus.REJECTED,
+      }
     )
     if(result.affected && result.affected <= 0) {
       throw new Error("No se rechazo la alta demanda")
     }
     const highDemandEntity = await this.highDemandRepository.findOne({
       where: {
-        id: id
+        id: highDemandId
       }
     })
     if(!highDemandEntity) throw new Error('No existe la Alta demanda');
@@ -120,12 +175,18 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
   // ** busca altas demandas por distrito que esten en la bandeja de entrada **
   async searchInbox(
     rolId: number,
-    stateId: number,
     placeTypes: number[]
   ): Promise<HighDemandRegistration[]> {
+    const workflowStates = await this.workflowStateRepository.find({
+      where: { name: In(['DEVUELTO', 'ENVIADO'])},
+      select: { id: true }
+    })
+    if(!workflowStates.length) throw new Error(
+      "No existe estado de flujos para devolver, por favor contáctese con el administrador"
+    )
     const highDemands = await this.highDemandRepository.find({
       where: {
-        workflowStateId: stateId,
+        workflowStateId: In(workflowStates.map(w => w.id)),
         rolId: rolId,
         inbox: false,
         placeDistrict: In(placeTypes)

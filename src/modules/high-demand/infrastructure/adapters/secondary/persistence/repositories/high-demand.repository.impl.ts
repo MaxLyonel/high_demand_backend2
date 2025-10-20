@@ -14,6 +14,8 @@ import { HighDemandRegistrationCourseEntity } from '../entities/high-demand-cour
 import { HighDemandRegistrationCourse } from '@high-demand/domain/models/high-demand-registration-course.model';
 import { PlaceTypeEntity } from '../entities/place-type.entity';
 import { OperativeEntity } from 'src/modules/operations-programming/infrastructure/adapters/secondary/persistence/entities/operations-programming.entity';
+import { WorkflowSequenceRepository } from '@high-demand/domain/ports/outbound/workflow-sequence.repository';
+import { HistoryEntity } from '../entities/history.entity';
 
 interface Course {
   id: number;
@@ -51,7 +53,10 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     private readonly placeTypeRepository: Repository<PlaceTypeEntity>,
     private readonly _history: HistoryRepository,
     @InjectRepository(OperativeEntity, 'alta_demanda')
-    private readonly operativeRepository: Repository<OperativeEntity>
+    private readonly operativeRepository: Repository<OperativeEntity>,
+    private readonly workflowSequenceRepository: WorkflowSequenceRepository,
+    @InjectRepository(HistoryEntity, 'alta_demanda')
+    private readonly historyRepository: Repository<HistoryEntity>,
   ) {}
 
   // ** guarda la alta demanda **
@@ -64,26 +69,58 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
 
     try {
       // 1. Guardar la entidad principal sin los cursos aún
-      const { courses } = obj;
-      const highDemandToSave = { ...obj, courses: undefined };
-      const newHighDemand: any = await queryRunner.manager.save(
+      const { courses, educationalInstitutionId } = obj;
+
+      let highDemand = await queryRunner.manager.findOne(
         this.highDemandRepository.target,
-        highDemandToSave,
-      );
+        {
+          where: { educationalInstitutionId }
+        }
+      )
+
+      if(!highDemand) {
+        const highDemandToSave = { ...obj, courses: undefined };
+        highDemand = await queryRunner.manager.save(
+          this.highDemandRepository.target,
+          highDemandToSave
+        )
+      }
 
       // 2. Traer cursos existentes persistidos para esta inscripción
       const existingCourses = await queryRunner.manager.find(
         this.highDemandCourseRepository.target,
         {
-          where: { highDemandRegistrationId: newHighDemand.id },
+          where: { highDemandRegistrationId: highDemand!.id },
         },
       );
 
+      const incomingKeys = courses.map(
+        (c) => `${c.levelId}-${c.gradeId}-${c.parallelId}`
+      )
+      const existingKeys = existingCourses.map(
+        (c) => `${c.levelId}-${c.gradeId}-${c.parallelId}`,
+      );
+
+      // Determinar qué eliminar y qué agregar
+      const toDelete = existingCourses.filter(
+        (c) => !incomingKeys.includes(`${c.levelId}-${c.gradeId}-${c.parallelId}`)
+      )
+      const toAdd = courses.filter(
+        (c) => !existingKeys.includes(`${c.levelId}-${c.gradeId}-${c.parallelId}`)
+      )
+      if(toDelete.length > 0) {
+        const idsToDelete = toDelete.map((c) => c.id)
+        await queryRunner.manager.delete(
+          this.highDemandCourseRepository.target,
+          idsToDelete
+        )
+      }
+
       // 3. Crear y validar cursos en el dominio
-      for (const course of courses) {
+      for (const course of toAdd) {
         const domainCourse = HighDemandRegistrationCourse.create({
           id: null,
-          highDemandRegistrationId: newHighDemand.id,
+          highDemandRegistrationId: highDemand!.id,
           levelId: course.levelId,
           gradeId: course.gradeId,
           parallelId: course.parallelId,
@@ -110,11 +147,30 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
           this.highDemandCourseRepository.target,
           entityCourse,
         );
-        existingCourses.push(savedCourse);
       }
 
+      // guardando historial
+      const { rolId } = obj
+      const workflowSequence = await this.workflowSequenceRepository.findNextStates(rolId)
+      const { nextState } = workflowSequence[0]
+      obj.rolId = nextState
+      obj.workflowStateId = 1
+      obj.inbox = false
+      const newHistory = {
+        highDemandRegistrationId: highDemand!.id,
+        workflowStateId: highDemand!.workflowStateId,
+        registrationStatus: highDemand!.registrationStatus,
+        userId: highDemand!.userId,
+        rolId: highDemand!.rolId,
+        observation: ''
+      }
+      await queryRunner.manager.insert(
+        this.historyRepository.target,
+        newHistory
+      )
+
       await queryRunner.commitTransaction();
-      return newHighDemand;
+      return highDemand!;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

@@ -48,7 +48,7 @@ export class HighDemandCourseController {
     }
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   async deleteCourse(@Param('id') id: number) {
     return this.highDemandCourseService.deleteCourse(id);
   }

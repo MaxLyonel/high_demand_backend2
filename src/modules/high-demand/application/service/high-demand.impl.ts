@@ -74,15 +74,15 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
     const saved = await this.highDemandRepository.saveHighDemandRegistration(domain)
 
-    const newHistory = {
-      highDemandRegistrationId: saved.id,
-      workflowStateId: saved.workflowStateId,
-      registrationStatus: saved.registrationStatus,
-      userId: saved.userId,
-      rolId: saved.rolId,
-      observation: ''
-    }
-    this.historyRepository.updatedHistory(newHistory)
+    // const newHistory = {
+    //   highDemandRegistrationId: saved.id,
+    //   workflowStateId: saved.workflowStateId,
+    //   registrationStatus: saved.registrationStatus,
+    //   userId: saved.userId,
+    //   rolId: saved.rolId,
+    //   observation: ''
+    // }
+    // this.historyRepository.updatedHistory(newHistory)
     return saved
   }
 

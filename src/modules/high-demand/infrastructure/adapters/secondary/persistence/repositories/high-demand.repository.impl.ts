@@ -77,8 +77,16 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
           where: { educationalInstitutionId }
         }
       )
+      // para el historico
+      const { rolId } = obj
+      const workflowSequence = await this.workflowSequenceRepository.findNextStates(rolId)
+      const { nextState } = workflowSequence[0]
+      obj.rolId = nextState
+      obj.workflowStateId = 1
+      obj.inbox = false
 
       if(!highDemand) {
+
         const highDemandToSave = { ...obj, courses: undefined };
         highDemand = await queryRunner.manager.save(
           this.highDemandRepository.target,
@@ -143,19 +151,13 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
           totalQuota: domainCourse.totalQuota,
         });
 
-        const savedCourse = await queryRunner.manager.save(
+        await queryRunner.manager.save(
           this.highDemandCourseRepository.target,
           entityCourse,
         );
       }
 
       // guardando historial
-      const { rolId } = obj
-      const workflowSequence = await this.workflowSequenceRepository.findNextStates(rolId)
-      const { nextState } = workflowSequence[0]
-      obj.rolId = nextState
-      obj.workflowStateId = 1
-      obj.inbox = false
       const newHistory = {
         highDemandRegistrationId: highDemand!.id,
         workflowStateId: highDemand!.workflowStateId,

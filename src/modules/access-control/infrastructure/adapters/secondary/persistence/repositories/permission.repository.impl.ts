@@ -116,7 +116,7 @@ export class PermissionRepositoryImpl implements PermissionRepository {
     await queryRunner.connect()
     await queryRunner.startTransaction()
     try {
-      const { id, rol, conditions, __typename, ...rest } = obj
+      const { id, rol, conditions, __typename, userId, ...rest } = obj
       if(conditions.length) {
         for(let condition of conditions) {
           const resultCondition = await queryRunner.manager.update(

@@ -35,11 +35,14 @@ import { RolServiceImpl } from "./application/services/rol.service.impl";
 import { PermissionService } from "./domain/ports/inbound/permission.service";
 import { PermissionServiceImpl } from "./application/services/permission.service.impl";
 import { PermissionController } from "./infrastructure/adapters/primary/controllers/permission.controller";
+import { NotificationPort } from "./domain/ports/outbound/notification.service";
+import { PermissionsGateway } from "./infrastructure/adapters/secondary/services/websocket.permissions.gateway";
 
 
 @Module({
   controllers: [AuthController, UserController, RolController, PermissionController],
   providers: [
+    PermissionsGateway,
     {
       provide: UserRepository,
       useClass: UserRepositoryImpl
@@ -67,6 +70,10 @@ import { PermissionController } from "./infrastructure/adapters/primary/controll
     {
       provide: RolService,
       useClass: RolServiceImpl
+    },
+    {
+      provide: NotificationPort,
+      useExisting: PermissionsGateway
     },
     LocalStrategy,
     JwtStrategy,

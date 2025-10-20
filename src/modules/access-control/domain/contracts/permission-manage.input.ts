@@ -68,6 +68,10 @@ export class Rol {
 }
 
 export class ManagePermission {
+
+  @IsNumber()
+  userId: number
+
   @IsOptional()
   @IsNumber()
   @Type(() => Number)

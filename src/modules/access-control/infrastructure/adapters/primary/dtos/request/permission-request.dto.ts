@@ -69,6 +69,9 @@ export class RolDto {
 
 export class ManagePermissionRequestDto {
 
+  @IsNumber()
+  userId: number;
+
   @IsOptional()
   @IsNumber()
   @Type(() => Number)

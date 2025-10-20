@@ -4,6 +4,7 @@ import { PermissionRepository } from "../../domain/ports/outbound/permission.rep
 import { Action, Permission, Resource } from "@access-control/domain/models/permission.model";
 import { ManagePermission } from "@access-control/domain/contracts/permission-manage.input";
 import { RolPermission } from "@access-control/domain/models/rol-permission.model";
+import { NotificationPort } from "@access-control/domain/ports/outbound/notification.service";
 
 
 
@@ -11,7 +12,8 @@ import { RolPermission } from "@access-control/domain/models/rol-permission.mode
 export class PermissionServiceImpl implements PermissionService {
 
   constructor(
-    private readonly permissionRepository: PermissionRepository
+    private readonly permissionRepository: PermissionRepository,
+    private readonly notifier: NotificationPort
   ) {}
 
   async getActions(): Promise<Action[]> {
@@ -26,11 +28,13 @@ export class PermissionServiceImpl implements PermissionService {
 
   async createPermission(obj: ManagePermission): Promise<RolPermission> {
     const newRolPermission = await this.permissionRepository.savePermission(obj)
+    await this.notifier.notifyPermissionChange(obj.rol.id);
     return newRolPermission
   }
 
   async updatePermission(obj: ManagePermission): Promise<Permission> {
     const updatedPermission = await this.permissionRepository.updatePermission(obj)
+    await this.notifier.notifyPermissionChange(obj.rol.id);
     return updatedPermission
   }
 
@@ -46,6 +50,7 @@ export class PermissionServiceImpl implements PermissionService {
 
   async changePermissionStatus(obj: ManagePermission & {rolId: number}): Promise<RolPermission> {
     const updatedPermission = await this.permissionRepository.updatePermissionStatus(obj)
+    await this.notifier.notifyPermissionChange(obj.rolId);
     return updatedPermission
   }
 

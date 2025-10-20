@@ -16,7 +16,7 @@ export class CaslGuard implements CanActivate {
     const user = request.user;
 
     const roleId = user.roles[0].role.id
-    const ability = await this.abilityFactory.createForRole(roleId);
+    const ability = await this.abilityFactory.createForRole(roleId, user.id);
 
     return rules.every((rule) => ability.can(rule.action, rule.subject));
   }

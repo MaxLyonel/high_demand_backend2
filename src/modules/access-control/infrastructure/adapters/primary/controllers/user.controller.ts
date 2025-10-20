@@ -13,7 +13,7 @@ export class UserController {
   async getAbilities(@Req() req: LoginRequestDto) {
     const user = req.user
     const roleId = user.roles[0].role.id
-    const ability = await this.abilityFactory.createForRole(roleId)
+    const ability = await this.abilityFactory.createForRole(roleId, user.id)
     return { rules: ability.rules }
   }
 }

@@ -96,6 +96,6 @@ import { PermissionsGateway } from "./infrastructure/adapters/secondary/services
       TeacherEntity
     ], 'alta_demanda'),
   ],
-  exports: [AuthService, TokenService, PermissionRepository]
+  exports: [AuthService, TokenService, PermissionRepository, AbilityFactory]
 })
 export class AuthModule {}

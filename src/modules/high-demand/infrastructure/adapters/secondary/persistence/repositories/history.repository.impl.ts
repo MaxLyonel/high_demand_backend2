@@ -6,6 +6,7 @@ import { HistoryEntity } from "../entities/history.entity";
 import { History } from "@high-demand/domain/models/history.model";
 import { CreateHistoryDto } from "@high-demand/application/dtos/create-history.dto";
 import { OperativeEntity } from "src/modules/operations-programming/infrastructure/adapters/secondary/persistence/entities/operations-programming.entity";
+import { AbilityFactory } from "@access-control/application/services/ability.factory";
 
 
 @Injectable()
@@ -14,7 +15,8 @@ export class HistoryRepositoryImpl implements HistoryRepository {
   constructor(
     @Inject('APP_CONSTANTS') private readonly constants,
     @InjectRepository(HistoryEntity, 'alta_demanda') private _historyRepository: Repository<HistoryEntity>,
-    @InjectRepository(OperativeEntity, 'alta_demanda') private readonly operativeRepository: Repository<OperativeEntity>
+    @InjectRepository(OperativeEntity, 'alta_demanda') private readonly operativeRepository: Repository<OperativeEntity>,
+    private readonly abilityFactory: AbilityFactory
   ) {}
 
   async updatedHistory(obj: CreateHistoryDto): Promise<any> {
@@ -51,7 +53,9 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     });
   }
 
-  async getHistories(): Promise<History[]> {
+  async getHistories(user: any): Promise<History[]> {
+    const ability = await this.abilityFactory.createForRole(user.roles[0].role.id, user.id)
+
     const histories = await this._historyRepository.find({
       withDeleted: true,
       relations: ['highDemandRegistration.educationalInstitution', 'user', 'workflowState', 'rol'],
@@ -59,7 +63,13 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         id: 'DESC'
       }
     })
-    return histories.map(entity => {
+    // aplicamos las reglas CASL
+    const filtered = histories.filter(h => {
+      return ability.can('read', { __typename: 'history', user_id: h.userId })
+    }
+    );
+
+    return filtered.map(entity => {
       return new History(
         entity.id,
         entity.highDemandRegistration.id,
@@ -78,71 +88,6 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     })
   }
 
-  // async getHighDemands(districtId: number): Promise<any[]> {
-  //   const { CURRENT_YEAR } = this.constants
-  //   const operative = await this.operativeRepository.findOne({
-  //     where: { gestionId: CURRENT_YEAR },
-  //     select: { id: true }
-  //   })
-  //   if(!operative) throw new Error("Periódos no definidos. Por favor contáctese con el administrador");
-  //   const highDemands = await this._historyRepository.find({
-  //     where: {
-  //       workflowStateId: 2, // EN REVISION
-  //       rolId: 37, // ROL DISTRITAL
-  //       highDemandRegistration: {
-  //         operativeId: operative.id,
-  //         educationalInstitution: {
-  //           jurisdiction: {
-  //             districtPlaceType: {
-  //               id: districtId
-  //             }
-  //           }
-  //         }
-  //       }
-  //     },
-  //     relations: [
-  //       'highDemandRegistration',
-  //       'highDemandRegistration.courses',
-  //       'highDemandRegistration.courses.level',
-  //       'highDemandRegistration.courses.grade',
-  //       'highDemandRegistration.courses.parallel',
-  //       'highDemandRegistration.educationalInstitution',
-  //       'highDemandRegistration.educationalInstitution.dependencyType',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.districtPlaceType',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent.parent',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent.parent',
-  //     ]
-  //   })
-  //   const histories:any = []
-  //   for(let history of highDemands) {
-  //     const newObj:any = {}
-  //     newObj.district = history?.highDemandRegistration?.educationalInstitution?.jurisdiction?.districtPlaceType?.place
-  //     newObj.department = history?.highDemandRegistration?.educationalInstitution?.jurisdiction?.localityPlaceType?.parent?.parent?.parent?.parent?.place
-  //     // newObj.department = history?.highDemandRegistration?.educationalInstitution?.jurisdiction?.districtPlaceType?.parent?.place
-  //     newObj.institution = {
-  //       name: history?.highDemandRegistration?.educationalInstitution?.name,
-  //       rude: history?.highDemandRegistration?.educationalInstitution?.id,
-  //       dependency: history?.highDemandRegistration?.educationalInstitution?.dependencyType?.dependency
-  //     }
-  //     const courses:any = []
-  //     for(let course of history?.highDemandRegistration?.courses) {
-  //       const newObjCourses: any = {}
-  //       newObjCourses.nivel = course?.level?.name,
-  //       newObjCourses.grade = course?.grade?.name,
-  //       newObjCourses.parallel = course?.parallel?.name
-  //       newObjCourses.totalQuota = course?.totalQuota
-
-  //       courses.push(newObjCourses)
-  //     }
-  //     newObj.courses = courses
-  //     histories.push(newObj)
-  //   }
-  //   return histories
-  // }
   async getHighDemands(districtId: number): Promise<any[]> {
     const { CURRENT_YEAR } = this.constants;
 
@@ -230,108 +175,6 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     return Array.from(institutionMap.values());
   }
 
-
-  // async getHighDemandsByDepartment(departmentId: number): Promise<any> {
-  //   const { CURRENT_YEAR } = this.constants;
-
-  //   const operative = await this.operativeRepository.findOne({
-  //     where: { gestionId: CURRENT_YEAR },
-  //     select: { id: true },
-  //   });
-
-  //   if (!operative)
-  //     throw new Error(
-  //       'Períodos no definidos. Por favor contáctese con el administrador'
-  //     );
-
-  //   const highDemands = await this._historyRepository.find({
-  //     where: {
-  //       workflowStateId: 2,
-  //       rolId: 38,
-  //       highDemandRegistration: {
-  //         operativeId: operative.id,
-  //         educationalInstitution: {
-  //           jurisdiction: {
-  //             districtPlaceType: {
-  //               parent: {
-  //                 id: departmentId,
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //     relations: [
-  //       'highDemandRegistration',
-  //       'highDemandRegistration.courses',
-  //       'highDemandRegistration.courses.level',
-  //       'highDemandRegistration.courses.grade',
-  //       'highDemandRegistration.courses.parallel',
-  //       'highDemandRegistration.educationalInstitution',
-  //       'highDemandRegistration.educationalInstitution.dependencyType',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.districtPlaceType',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent.parent',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent',
-  //       'highDemandRegistration.educationalInstitution.jurisdiction.localityPlaceType.parent.parent.parent.parent',
-  //     ],
-  //   });
-
-  //   const departmentName =
-  //     highDemands[0]?.highDemandRegistration?.educationalInstitution?.jurisdiction
-  //       ?.localityPlaceType?.parent?.parent?.parent?.parent?.place || 'Sin nombre';
-
-  //   // 🔹 Agrupar por distrito
-  //   const groupedDistricts = Object.values(
-  //     highDemands.reduce((acc, item) => {
-  //       const district =
-  //         item.highDemandRegistration.educationalInstitution.jurisdiction
-  //           .districtPlaceType;
-
-  //       if (!district) return acc;
-
-  //       const districtName = district.place;
-
-  //       if (!acc[districtName]) {
-  //         acc[districtName] = {
-  //           districtName,
-  //           institutions: [],
-  //         };
-  //       }
-
-  //       const institution =
-  //         item.highDemandRegistration.educationalInstitution;
-
-  //       // Evitar duplicados de instituciones
-  //       const existing = acc[districtName].institutions.find(
-  //         (i) => i.id === institution.id
-  //       );
-
-  //       if (!existing) {
-  //         acc[districtName].institutions.push({
-  //           name: institution.name,
-  //           rude: institution.id,
-  //           dependency: institution?.dependencyType?.dependency,
-  //           courses: item.highDemandRegistration.courses.map((c) => ({
-  //             nivel: c.level?.name,
-  //             grade: c.grade?.name,
-  //             parallel: c.parallel?.name,
-  //             totalQuota: c?.totalQuota
-  //           })),
-  //         });
-  //       }
-
-  //       return acc;
-  //     }, {})
-  //   );
-
-  //   return {
-  //       department: departmentName,
-  //       districts: groupedDistricts,
-  //   };
-  // }
 
   async getHighDemandsByDepartment(departmentId: number): Promise<any> {
     const { CURRENT_YEAR } = this.constants;

@@ -66,6 +66,8 @@ import { DistrictReportImpl } from "./infrastructure/adapters/secondary/services
 import { DistrictReportService } from "./domain/ports/outbound/district-report.service";
 import { DepartmentReportService } from "./domain/ports/outbound/department-report.service";
 import { DepartmentReportImpl } from "./infrastructure/adapters/secondary/services/pdf/department-report.service";
+import { AbilityFactory } from "@access-control/application/services/ability.factory";
+import { AuthModule } from "@access-control/auth.module";
 
 
 
@@ -182,7 +184,8 @@ import { DepartmentReportImpl } from "./infrastructure/adapters/secondary/servic
         WorkflowSequenceEntity,
         WorkflowStateEntity,
       ], 'alta_demanda'),
-    OperationsProgrammingModule
+    OperationsProgrammingModule,
+    AuthModule
   ],
   exports: [EducationalInstitutionService]
 })

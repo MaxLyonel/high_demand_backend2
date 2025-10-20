@@ -16,8 +16,8 @@ export class HistoryServiceImpl implements HistoryService {
     return histories
   }
 
-  async historiesList(): Promise<History[]> {
-    const histories = await this._historyRepository.getHistories()
+  async historiesList(user: any): Promise<History[]> {
+    const histories = await this._historyRepository.getHistories(user)
     return histories
   }
 

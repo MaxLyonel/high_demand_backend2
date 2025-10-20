@@ -1,7 +1,9 @@
+import { JwtAuthGuard } from "@access-control/infrastructure/adapters/primary/guards/jwt-auth.guard";
+import { LocalAuthGuard } from "@access-control/infrastructure/adapters/primary/guards/local-auth.guard";
 import { HistoryService } from "@high-demand/domain/ports/inbound/history.service";
 import { DepartmentReportService } from "@high-demand/domain/ports/outbound/department-report.service";
 import { DistrictReportService } from "@high-demand/domain/ports/outbound/district-report.service";
-import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Res } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Req, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 
 
@@ -31,10 +33,11 @@ export class HistoryController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('list-histories')
-  async getHistories() {
+  async getHistories(@Req() req) {
     try {
-      const result = await this.historyService.historiesList()
+      const result = await this.historyService.historiesList(req.user)
       return {
         status: 'success',
         message: 'Listado de historiales obtenido exitosamente',

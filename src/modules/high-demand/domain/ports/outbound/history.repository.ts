@@ -5,7 +5,7 @@ import { History } from "@high-demand/domain/models/history.model";
 export abstract class HistoryRepository {
   abstract updatedHistory(obj: CreateHistoryDto): Promise<any>;
   abstract getHistory(highDemandRegistrationId: number): Promise<History[]>;
-  abstract getHistories(): Promise<History[]>;
+  abstract getHistories(user: any): Promise<History[]>;
   abstract getHighDemands(districtId: number): Promise<any[]>;
   abstract getHighDemandsByDepartment(departmentId: number): Promise<any[]>;
 }

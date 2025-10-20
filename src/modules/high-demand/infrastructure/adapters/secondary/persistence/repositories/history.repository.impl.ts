@@ -54,7 +54,8 @@ export class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   async getHistories(user: any): Promise<History[]> {
-    const ability = await this.abilityFactory.createForRole(user.roles[0].role.id, user.id)
+    const ability = await this.abilityFactory.createForRole(user.selectedRoleId, user.id, user.institutionId)
+    // console.log("Reglas CASL del usuario:", JSON.stringify(ability.rules, null, 2));
 
     const histories = await this._historyRepository.find({
       withDeleted: true,
@@ -64,10 +65,34 @@ export class HistoryRepositoryImpl implements HistoryRepository {
       }
     })
     // aplicamos las reglas CASL
-    const filtered = histories.filter(h => {
-      return ability.can('read', { __typename: 'history', user_id: h.userId })
+    const { ROLES } = this.constants
+    let filtered: Array<HistoryEntity> = []
+    switch(user.selectedRoleId) {
+      case ROLES.DIRECTOR_ROLE:
+        filtered = histories.filter(h => {
+          return ability.can('read', {
+            __typename: 'history',
+            user_id: h.userId,
+            institucion_educativa_id:
+              h.highDemandRegistration
+                .educationalInstitution?.id
+          });
+        });
+        console.log("director: ", filtered)
+        break;
+      case ROLES.DISTRICT_ROLE:
+        filtered = histories.filter(h => {
+          return ability.can('read', {__typename: 'history'})
+        })
+        console.log("distrital: ", filtered)
+        break;
+      case ROLES.DEPARTMENT_ROLE:
+        filtered = histories.filter(h => {
+          return ability.can('read', {__typename: 'history'})
+        })
+        console.log("departamental: ", filtered)
+        break;
     }
-    );
 
     return filtered.map(entity => {
       return new History(

@@ -37,7 +37,14 @@ export class HistoryController {
   @Get('list-histories')
   async getHistories(@Req() req) {
     try {
-      const result = await this.historyService.historiesList(req.user)
+      const selectedRoleId = Number(req.headers['x-selected-role-id']);
+      const institutionId = Number(req.headers['x-institution-id']);
+      const user = {
+        ...req.user,
+        selectedRoleId,
+        institutionId
+      }
+      const result = await this.historyService.historiesList(user)
       return {
         status: 'success',
         message: 'Listado de historiales obtenido exitosamente',

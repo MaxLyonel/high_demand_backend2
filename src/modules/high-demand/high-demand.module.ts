@@ -1,5 +1,5 @@
 // framework
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 // external dependencies
 import { TypeOrmModule } from "@nestjs/typeorm";
 // own implementation
@@ -68,6 +68,7 @@ import { DepartmentReportService } from "./domain/ports/outbound/department-repo
 import { DepartmentReportImpl } from "./infrastructure/adapters/secondary/services/pdf/department-report.service";
 import { AbilityFactory } from "@access-control/application/services/ability.factory";
 import { AuthModule } from "@access-control/auth.module";
+import { AddInfoMiddleware } from "./infrastructure/adapters/primary/middleware/add-info.middleware";
 
 
 
@@ -189,4 +190,10 @@ import { AuthModule } from "@access-control/auth.module";
   ],
   exports: [EducationalInstitutionService]
 })
-export class HighDemandModule {}
+export class HighDemandModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AddInfoMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL }); // o rutas específicas
+  }
+}

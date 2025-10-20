@@ -16,7 +16,7 @@ export class AbilityFactory {
     private permissionRepo: PermissionRepository
   ) {}
 
-  async createForRole(roleId: number, currentUserId: number): Promise<AppAbility> {
+  async createForRole(roleId: number, currentUserId: number, institutionId?: number): Promise<AppAbility> {
     const operatorMap: Record<string, string | null> = {
       '=': null,
       '>': '$gt',
@@ -43,7 +43,10 @@ export class AbilityFactory {
           if(!conditionsObj![c.field]) conditionsObj![c.field] = {};
 
           const op = operatorMap[c.operator]
-          const value = c.value === '$currentUserId' ? currentUserId : c.value
+          const value =
+          c.value === '$currentUserId' ? currentUserId :
+          c.value === '$currentInstitutionId' ? institutionId :
+          c.value;
 
           if(op === null) {
             // conditionsObj![c.field] = c.value

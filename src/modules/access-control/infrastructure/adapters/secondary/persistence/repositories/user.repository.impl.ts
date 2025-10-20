@@ -77,7 +77,8 @@ export class UserRepositoryImpl implements UserRepository {
       select: ['id', 'username' ]
     })
     if(!user) throw new Error('No se encontro al usuario')
-    return UserEntity.toDomain(user)
+    const ruser =  UserEntity.toDomain(user)
+    return  ruser
   }
 
 }

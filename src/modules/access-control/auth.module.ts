@@ -37,6 +37,8 @@ import { PermissionServiceImpl } from "./application/services/permission.service
 import { PermissionController } from "./infrastructure/adapters/primary/controllers/permission.controller";
 import { NotificationPort } from "./domain/ports/outbound/notification.service";
 import { PermissionsGateway } from "./infrastructure/adapters/secondary/services/websocket.permissions.gateway";
+import { OperationsProgrammingModule } from "../operations-programming/operations-programming.module";
+import { PermissionWatcherService } from "./infrastructure/adapters/secondary/services/permission-watcher.service";
 
 
 @Module({
@@ -77,9 +79,11 @@ import { PermissionsGateway } from "./infrastructure/adapters/secondary/services
     },
     LocalStrategy,
     JwtStrategy,
-    AbilityFactory
+    AbilityFactory,
+    PermissionWatcherService
   ],
   imports: [
+    OperationsProgrammingModule,
     PassportModule,
     JwtModule.register({
       secret: envs.jwtSecret,

@@ -37,4 +37,14 @@ export class PermissionsGateway
     console.log("notificando...")
     this.server.emit('permission:changed', { roleId });
   }
+
+  async notifyPermissionExpired(roleId: number) {
+    console.log("Notificando.... expiración....")
+    this.server.emit('permission:expired', { roleId })
+  }
+
+  async notifyPermissionActivated(roleId: number) {
+    console.log("Notificando.... activado....")
+    this.server.emit('permission:expired', { roleId })
+  }
 }

@@ -154,22 +154,15 @@ export class CatalogsController {
   @Get('print')
   async print(@Res() res: Response) {
     try {
-      console.log("Solicitud PDF recibida");
-      // ✅ Solo llamar al servicio, sin return
       await this.pdfService.generateRegistrationForm({ campo: 1 }, res);
-      // return "Hola"
-      console.log("PDF enviado exitosamente");
     } catch(error) {
       console.error('Error generando PDF:', error);
-      // ✅ Solo enviar error si los headers no se enviaron
       if (!res.headersSent) {
-        // Puedes usar throw o res.status().json()
         res.status(HttpStatus.BAD_REQUEST).json({
           status: 'error',
           message: error.message || 'Error al descargar PDF'
         });
       } else {
-        // Si ya se enviaron headers, solo logear el error
         console.error('Error después de enviar headers PDF');
       }
     }

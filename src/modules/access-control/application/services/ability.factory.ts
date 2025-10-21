@@ -4,6 +4,8 @@ import { Injectable } from "@nestjs/common";
 import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
 // own implementation
 import { PermissionRepository } from "../../domain/ports/outbound/permission.repository";
+import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
+import { PermissionsGateway } from "@access-control/infrastructure/adapters/secondary/services/websocket.permissions.gateway";
 
 type Subjects = any | 'all'
 
@@ -13,14 +15,17 @@ type AppAbility = Ability<[string, Subjects | { __typename: string; [key: string
 export class AbilityFactory {
 
   constructor(
-    private permissionRepo: PermissionRepository
+    private permissionRepo: PermissionRepository,
+    private operativeRepo: OperationsProgrammingRepository,
+    private permissionGateway: PermissionsGateway
   ) {}
 
   async createForRole(
       roleId: number,
       currentUserId: number,
       institutionId?: number | null,
-      placeTypeId?: number | null
+      placeTypeId?: number | null,
+      gestionId?: number
   ): Promise<AppAbility> {
     const operatorMap: Record<string, string | null> = {
       '=': null,
@@ -35,10 +40,21 @@ export class AbilityFactory {
       Ability as AbilityClass<AppAbility>
     );
 
+    // Obtener el opertivo actual para validar fechas
+    let currentOperative: any = null;
+    if(gestionId) {
+      currentOperative = await this.operativeRepo.getOperative(gestionId)
+    }
+
     const permissions = await this.permissionRepo.findByRoleId(roleId);
 
-    permissions.forEach((perm) => {
-      if (!perm.action || !perm.subject) return; // no debería existir permisos sin una acción o recurso asignado
+    permissions.forEach((perm, index) => {
+      if (!perm.action || !perm.subject) return;
+
+      if(this.isPermissionExpired(roleId, currentOperative)) {
+        console.log("permiso expirado! para rolId:", roleId)
+        return;
+      }
 
       let conditionsObj: Record<string, any> | undefined;
 
@@ -54,7 +70,6 @@ export class AbilityFactory {
           c.value === '$currentDistrictId' ? placeTypeId :
           c.value;
 
-          // console.log("value: ", value)
           if(op === null) {
             // conditionsObj![c.field] = c.value
             conditionsObj![c.field] = value
@@ -74,5 +89,37 @@ export class AbilityFactory {
         return 'all';
       }
     });
+  }
+
+  private isPermissionExpired(roleId: any, operative: any): boolean {
+    if(!operative) return true; // Si no hay operativo, no permitir nada
+    const now = new Date();
+
+    // console.log("Tiempo actual: ", now)
+    // console.log("Operativo: ", operative)
+    let expired = false;
+    switch(roleId) {
+      case 9:
+        // console.log("1",now < operative.datePosUEIni, operative.datePosUEIni)
+        // console.log("2",now > operative.datePosUEEnd, operative.datePosUEEnd)
+        // console.log("Resultado final: ", now < operative.datePosUEIni || now > operative.datePosUEEnd)
+        expired = now < operative.datePosUEIni || now > operative.datePosUEEnd;
+        break;
+      case 37:
+        expired = now < operative.dateRevDisIni || now > operative.dateRevDisEnd;
+        break;
+      case 38:
+        expired = now < operative.dateRevDepIni || now > operative.dateRevDepEnd;
+        break;
+      default:
+        expired = false;
+        break;
+    }
+    // if(expired) {
+    //   console.log("no ingresa aca")
+    //   this.permissionGateway.notifyPermissionExpired(roleId);
+    // }
+    return expired;
+
   }
 }

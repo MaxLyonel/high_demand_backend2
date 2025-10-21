@@ -10,7 +10,6 @@ export class PdfServiceImpl implements PdfService {
 
   async generateAffidavit(formData: any, res: Response) {
     try {
-      console.log("Esto llega ", formData)
       const doc = new PDFDocument({ margin: 1})
       res.setHeader('Content-Type', 'application/pdf')
       res.setHeader('Content-Disposition', 'inline; filename=declaracion.pdf')

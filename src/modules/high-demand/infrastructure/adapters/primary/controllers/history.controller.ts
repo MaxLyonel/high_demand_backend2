@@ -83,7 +83,6 @@ export class HistoryController {
   ) {
     try {
       const result = await this.historyService.getHighDemandsByDepartment(departmentId)
-      console.log(result)
       await this.departmentReportService.generateDepartmentReport(result, res)
       return result
     } catch(error) {

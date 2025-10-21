@@ -1,5 +1,5 @@
 // framework nestjs
-import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
+import { Global, MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 // own implementations
 import { AuthModule } from "./modules/access-control/auth.module";
 import { DatabaseModule } from "./infrastructure/database/database.module";
@@ -8,7 +8,12 @@ import { OperationsProgrammingModule } from "./modules/operations-programming/op
 import { PreRegistrationModule } from "./modules/pre-registration/pre-registration.module";
 import { ConstantModule } from "@infrastructure-general/constants/constant.module";
 import { AddInfoMiddleware } from "@high-demand/infrastructure/adapters/primary/middleware/add-info.middleware";
+import { JwtAuthGuard } from "@access-control/infrastructure/adapters/primary/guards/jwt-auth.guard";
+import { APP_GUARD } from "@nestjs/core";
+import { PermissionGuard } from "@access-control/infrastructure/adapters/primary/guards/permission.guard";
+import { ScheduleModule } from "@nestjs/schedule";
 
+@Global()
 @Module({
   imports: [
     AuthModule,
@@ -16,8 +21,19 @@ import { AddInfoMiddleware } from "@high-demand/infrastructure/adapters/primary/
     DatabaseModule,
     HighDemandModule,
     PreRegistrationModule,
-    OperationsProgrammingModule
-  ]
+    OperationsProgrammingModule,
+    ScheduleModule.forRoot(),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD, // ✅ Aplicar guard JWT globalmente
+      useClass: JwtAuthGuard
+    },
+    // {
+    //   provide: APP_GUARD, // ✅ Aplicar guar Permissions globalmente
+    //   useClass: PermissionGuard
+    // },
+  ],
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {

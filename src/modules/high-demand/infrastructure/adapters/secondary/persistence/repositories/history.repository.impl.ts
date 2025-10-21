@@ -54,17 +54,12 @@ export class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   async getHistories(user: any): Promise<History[]> {
-
     const { ROLES } = this.constants
-    // console.log("user", user)
-
     let filtered: HistoryEntity[] = []
     switch(user.selectedRoleId) {
       case ROLES.DIRECTOR_ROLE:
-        console.log("Director", user.institutionId)
         filtered = await this._historyRepository.find({
           where: {
-            // rolId: user.selectedRoleId,
             highDemandRegistration: {
               educationalInstitutionId: user.institutionId
             }
@@ -83,10 +78,8 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         })
         break;
       case ROLES.DISTRICT_ROLE:
-        console.log("Distrito")
         filtered = await this._historyRepository.find({
           where: {
-            // rolId: user.selectedRoleId,
             highDemandRegistration: {
               placeDistrict: {
                 id: user.placeTypeId
@@ -107,10 +100,8 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         })
         break;
       case ROLES.DEPARTMENT_ROLE:
-        console.log("Departamento", user.placeTypeId, user.selectedRoleId)
         filtered = await this._historyRepository.find({
           where: {
-            // rolId: user.selectedRoleId,
             highDemandRegistration: {
               placeDistrict: {
                 parent: {
@@ -131,11 +122,9 @@ export class HistoryRepositoryImpl implements HistoryRepository {
             id: 'DESC'
           }
         })
-        console.log(filtered)
         break;
     }
 
-    console.log("filtered", filtered)
     return filtered.map(entity => {
       return new History(
         entity.id,
@@ -208,7 +197,6 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     //     break;
     // }
 
-    // console.log("filtered: ", filtered)
     // // Convertimos a dominio
     // return filtered.map(entity => {
     //   return new History(

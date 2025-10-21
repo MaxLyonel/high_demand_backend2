@@ -61,10 +61,10 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     let filtered: HistoryEntity[] = []
     switch(user.selectedRoleId) {
       case ROLES.DIRECTOR_ROLE:
-        console.log("Director")
+        console.log("Director", user.institutionId)
         filtered = await this._historyRepository.find({
           where: {
-            rolId: user.selectedRoleId,
+            // rolId: user.selectedRoleId,
             highDemandRegistration: {
               educationalInstitutionId: user.institutionId
             }
@@ -86,7 +86,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         console.log("Distrito")
         filtered = await this._historyRepository.find({
           where: {
-            rolId: user.selectedRoleId,
+            // rolId: user.selectedRoleId,
             highDemandRegistration: {
               placeDistrict: {
                 id: user.placeTypeId
@@ -110,7 +110,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
         console.log("Departamento", user.placeTypeId, user.selectedRoleId)
         filtered = await this._historyRepository.find({
           where: {
-            rolId: user.selectedRoleId,
+            // rolId: user.selectedRoleId,
             highDemandRegistration: {
               placeDistrict: {
                 parent: {

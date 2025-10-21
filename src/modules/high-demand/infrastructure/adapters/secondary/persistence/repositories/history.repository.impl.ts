@@ -53,151 +53,181 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     });
   }
 
-  // async getHistories(user: any): Promise<History[]> {
-  //   const ability = await this.abilityFactory.createForRole(user.selectedRoleId, user.id, user.institutionId)
-  //   // console.log("Reglas CASL del usuario:", JSON.stringify(ability.rules, null, 2));
-
-  //   const histories = await this._historyRepository.find({
-  //     withDeleted: true,
-  //     relations: [
-  //       'highDemandRegistration.educationalInstitution',
-  //       'highDemandRegistration.placeDistrict',
-  //       'user',
-  //       'workflowState',
-  //       'rol'
-  //     ],
-  //     order: {
-  //       id: 'DESC'
-  //     }
-  //   })
-  //   // aplicamos las reglas CASL
-  //   const { ROLES } = this.constants
-  //   let filtered: Array<HistoryEntity> = []
-  //   switch(user.selectedRoleId) {
-  //     case ROLES.DIRECTOR_ROLE:
-  //       filtered = histories.filter(h => {
-  //         return ability.can('read', {
-  //           __typename: 'history',
-  //           institucion_educativa_id:
-  //             h.highDemandRegistration
-  //               .educationalInstitution?.id
-  //         });
-  //       });
-  //       break;
-  //     case ROLES.DISTRICT_ROLE:
-  //       filtered = histories.filter(h => {
-  //         console.log(h.highDemandRegistration.placeDistrict)
-  //         return ability.can('read', {
-  //           __typename: 'history',
-  //           id:
-  //             h.highDemandRegistration
-  //               .placeDistrict?.id
-  //         })
-  //         // console.log('Eval:', obj, '=>', ability.can('read', obj));
-  //       })
-  //       break;
-  //     case ROLES.DEPARTMENT_ROLE:
-  //       filtered = histories.filter(h => {
-  //         return ability.can('read', {__typename: 'history'})
-  //       })
-  //       break;
-  //   }
-
-  //   console.log("result: ", filtered)
-  //   return filtered.map(entity => {
-  //     return new History(
-  //       entity.id,
-  //       entity.highDemandRegistration.id,
-  //       entity.highDemandRegistration.educationalInstitution?.id,
-  //       entity.highDemandRegistration.educationalInstitution?.name,
-  //       entity.userId,
-  //       entity.user.username,
-  //       entity.rol.name,
-  //       entity.rol.id,
-  //       entity.workflowState.name,
-  //       entity.registrationStatus,
-  //       entity.observation,
-  //       entity.createdAt,
-  //       entity.updatedAt
-  //     )
-  //   })
-  // }
-
   async getHistories(user: any): Promise<History[]> {
-  const ability = await this.abilityFactory.createForRole(
-    user.selectedRoleId,
-    user.id,
-    user.institutionId,
-    user.placeTypeId
-  );
 
-  const histories = await this._historyRepository.find({
-    withDeleted: true,
-    relations: [
-      'highDemandRegistration.educationalInstitution',
-      'highDemandRegistration.placeDistrict',
-      'user',
-      'workflowState',
-      'rol'
-    ],
-    order: {
-      id: 'DESC'
+    const { ROLES } = this.constants
+    // console.log("user", user)
+
+    let filtered: HistoryEntity[] = []
+    switch(user.selectedRoleId) {
+      case ROLES.DIRECTOR_ROLE:
+        console.log("Director")
+        filtered = await this._historyRepository.find({
+          where: {
+            rolId: user.selectedRoleId,
+            highDemandRegistration: {
+              educationalInstitutionId: user.institutionId
+            }
+          },
+          withDeleted: true,
+          relations: [
+            'highDemandRegistration.educationalInstitution',
+            'highDemandRegistration.placeDistrict',
+            'user',
+            'workflowState',
+            'rol'
+          ],
+          order: {
+            id: 'DESC'
+          }
+        })
+        break;
+      case ROLES.DISTRICT_ROLE:
+        console.log("Distrito")
+        filtered = await this._historyRepository.find({
+          where: {
+            rolId: user.selectedRoleId,
+            highDemandRegistration: {
+              placeDistrict: {
+                id: user.placeTypeId
+              }
+            }
+          },
+          withDeleted: true,
+          relations: [
+            'highDemandRegistration.educationalInstitution',
+            'highDemandRegistration.placeDistrict',
+            'user',
+            'workflowState',
+            'rol'
+          ],
+          order: {
+            id: 'DESC'
+          }
+        })
+        break;
+      case ROLES.DEPARTMENT_ROLE:
+        console.log("Departamento", user.placeTypeId, user.selectedRoleId)
+        filtered = await this._historyRepository.find({
+          where: {
+            rolId: user.selectedRoleId,
+            highDemandRegistration: {
+              placeDistrict: {
+                parent: {
+                  id: user.placeTypeId
+                }
+              }
+            }
+          },
+          withDeleted: true,
+          relations: [
+            'highDemandRegistration.educationalInstitution',
+            'highDemandRegistration.placeDistrict',
+            'user',
+            'workflowState',
+            'rol'
+          ],
+          order: {
+            id: 'DESC'
+          }
+        })
+        console.log(filtered)
+        break;
     }
-  });
 
-  const { ROLES } = this.constants;
-  let filtered: HistoryEntity[] = [];
+    console.log("filtered", filtered)
+    return filtered.map(entity => {
+      return new History(
+        entity.id,
+        entity.highDemandRegistration.id,
+        entity.highDemandRegistration.educationalInstitution?.id,
+        entity.highDemandRegistration.educationalInstitution?.name,
+        entity.userId,
+        entity.user.username,
+        entity.rol.name,
+        entity.rol.id,
+        entity.workflowState.name,
+        entity.registrationStatus,
+        entity.observation,
+        entity.createdAt,
+        entity.updatedAt
+      );
+    });
 
-  switch (user.selectedRoleId) {
-    case ROLES.DIRECTOR_ROLE:
-      filtered = histories.filter(h => {
-        const subject = {
-          __typename: 'history',
-          institucion_educativa_id: h.highDemandRegistration.educationalInstitution?.id
-        };
-        return ability.can('read', subject);
-      });
-      break;
+    // const ability = await this.abilityFactory.createForRole(
+    //   user.selectedRoleId,
+    //   user.id,
+    //   user.institutionId,
+    //   user.placeTypeId
+    // );
 
-    case ROLES.DISTRICT_ROLE:
-      filtered = histories.filter(h => {
-        const subject = {
-          __typename: 'history',
-          lugar_distrito_id: h.highDemandRegistration.placeDistrict?.id
-        };
-        return ability.can('read', subject);
-      });
-      break;
+    // const histories = await this._historyRepository.find({
+    //   withDeleted: true,
+    //   relations: [
+    //     'highDemandRegistration.educationalInstitution',
+    //     'highDemandRegistration.placeDistrict',
+    //     'user',
+    //     'workflowState',
+    //     'rol'
+    //   ],
+    //   order: {
+    //     id: 'DESC'
+    //   }
+    // });
 
-    case ROLES.DEPARTMENT_ROLE:
-      // Para el departamental, asumimos que puede leer todo el histórico
-      filtered = histories.filter(h => {
-        const subject = { __typename: 'history' };
-        return ability.can('read', subject);
-      });
-      break;
+    // const { ROLES } = this.constants;
+    // let filtered: HistoryEntity[] = [];
+
+    // switch (user.selectedRoleId) {
+    //   case ROLES.DIRECTOR_ROLE:
+    //     filtered = histories.filter(h => {
+    //       const subject = {
+    //         __typename: 'history',
+    //         institucion_educativa_id: h.highDemandRegistration.educationalInstitution?.id
+    //       };
+    //       return ability.can('read', subject);
+    //     });
+    //     break;
+
+    //   case ROLES.DISTRICT_ROLE:
+    //     filtered = histories.filter(h => {
+    //       const subject = {
+    //         __typename: 'history',
+    //         lugar_distrito_id: h.highDemandRegistration.placeDistrict?.id
+    //       };
+    //       return ability.can('read', subject);
+    //     });
+    //     break;
+
+    //   case ROLES.DEPARTMENT_ROLE:
+    //     // Para el departamental, asumimos que puede leer todo el histórico
+    //     filtered = histories.filter(h => {
+    //       const subject = { __typename: 'history' };
+    //       return ability.can('read', subject);
+    //     });
+    //     break;
+    // }
+
+    // console.log("filtered: ", filtered)
+    // // Convertimos a dominio
+    // return filtered.map(entity => {
+    //   return new History(
+    //     entity.id,
+    //     entity.highDemandRegistration.id,
+    //     entity.highDemandRegistration.educationalInstitution?.id,
+    //     entity.highDemandRegistration.educationalInstitution?.name,
+    //     entity.userId,
+    //     entity.user.username,
+    //     entity.rol.name,
+    //     entity.rol.id,
+    //     entity.workflowState.name,
+    //     entity.registrationStatus,
+    //     entity.observation,
+    //     entity.createdAt,
+    //     entity.updatedAt
+    //   );
+    // });
   }
-
-  console.log("filtered: ", filtered)
-  // Convertimos a dominio
-  return filtered.map(entity => {
-    return new History(
-      entity.id,
-      entity.highDemandRegistration.id,
-      entity.highDemandRegistration.educationalInstitution?.id,
-      entity.highDemandRegistration.educationalInstitution?.name,
-      entity.userId,
-      entity.user.username,
-      entity.rol.name,
-      entity.rol.id,
-      entity.workflowState.name,
-      entity.registrationStatus,
-      entity.observation,
-      entity.createdAt,
-      entity.updatedAt
-    );
-  });
-}
 
 
   async getHighDemands(districtId: number): Promise<any[]> {

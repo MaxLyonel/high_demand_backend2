@@ -39,10 +39,12 @@ export class HistoryController {
     try {
       const selectedRoleId = Number(req.headers['x-selected-role-id']);
       const institutionId = Number(req.headers['x-institution-id']);
+      const placeTypeId = req.headers['x-place-type-id'] !== undefined ? Number(req.headers['x-place-type-id']) : null;
       const user = {
         ...req.user,
         selectedRoleId,
-        institutionId
+        institutionId,
+        placeTypeId
       }
       const result = await this.historyService.historiesList(user)
       return {

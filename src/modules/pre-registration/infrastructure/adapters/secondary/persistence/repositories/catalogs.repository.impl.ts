@@ -67,4 +67,13 @@ export class CatalogsRepositoryImpl implements CatalogsRepository {
     return departments
   }
 
+  async getDistrictByDepartment(departmentId: number): Promise<any> {
+    const districts = await this.placeRepository.find({
+      where: {
+        parentId: departmentId
+      }
+    })
+    return districts
+  }
+
 }

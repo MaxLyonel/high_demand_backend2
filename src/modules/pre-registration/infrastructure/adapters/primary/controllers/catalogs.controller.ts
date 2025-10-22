@@ -168,4 +168,21 @@ export class CatalogsController {
     }
   }
 
+  @Get('list-districts-by-departement/:departmentId')
+  async getDistrictsByDepartment(@Param('departmentId', ParseIntPipe) departmentId: number) {
+    try {
+      const result = await this.catalogsService.listDistrictByDepartment(departmentId)
+      return {
+        status: 'success',
+        message: 'Obtención de distritos por departamento exitosa',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener los distritos por departamento'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

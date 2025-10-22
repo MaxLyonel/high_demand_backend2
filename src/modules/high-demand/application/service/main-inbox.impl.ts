@@ -115,8 +115,9 @@ export class MainInboxImpl implements MainInboxService {
         placeTypes.push(placeTypeId)
         break;
       case DEPARTMENT_ROLE:
-        const places = await this.mainInboxRepository.searchChildren(placeTypeId)
-        placeTypes = places.map(p => p.id)
+        // const places = await this.mainInboxRepository.searchChildren(placeTypeId)
+        // placeTypes = places.map(p => p.id)
+        placeTypes = [placeTypeId]
         break;
     }
     const highDemands = await this.mainInboxRepository.searchInbox(rolId, placeTypes)

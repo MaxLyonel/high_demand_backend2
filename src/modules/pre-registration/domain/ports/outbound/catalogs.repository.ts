@@ -6,4 +6,5 @@ export abstract class CatalogsRepository {
   abstract getCriterias(): Promise<any>
   abstract getLevels(): Promise<any>;
   abstract getDepartments(): Promise<any>;
+  abstract getDistrictByDepartment(departmentId: number): Promise<any>;
 }

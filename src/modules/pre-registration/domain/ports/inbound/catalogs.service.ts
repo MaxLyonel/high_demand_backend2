@@ -6,4 +6,5 @@ export abstract class CatalogsService {
   abstract listCriterias(): Promise<any>;
   abstract listLevels(): Promise<any>;
   abstract listDepartments(): Promise<any>;
+  abstract listDistrictByDepartment(departmentId: number): Promise<any>;
 }

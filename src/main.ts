@@ -6,6 +6,8 @@ import { DocumentBuilder } from '@nestjs/swagger';
 // own implementation
 import { AppModule } from './app.module';
 import { TypenameInterceptor } from '@access-control/infrastructure/adapters/primary/interceptors/typename.interceptor';
+import { RequestContextInterceptor } from '@infrastructure-general/register-logs/request-content.interceptor';
+import { RequestContextService } from '@infrastructure-general/register-logs/request-context.service';
 
 require('module-alias/register');
 
@@ -24,6 +26,7 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new TypenameInterceptor());
+  app.useGlobalInterceptors(new RequestContextInterceptor(app.get(RequestContextService)));
 
 
   app.setGlobalPrefix('api', {

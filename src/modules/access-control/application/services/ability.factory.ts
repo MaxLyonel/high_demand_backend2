@@ -52,10 +52,10 @@ export class AbilityFactory {
     permissions.forEach((perm, index) => {
       if (!perm.action || !perm.subject) return;
 
-      if(this.isPermissionExpired(roleId, currentOperative)) {
-        console.log("permiso expirado! para rolId:", roleId)
-        return;
-      }
+      // if(this.isPermissionExpired(roleId, currentOperative)) {
+      //   console.log("permiso expirado! para rolId:", roleId)
+      //   return;
+      // }
 
       let conditionsObj: Record<string, any> | undefined;
 

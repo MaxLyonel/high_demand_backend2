@@ -12,6 +12,8 @@ import { JwtAuthGuard } from "@access-control/infrastructure/adapters/primary/gu
 import { APP_GUARD } from "@nestjs/core";
 import { PermissionGuard } from "@access-control/infrastructure/adapters/primary/guards/permission.guard";
 import { ScheduleModule } from "@nestjs/schedule";
+import { RequestContextModule } from "@infrastructure-general/register-logs/request-context.module";
+import { ActivityLogModule } from "@infrastructure-general/register-logs/activity-log.module";
 
 @Global()
 @Module({
@@ -23,6 +25,8 @@ import { ScheduleModule } from "@nestjs/schedule";
     PreRegistrationModule,
     OperationsProgrammingModule,
     ScheduleModule.forRoot(),
+    RequestContextModule,
+    ActivityLogModule,
   ],
   providers: [
     {
@@ -36,7 +40,7 @@ import { ScheduleModule } from "@nestjs/schedule";
   ],
 })
 export class AppModule {
-    configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AddInfoMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL }); // o rutas específicas

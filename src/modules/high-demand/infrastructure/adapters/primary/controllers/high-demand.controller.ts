@@ -34,6 +34,23 @@ export class HighDemandController {
     }
   }
 
+  @Post('edit')
+  async editHighDemandRegistration(@Body() body: any) {
+    try {
+      const result = await this.highDemandService.editHighDemandRegistration(body)
+      return {
+        status: 'success',
+        message: 'Se modificó la Alta Demanda exitosamente',
+        data: result
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al editar la institución como Alta Demanda',
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Post('send')
   async sendHighDemand(@Body() body: RegisterHighDemandDto){
     try {

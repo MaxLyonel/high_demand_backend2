@@ -181,6 +181,92 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     }
   }
 
+  async editHighDemandRegistration(obj: any): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const { highDemand, courses } = obj
+      const existingCourses = await queryRunner.manager.find(
+        this.highDemandCourseRepository.target,
+        {
+          where: { highDemandRegistrationId: highDemand.id },
+        },
+      );
+      const incomingKeys = courses.map(
+        (c) => `${c.levelId}-${c.gradeId}-${c.parallelId}`
+      )
+      const existingKeys = existingCourses.map(
+        (c) => `${c.levelId}-${c.gradeId}-${c.parallelId}`,
+      );
+      // Determinar qué eliminar y qué agregar
+      const toDelete = existingCourses.filter(
+        (c) => !incomingKeys.includes(`${c.levelId}-${c.gradeId}-${c.parallelId}`)
+      )
+      const toAdd = courses.filter(
+        (c) => !existingKeys.includes(`${c.levelId}-${c.gradeId}-${c.parallelId}`)
+      )
+      if(toDelete.length > 0) {
+        const idsToDelete = toDelete.map((c) => c.id)
+        await queryRunner.manager.delete(
+          this.highDemandCourseRepository.target,
+          idsToDelete
+        )
+      }
+            // 3. Crear y validar cursos en el dominio
+      for (const course of toAdd) {
+        const domainCourse = HighDemandRegistrationCourse.create({
+          id: null,
+          highDemandRegistrationId: highDemand.id,
+          levelId: course.levelId,
+          gradeId: course.gradeId,
+          parallelId: course.parallelId,
+          totalQuota: course.totalQuota,
+          existingCourses: existingCourses.map(
+            (c) =>
+              ({
+                levelId: c.levelId,
+                gradeId: c.gradeId,
+                parallelId: c.parallelId,
+              }) as any,
+          ),
+        });
+
+        const entityCourse = this.highDemandCourseRepository.create({
+          highDemandRegistrationId: domainCourse.highDemandRegistrationId,
+          levelId: domainCourse.levelId,
+          gradeId: domainCourse.gradeId,
+          parallelId: domainCourse.parallelId,
+          totalQuota: domainCourse.totalQuota,
+        });
+
+        await queryRunner.manager.save(
+          this.highDemandCourseRepository.target,
+          entityCourse,
+        );
+      }
+      const newHistory = {
+        highDemandRegistrationId: highDemand!.id,
+        workflowStateId: highDemand!.workflowStateId,
+        registrationStatus: highDemand!.registrationStatus,
+        userId: highDemand!.userId,
+        rolId: highDemand!.rolId,
+        observation: ''
+      }
+      await queryRunner.manager.insert(
+        this.historyRepository.target,
+        newHistory
+      )
+
+      await queryRunner.commitTransaction();
+    } catch(error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   // ** busca alta demandas previamente registradas **
   async findInscriptions(
     obj: NewHighDemandRegistration,

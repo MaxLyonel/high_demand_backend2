@@ -5,6 +5,7 @@ import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-r
 
 export abstract class HighDemandRepository {
   abstract saveHighDemandRegistration(obj: any): Promise<HighDemandRegistration>;
+  abstract editHighDemandRegistration(obj: any): Promise<any>;
   abstract cancelHighDemand(obj: any, registrationStatus: RegistrationStatus): Promise<any>;
   abstract getHighDemandsApproved(departmentId: number): Promise<any[]>;
   abstract getHighDemandRegistered(highDemandId: number): Promise<any>;

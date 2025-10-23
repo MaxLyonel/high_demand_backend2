@@ -86,6 +86,15 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     return saved
   }
 
+  async editHighDemandRegistration(obj: any): Promise<any> {
+    const { highDemand  } = obj
+    if(highDemand.workflowStateId === 1 && highDemand.registrationStatus === RegistrationStatus.REGISTER ) {
+      const edited = await this.highDemandRepository.editHighDemandRegistration(obj)
+      return edited
+    }
+    throw new Error("No puede editar la alta demanda")
+  }
+
   // ****** Registrar la Alta Demanda ******
   async sendHighDemand(obj: any): Promise<HighDemandRegistration> {
     const { rolId } = obj

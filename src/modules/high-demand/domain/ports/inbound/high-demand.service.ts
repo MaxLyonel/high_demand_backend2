@@ -7,6 +7,7 @@ export abstract class HighDemandService {
     obj: Omit<HighDemandRegistration, 'id' | 'courses' | 'workflowStateId' | 'registrationStatus' | 'operativeId' | 'inbox' | 'workflowId' | 'placeDistrict'>,
     course: any
   ): Promise<HighDemandRegistration>;
+  abstract editHighDemandRegistration(obj: any): Promise<any>;
   abstract sendHighDemand(obj: any): Promise<HighDemandRegistration>;
   abstract listHighDemandsApproved(departmentId: number): Promise<any[]>
   abstract getHighDemandRegistered(highDemandId: number): Promise<any>;

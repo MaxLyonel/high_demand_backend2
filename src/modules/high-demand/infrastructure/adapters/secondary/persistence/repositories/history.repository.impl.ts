@@ -219,7 +219,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
 
 
   async getHighDemands(districtId: number): Promise<any[]> {
-    const { CURRENT_YEAR } = this.constants;
+    const { CURRENT_YEAR, ROLES } = this.constants;
 
     const operative = await this.operativeRepository.findOne({
       where: { gestionId: CURRENT_YEAR },
@@ -232,7 +232,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     const highDemands = await this._historyRepository.find({
       where: {
         workflowStateId: 2, // EN REVISION
-        rolId: 37, // ROL DISTRITAL
+        rolId: ROLES.DISTRICT_ROLE, // ROL DISTRITAL
         highDemandRegistration: {
           operativeId: operative.id,
           educationalInstitution: {
@@ -307,7 +307,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
 
 
   async getHighDemandsByDepartment(departmentId: number): Promise<any> {
-    const { CURRENT_YEAR } = this.constants;
+    const { CURRENT_YEAR, ROLES } = this.constants;
 
     const operative = await this.operativeRepository.findOne({
       where: { gestionId: CURRENT_YEAR },
@@ -322,7 +322,7 @@ export class HistoryRepositoryImpl implements HistoryRepository {
     const highDemands = await this._historyRepository.find({
       where: {
         workflowStateId: 2, // EN REVISIÓN
-        rolId: 38, // ROL DEPARTAMENTAL
+        rolId: ROLES.DEPARTMENT_ROLE, // ROL DEPARTAMENTAL
         highDemandRegistration: {
           operativeId: operative.id,
           educationalInstitution: {

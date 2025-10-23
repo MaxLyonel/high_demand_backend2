@@ -1,5 +1,5 @@
 // framework nestjs
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 // own implementations
 import { HighDemandRegistration } from "../../domain/models/high-demand-registration.model";
 import { HighDemandRegistrationEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand.entity";
@@ -18,6 +18,7 @@ import { HighDemandRegistrationCourse } from "@high-demand/domain/models/high-de
 @Injectable()
 export class HighDemandRegistrationImpl implements HighDemandService {
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     private readonly highDemandRepository: HighDemandRepository,
     private readonly workflowRepository: WorkflowRepository,
     private readonly historyRepository: HistoryRepository,
@@ -29,13 +30,14 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   // ****** Guardar la Alta Demanda *******
   async saveHighDemandRegistration(obj: HighDemandRegistration, coursesParam: any): Promise<HighDemandRegistration> {
 
+    const { CURRENT_YEAR } = this.constants
     const workflow = await this.workflowRepository.findLastActive()
     if(!workflow) throw new Error("No se puede crear la Alta Demanda, falta definir el flujo")
 
     const workflowStates = await this.workflowSequenceRepository.getOrderedFlowStates()
     if(workflowStates.length <= 0) throw new Error("No se puede crear la Alta Demanda, falta definir las secuencias")
 
-    const operative = await this.operativeRepository.getOperative(2025)
+    const operative = await this.operativeRepository.getOperative(CURRENT_YEAR)
     if(!operative) throw new Error("Aún no se definio las fechas para el operativo")
 
     const firstWorkflowState = workflowStates[0]

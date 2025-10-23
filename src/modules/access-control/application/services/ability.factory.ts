@@ -1,5 +1,5 @@
 // framework
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 // external dependency
 import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
 // own implementation
@@ -15,6 +15,7 @@ type AppAbility = Ability<[string, Subjects | { __typename: string; [key: string
 export class AbilityFactory {
 
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     private permissionRepo: PermissionRepository,
     private operativeRepo: OperationsProgrammingRepository,
     private permissionGateway: PermissionsGateway
@@ -93,22 +94,23 @@ export class AbilityFactory {
 
   private isPermissionExpired(roleId: any, operative: any): boolean {
     if(!operative) return true; // Si no hay operativo, no permitir nada
+    const { ROLES } = this.constants
     const now = new Date();
 
     // console.log("Tiempo actual: ", now)
     // console.log("Operativo: ", operative)
     let expired = false;
     switch(roleId) {
-      case 9:
+      case ROLES.DIRECTOR_ROLE:
         // console.log("1",now < operative.datePosUEIni, operative.datePosUEIni)
         // console.log("2",now > operative.datePosUEEnd, operative.datePosUEEnd)
         // console.log("Resultado final: ", now < operative.datePosUEIni || now > operative.datePosUEEnd)
         expired = now < operative.datePosUEIni || now > operative.datePosUEEnd;
         break;
-      case 37:
+      case ROLES.DISTRICT_ROLE:
         expired = now < operative.dateRevDisIni || now > operative.dateRevDisEnd;
         break;
-      case 38:
+      case ROLES.DEPARTMENT_ROLE:
         expired = now < operative.dateRevDepIni || now > operative.dateRevDepEnd;
         break;
       default:

@@ -1,5 +1,5 @@
 import { MainInboxRepository } from "@high-demand/domain/ports/outbound/main-inbox.repository";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { HighDemandRegistrationEntity } from "../entities/high-demand.entity";
 import { In, Repository } from "typeorm";
@@ -12,6 +12,7 @@ import { WorkflowStateEntity } from "../entities/workflow-state.entity";
 @Injectable()
 export class MainInboxRepositoryImpl implements MainInboxRepository {
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     @InjectRepository(HighDemandRegistrationEntity, 'alta_demanda')
     private readonly highDemandRepository: Repository<HighDemandRegistrationEntity>,
     @InjectRepository(PlaceTypeEntity, 'alta_demanda')
@@ -77,6 +78,7 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
 
   // ** devolver una alta demanda **
   async returnHighDemands(highDemandId: number, rolId: number): Promise<HighDemandRegistration> {
+    const { ROLES } = this.constants
     const workflowState = await this.workflowStateRepository.findOne({
       where: { name: 'DEVUELTO'},
       select: { id: true }
@@ -90,7 +92,7 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
       workflowStateId: workflowState.id
     }
 
-    if(rolId === 9) {
+    if(rolId === ROLES.DIRECTOR_ROLE) {
       Object.assign(updateData, {
         registrationStatus: RegistrationStatus.REJECTED
       })

@@ -23,6 +23,7 @@ export class RolRepositoryImpl implements RolRepository {
       DISTRICT_ROLE,
       DEPARTMENT_ROLE,
       VER_ROLE,
+      POSTULANT_ROLE,
       ADMIN_ROLE
     } = ROLES
     const roles = await this._rolRepository
@@ -32,7 +33,7 @@ export class RolRepositoryImpl implements RolRepository {
       .leftJoinAndSelect("perm.action", "action")
       .leftJoinAndSelect("perm.subject", "subject")
       .leftJoinAndSelect("perm.condition", "conditions")
-      .where("rol.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, ADMIN_ROLE] })
+      .where("rol.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, POSTULANT_ROLE, ADMIN_ROLE] })
       .getMany();
 
     const res = roles.map(rol => ({

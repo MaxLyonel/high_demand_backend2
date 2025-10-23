@@ -40,6 +40,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.startTransaction()
+    const { ROLES } = this.constants
     try {
       const {
         postulant,
@@ -215,7 +216,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       // ***** Guardando HISTORICO ******
       const history = {
         preRegistration: { id: newPreRegistration.id},
-        rol: { id: 49 }, //TODO Rol postulante
+        rol: { id: ROLES.POSTULANT_ROLE },
         state: newPreRegistration.state,
         observation: '',
       }
@@ -241,6 +242,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.startTransaction()
+    const { ROLES } = this.constants
     try {
       const result = await queryRunner.manager.update(PreRegistrationEntity,
         { id: obj.id },
@@ -253,7 +255,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         })
         const history = {
           preRegistration: { id: obj.id },
-          rol: { id: 9 },
+          rol: { id: ROLES.DIRECTOR_ROLE },
           state: updated!.state,
           observation: obj.observation
         }
@@ -279,6 +281,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.startTransaction()
+    const { ROLES } = this.constants
     try {
       const result = await queryRunner.manager.update(PreRegistrationEntity,
         { id: obj.id },
@@ -288,7 +291,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         const updated = await queryRunner.manager.findOneBy(PreRegistrationEntity, { id: obj.id })
         const history = {
           preRegistration: { id: obj.id },
-          rol: { id: 9 },
+          rol: { id: ROLES.DIRECTOR_ROLE },
           state: updated!.state,
           observation: ''
         }
@@ -314,6 +317,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.startTransaction()
+    const { ROLES } = this.constants
     try {
       let count = 0
       const updated: any[] = []
@@ -334,7 +338,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
 
           const history = {
             preRegistration: { id: o.id },
-            rol: { id: 9 },
+            rol: { id: ROLES.DIRECTOR_ROLE },
             state: preRegistration!.state,
             observation: ''
           }

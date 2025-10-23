@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
 import { PermissionsGateway } from "./websocket.permissions.gateway";
 import { Cron, CronExpression } from "@nestjs/schedule";
@@ -11,21 +11,23 @@ export class PermissionWatcherService {
   private notifiedStates = new Map<number, 'active' | 'expired' | null>();
 
   constructor(
+    @Inject('APP_CONSTANTS') private readonly constants,
     private readonly operativeRepo: OperationsProgrammingRepository,
     private readonly gateway: PermissionsGateway
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
   async checkPermissionStatus() {
+    const { ROLES } = this.constants
     const now = new Date();
     const currentGestion = now.getFullYear();
     const operative = await this.operativeRepo.getOperative(currentGestion);
     if (!operative) return;
 
     const permissions = [
-      { roleId: 9, start: operative.datePosUEIni, end: operative.datePosUEEnd },
-      { roleId: 37, start: operative.dateRevDisIni, end: operative.dateRevDisEnd },
-      { roleId: 38, start: operative.dateRevDepIni, end: operative.dateRevDepEnd },
+      { roleId: ROLES.DIRECTOR_ROLE, start: operative.datePosUEIni, end: operative.datePosUEEnd },
+      { roleId: ROLES.DISTRICT_ROLE, start: operative.dateRevDisIni, end: operative.dateRevDisEnd },
+      { roleId: ROLES.DEPARTMENT_ROLE, start: operative.dateRevDepIni, end: operative.dateRevDepEnd },
     ];
 
     for (const { roleId, start, end } of permissions) {

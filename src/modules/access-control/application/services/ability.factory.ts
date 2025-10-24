@@ -52,10 +52,10 @@ export class AbilityFactory {
     permissions.forEach((perm, index) => {
       if (!perm.action || !perm.subject) return;
 
-      // if(this.isPermissionExpired(roleId, currentOperative)) {
-      //   console.log("permiso expirado! para rolId:", roleId)
-      //   return;
-      // }
+      if(this.isPermissionExpired(roleId, currentOperative, perm)) {
+        console.log("permiso expirado! para rolId:", roleId)
+        return;
+      }
 
       let conditionsObj: Record<string, any> | undefined;
 
@@ -92,10 +92,12 @@ export class AbilityFactory {
     });
   }
 
-  private isPermissionExpired(roleId: any, operative: any): boolean {
+  private isPermissionExpired(roleId: any, operative: any, perm?:any): boolean {
     if(!operative) return true; // Si no hay operativo, no permitir nada
     const { ROLES } = this.constants
     const now = new Date();
+
+    if(perm?.action?.name === 'read') return false;
 
     // console.log("Tiempo actual: ", now)
     // console.log("Operativo: ", operative)

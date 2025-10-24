@@ -1,3 +1,4 @@
+import { Public } from "@access-control/infrastructure/adapters/primary/decorators/public.decorator";
 import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Query, Res, UseInterceptors } from "@nestjs/common";
 import { StudentService } from "@pre-registration/domain/ports/inbound/student.service";
 import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service";
@@ -15,6 +16,7 @@ export class CatalogsController {
     private readonly pdfService: PdfService
   ) {}
 
+  @Public()
   @Get('list-relationship')
   async getRelationships() {
     try {
@@ -32,6 +34,7 @@ export class CatalogsController {
     }
   }
 
+  @Public()
   @Get('list-criterias')
   async getCriterias() {
     try {
@@ -49,6 +52,7 @@ export class CatalogsController {
     }
   }
 
+  @Public()
   @Get('list-municipies')
   async getMunicipies() {
     try {
@@ -66,6 +70,7 @@ export class CatalogsController {
     }
   }
 
+  @Public()
   @Get('search-student')
   async searchStudent(@Query() query: any) {
     try {
@@ -92,6 +97,7 @@ export class CatalogsController {
     }
   }
 
+  @Public()
   @Get('search-student/:codeRude')
   async searchStudentByRUDE(@Param('codeRude') codeRude: string) {
     try {
@@ -117,6 +123,7 @@ export class CatalogsController {
     }
   }
 
+  @Public()
   @Get('list-levels')
   async getLevels() {
     try {
@@ -134,6 +141,7 @@ export class CatalogsController {
     }
   }
 
+  @Public()
   @Get('list-departments')
   async getDepartments() {
     try {
@@ -151,6 +159,7 @@ export class CatalogsController {
     }
   }
 
+  @Public()
   @Get('print')
   async print(@Res() res: Response) {
     try {

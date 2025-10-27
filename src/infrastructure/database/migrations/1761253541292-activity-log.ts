@@ -11,7 +11,8 @@ export class ActivityLog1761253541292 implements MigrationInterface {
                 entity_id INT,
                 action VARCHAR(50) NOT NULL,
                 details JSON NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `)
     }

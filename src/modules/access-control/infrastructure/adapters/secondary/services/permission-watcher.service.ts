@@ -8,7 +8,7 @@ export class PermissionWatcherService {
   private readonly logger = new Logger(PermissionWatcherService.name);
 
   // Para evitar notificar repetidamente el mismo estado
-  private notifiedStates = new Map<number, 'active' | 'expired' | null>();
+  private notifiedStates = new Map<number | 'operative', 'active' | 'expired' | null>();
 
   constructor(
     @Inject('APP_CONSTANTS') private readonly constants,
@@ -47,5 +47,12 @@ export class PermissionWatcherService {
         this.notifiedStates.set(roleId, 'expired');
       }
     }
+
+    const isActive = now >= operative.dateOpeIni && now <= operative.dateOpeEnd;
+    this.gateway.notifyCurrentOperation({
+      active: isActive,
+      start: operative.dateOpeIni,
+      end: operative.dateOpeEnd
+    })
   }
 }

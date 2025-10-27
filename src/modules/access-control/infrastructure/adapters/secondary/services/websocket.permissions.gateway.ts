@@ -21,12 +21,19 @@ export class PermissionsGateway
 
   private readonly logger = new Logger(PermissionsGateway.name);
 
+  private currentOperation:
+    { active: boolean; start: Date; end: Date } | null = null;
+
   afterInit() {
     this.logger.log('🚀 Gateway initialized');
   }
 
   handleConnection(client: Socket) {
     this.logger.log(`🔌 Cliente conectado: ${client.id}`);
+    if(this.currentOperation) {
+      client.emit('operative:current', this.currentOperation)
+      this.logger.log(`=> Estado operativo enviado a ${client.id}`)
+    }
   }
 
   handleDisconnect(client: Socket) {
@@ -46,5 +53,11 @@ export class PermissionsGateway
   async notifyPermissionActivated(roleId: number) {
     console.log("Notificando.... activado....")
     this.server.emit('permission:expired', { roleId })
+  }
+
+  async notifyCurrentOperation(data: { active: boolean; start: Date; end: Date }) {
+    this.logger.log('Notificando estado de operativo....')
+    this.currentOperation = data
+    this.server.emit('operative:current', data)
   }
 }

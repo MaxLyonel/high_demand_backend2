@@ -393,10 +393,10 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     return preRegistrations
   }
 
-  async getValidPreRegistrations(highDemandId: number): Promise<any> {
+  async getValidPreRegistrations(highDemandId: number, levelId: number, gradeId: number): Promise<any> {
     const validPreRegistrations = await this.preRegistrationRepository.find({
       where: {
-        highDemandCourse: { highDemandRegistrationId: highDemandId },
+        highDemandCourse: { highDemandRegistrationId: highDemandId,  levelId, gradeId },
         state: In([PreRegistrationStatus.VALIDATED, PreRegistrationStatus.ACCEPTED])
       },
       relations: [

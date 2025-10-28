@@ -8,7 +8,7 @@ export abstract class PreRegistrationService {
   abstract acceptPreRegistrations(obj: any): Promise<any>;
 
   abstract listPreRegistration(highDemandId: number): Promise<any>;
-  abstract listValidPreRegistrations(highDemandId: number): Promise<any>;
+  abstract listValidPreRegistrations(highDemandId: number, levelId: number, gradeId: number): Promise<any>;
   abstract listPreRegistrationFollow(identityCardPostulant: string): Promise<any>;
 
   abstract lotterySelection(preRegistrationId: number): Promise<any>;

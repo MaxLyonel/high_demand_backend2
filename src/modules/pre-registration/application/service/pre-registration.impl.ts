@@ -37,8 +37,8 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     return result
   }
 
-  async listValidPreRegistrations(highDemandId: number): Promise<any> {
-    const result = await this.preRegistrationRepository.getValidPreRegistrations(highDemandId)
+  async listValidPreRegistrations(highDemandId: number, levelId: number, gradeId: number): Promise<any> {
+    const result = await this.preRegistrationRepository.getValidPreRegistrations(highDemandId, levelId, gradeId)
     return result
   }
 

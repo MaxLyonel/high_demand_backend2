@@ -155,4 +155,29 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     const highDemandAproved = await this.highDemandRepository.getHighDemandRegistered(highDemandId)
     return highDemandAproved
   }
+
+  async getHighDemandLevels(obj: any): Promise<any> {
+    const highDemand = await this.highDemandRepository.getHighDemandLevels(obj)
+    const grouped = highDemand.courses.reduce((acc: any, item: any) => {
+      if(!acc[item.level.id]) {
+        acc[item.level.id] = {
+          id: item.level.id,
+          name: item.level.name,
+          grades: []
+        }
+      }
+      // Agregamos el grado si no está
+      const exists = acc[item.level.id].grades.find((g: any) => g.id === item.grade.id);
+      if (!exists) {
+        acc[item.level.id].grades.push({
+          id: item.grade.id,
+          name: item.grade.name,
+        });
+      }
+
+      return acc;
+    }, {} as any)
+    const result = Object.values(grouped)
+    return result
+  }
 }

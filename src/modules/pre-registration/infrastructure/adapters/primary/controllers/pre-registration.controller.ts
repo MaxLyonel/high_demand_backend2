@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Res } from "@nestjs/common";
 import { PreRegistrationService } from "@pre-registration/domain/ports/inbound/pre-registration.service";
 import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service";
 import { Response } from "express";
@@ -99,10 +99,12 @@ export class PreRegistrationController {
     }
   }
 
-  @Get('list-valid/:highDemandId')
-  async listValidPreRegistration(@Param('highDemandId', ParseIntPipe) highDemandId: number) {
+  @Get('list-valid')
+  // async listValidPreRegistration(@Param('highDemandId', ParseIntPipe) highDemandId: number) {
+  async listValidPreRegistration(@Query() query) {
     try {
-      const result = await this.preRegistrationService.listValidPreRegistrations(highDemandId)
+      const { highDemandId, levelId, gradeId } = query
+      const result = await this.preRegistrationService.listValidPreRegistrations(highDemandId, levelId, gradeId)
       return {
         status: 'success',
         message: 'Listado de pre inscripciones validas obtenido exitosamente',

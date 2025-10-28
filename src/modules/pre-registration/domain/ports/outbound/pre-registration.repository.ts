@@ -8,7 +8,7 @@ export abstract class PreRegistrationRepository {
   abstract acceptPreRegistrations(obj: any): Promise<any>;
 
   abstract getAllPreRegistration(highDemandId: number): Promise<any>;
-  abstract getValidPreRegistrations(highDemandId: number): Promise<any>;
+  abstract getValidPreRegistrations(highDemandId: number, levelId: number, gradeId: number): Promise<any>;
   abstract getPreRegistrationFollow(identityCardPostulant: string): Promise<any>;
 
   abstract updateStatus(preRegistrationId: number): Promise<any>;

@@ -14,4 +14,5 @@ export abstract class HighDemandService {
   abstract getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
   abstract modifyWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
   abstract cancelHighDemand(obj: any): Promise<any>;
+  abstract getHighDemandLevels(obj: any): Promise<any>;
 }

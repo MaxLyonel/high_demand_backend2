@@ -132,4 +132,21 @@ export class HighDemandController {
     }
   }
 
+  @Get(':id/levels')
+  async getHighDemandLevels(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const response = await this.highDemandService.getHighDemandLevels(id)
+      return {
+        status: 'success',
+        message: 'Niveles obtenidos exitosamente',
+        data: response
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener los niveles educativos de la alta demanda',
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

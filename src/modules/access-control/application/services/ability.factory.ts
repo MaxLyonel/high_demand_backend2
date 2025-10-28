@@ -93,7 +93,7 @@ export class AbilityFactory {
   }
 
   private isPermissionExpired(roleId: any, operative: any, perm?:any): boolean {
-    if(!operative) return false; // Si no hay operativo, no permitir nada
+    // if(!operative) return false; // Si no hay operativo, no permitir nada
     const { ROLES } = this.constants
     const now = new Date();
 

@@ -73,7 +73,7 @@ export class PdfServiceImpl implements PdfService {
        .text('La información recabada será utilizada para el registro de pre inscripción (postulación) de la o el estudiante para la gestión 2026', { align: 'center' })
        .moveDown(1)
        .font('./fonts/Lato-Bold.ttf')
-       .text(`Fecha del sorteo: ${data.dateLotteryIni ? this.getDay(data.dateLotteryIni) : ''} y ${ data.dateLotterEnd ? this.getDay(data.dateLotteryEnd) : ''} de noviembre de 2025`, { align: 'center' })
+       .text(`Fecha del sorteo: ${data.dateLotteryIni ? this.getDay(data.dateLotteryIni) : ''} y ${ data.dateLotteryEnd ? this.getDay(data.dateLotteryEnd) : ''} de noviembre de 2025`, { align: 'center' })
        .moveDown(1);
     const qrCodeDataURL = await this.generateQRCode(`FORM-${Date.now()}`)
     await this.addQRCodeTOPDF(doc, data, qrCodeDataURL, xQr, yQr)

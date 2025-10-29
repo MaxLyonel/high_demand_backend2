@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PreRegistrationService } from "@pre-registration/domain/ports/inbound/pre-registration.service";
 import { PreRegistrationRepository } from "@pre-registration/domain/ports/outbound/pre-registration.repository";
+import { OperationsProgrammingService } from "src/modules/operations-programming/domain/ports/inbound/operations-programming.service";
 
 
 
@@ -10,6 +11,7 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
 
   constructor(
     private readonly preRegistrationRepository: PreRegistrationRepository,
+    private readonly operativeService: OperationsProgrammingService
   ) {}
 
   async savePreRegistration(obj: any): Promise<any> {
@@ -58,7 +60,12 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
   }
 
   async obtainPreRegistrationInformation(postulantId: number): Promise<any> {
-    const result = await this.preRegistrationRepository.getPreRegistrationInfo(postulantId)
+    const preRegistration = await this.preRegistrationRepository.getPreRegistrationInfo(postulantId)
+    const operative = await this.operativeService.getRegisterOperative(2025);
+    const result = {
+      ...preRegistration,
+      ...operative
+    }
     return result
   }
 

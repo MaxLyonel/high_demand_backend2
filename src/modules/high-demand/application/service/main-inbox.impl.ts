@@ -150,13 +150,15 @@ export class MainInboxImpl implements MainInboxService {
     const { ROLES } = this.constants
     const { DISTRICT_ROLE, DEPARTMENT_ROLE } = ROLES
     let placeTypes:Array<number> = []
+    console.log(rolId, placeTypeId)
     switch(parseInt(rolId.toString())) {
       case DISTRICT_ROLE:
         placeTypes.push(placeTypeId)
         break;
       case DEPARTMENT_ROLE:
-        const places = await this.mainInboxRepository.searchChildren(placeTypeId)
-        placeTypes = places.map(p => p.id)
+        // const places = await this.mainInboxRepository.searchChildren(placeTypeId)
+        // placeTypes = places.map(p => p.id)
+        placeTypes = [placeTypeId]
         break;
     }
     const highDemands = await this.mainInboxRepository.searchReceived(rolId, placeTypes)

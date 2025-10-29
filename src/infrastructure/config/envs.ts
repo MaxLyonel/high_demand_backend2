@@ -12,6 +12,7 @@ interface EnvVars {
   JWT_SECRET: string
   JWT_EXPIRES_IN: string
   SEGIP_URL: string
+  MODE: string
 }
 
 const envsSchema = joi
@@ -24,7 +25,8 @@ const envsSchema = joi
     HIGH_DEMAND_DB_PASSWORD: joi.string().required(),
     JWT_SECRET: joi.string().required(),
     JWT_EXPIRES_IN: joi.string().required(),
-    SEGIP_URL: joi.string().required()
+    SEGIP_URL: joi.string().required(),
+    MODE: joi.string()
   })
   .unknown(true)
 
@@ -48,7 +50,8 @@ export const DbEnvs = {
 
 export const envs = {
   jwtSecret: envVars.JWT_SECRET,
-  expiresIn: envVars.JWT_EXPIRES_IN || '1h'
+  expiresIn: envVars.JWT_EXPIRES_IN || '1h',
+  mode: envVars.MODE
 }
 
 export const ownPort = {

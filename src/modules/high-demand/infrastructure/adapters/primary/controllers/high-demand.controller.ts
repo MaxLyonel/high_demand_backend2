@@ -7,6 +7,7 @@ import { CreateHighDemandDto } from "@high-demand/application/dtos/create-high-d
 import { RegisterHighDemandDto } from "@high-demand/application/dtos/register-high-demand.dto";
 import { Response } from "express";
 import { PdfService } from "@high-demand/domain/ports/outbound/pdf.service";
+import { Public } from "@access-control/infrastructure/adapters/primary/decorators/public.decorator";
 
 
 @Controller('high-demand')
@@ -68,6 +69,7 @@ export class HighDemandController {
     }
   }
 
+  @Public()
   @Get('list-high-demands-approved/:departmentId')
   async getHighDemandsApproved(@Param('departmentId') departmentId: number) {
     try {

@@ -1,3 +1,4 @@
+import { Public } from "@access-control/infrastructure/adapters/primary/decorators/public.decorator";
 import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Res } from "@nestjs/common";
 import { PreRegistrationService } from "@pre-registration/domain/ports/inbound/pre-registration.service";
 import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service";
@@ -13,6 +14,7 @@ export class PreRegistrationController {
     private readonly pdfService: PdfService
   ) {}
 
+  @Public()
   @Post('create')
   async createPreRegistration(@Body() body: any) {
     try {
@@ -186,6 +188,7 @@ export class PreRegistrationController {
     }
   }
 
+  @Public()
   @Get('print/:postulantId')
   async printPreRegistration(
     @Param('postulantId', ParseIntPipe) postulanId: number,

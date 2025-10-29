@@ -25,6 +25,6 @@ import { OperativeProgrammingRepositoryImpl } from './infrastructure/adapters/se
       OperativeEntity
     ], 'alta_demanda')
   ],
-  exports: [OperationsProgrammingRepository]
+  exports: [OperationsProgrammingRepository, OperationsProgrammingService]
 })
 export class OperationsProgrammingModule {}

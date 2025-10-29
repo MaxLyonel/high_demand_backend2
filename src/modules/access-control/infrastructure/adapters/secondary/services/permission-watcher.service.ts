@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
 import { PermissionsGateway } from "./websocket.permissions.gateway";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import { envs } from '../../../../../../infrastructure/config/envs';
 
 @Injectable()
 export class PermissionWatcherService {
@@ -50,7 +51,7 @@ export class PermissionWatcherService {
 
     const isActive = now >= operative.dateOpeIni && now <= operative.dateOpeEnd;
     this.gateway.notifyCurrentOperation({
-      active: isActive,
+      active: envs.mode === 'development' ? true : isActive,
       start: operative.dateOpeIni,
       end: operative.dateOpeEnd
     })

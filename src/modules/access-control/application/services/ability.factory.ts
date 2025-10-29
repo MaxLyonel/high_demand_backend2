@@ -6,6 +6,7 @@ import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
 import { PermissionRepository } from "../../domain/ports/outbound/permission.repository";
 import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
 import { PermissionsGateway } from "@access-control/infrastructure/adapters/secondary/services/websocket.permissions.gateway";
+import { envs } from "@infrastructure-general/config"
 
 type Subjects = any | 'all'
 
@@ -93,7 +94,12 @@ export class AbilityFactory {
   }
 
   private isPermissionExpired(roleId: any, operative: any, perm?:any): boolean {
-    // if(!operative) return false; // Si no hay operativo, no permitir nada
+
+    console.log(envs.mode)
+    if(envs.mode === 'development') {
+      return false; // los permisos nunca expiran
+    }
+
     const { ROLES } = this.constants
     const now = new Date();
 

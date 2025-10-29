@@ -120,6 +120,7 @@ export class PreRegistrationController {
     }
   }
 
+  @Public()
   @Get('list-follow/:identityCardPostulant')
   async listPreRegistrationFollow(@Param('identityCardPostulant') identityCardPostulant: string) {
     try {

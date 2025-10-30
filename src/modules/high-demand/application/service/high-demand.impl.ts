@@ -163,21 +163,39 @@ export class HighDemandRegistrationImpl implements HighDemandService {
         acc[item.level.id] = {
           id: item.level.id,
           name: item.level.name,
-          grades: []
+          grades: {}
         }
       }
-      // Agregamos el grado si no está
-      const exists = acc[item.level.id].grades.find((g: any) => g.id === item.grade.id);
-      if (!exists) {
-        acc[item.level.id].grades.push({
+      const level = acc[item.level.id];
+      if(!level.grades[item.grade.id]) {
+        level.grades[item.grade.id] = {
           id: item.grade.id,
           name: item.grade.name,
-        });
+          courseId: item.id,
+          parallels: [],
+        }
       }
 
+      const grade = level.grades[item.grade.id];
+
+      const existsParallel = grade.parallels.find((p: any) => p.id === item.parallel.id);
+      if(!existsParallel) {
+        grade.parallels.push({
+          id: item.parallel.id,
+          name: item.parallel.name,
+          totalQuota: item.totalQuota,
+          courseId: item.id
+        })
+      }
       return acc;
     }, {} as any)
-    const result = Object.values(grouped)
+    const result = Object.values(grouped).map((level: any) => ({
+      ...level,
+      grades: Object.values(level.grades).map((grade: any) => ({
+        ...grade,
+        parallels: grade.parallels
+      })),
+    }));
     return result
   }
 }

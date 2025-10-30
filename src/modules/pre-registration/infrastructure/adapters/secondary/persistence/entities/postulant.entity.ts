@@ -10,6 +10,9 @@ export class PostulantEntity {
   @Column({ name: 'carnet_identidad'})
   identityCard: string
 
+  @Column({ name: 'complement'})
+  complement: string
+
   @Column({ name: 'paterno'})
   lastName: string
 

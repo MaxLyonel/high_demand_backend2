@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PreRegistrationRepository } from "@pre-registration/domain/ports/outbound/pre-registration.repository";
 import { PreRegistrationEntity } from "../entities/pre-registration.entity";
-import { DataSource, In, Repository } from "typeorm";
+import { DataSource, In, QueryFailedError, Repository } from "typeorm";
 import { RepresentativeEntity } from "../entities/representative.entity";
 import { PostulantEntity } from "../entities/postulant.entity";
 import { PreRegistrationStatus } from "@pre-registration/domain/enums/pre-registration-status.enum";
@@ -33,7 +33,9 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     private readonly preRegistrationBrotherRepository: Repository<PreRegistrationBrotherEntity>,
     @InjectRepository(PreRegistrationLocationEntity, 'alta_demanda')
     private readonly preRegistrationLocationRepository: Repository<PreRegistrationLocationEntity>,
-    private readonly studentRepository: StudentRepository
+    private readonly studentRepository: StudentRepository,
+    @InjectRepository(HighDemandRegistrationCourseEntity, 'alta_demanda')
+    private readonly highDemandCourseRepository: Repository<HighDemandRegistrationCourseEntity>
   ){}
 
   async savePreRegistration(obj: any): Promise<any> {
@@ -84,6 +86,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       const existsPostulant = await queryRunner.manager.findOne(PostulantEntity, {
         where: {
           identityCard: postulant.identityCard,
+          complement: postulant.complement ?? ''
         }
       });
 
@@ -323,10 +326,38 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       const updated: any[] = []
 
       for (let o of obj) {
+        const course = await this.highDemandCourseRepository.findOne({
+          where: {
+            highDemandRegistrationId: o.highDemandCourse.highDemandRegistrationId,
+            levelId: o.highDemandCourse.level.id,
+            gradeId: o.highDemandCourse.grade.id,
+            parallelId: o.selectedParallel.id
+          }
+        })
+        if(!course) throw new Error('No existe el curso a registrar')
+        const enrolled = await queryRunner.manager.count(PreRegistrationEntity, {
+          where: { highDemandCourse: { id: course.id }, state: PreRegistrationStatus.ACCEPTED }
+        })
+        if(enrolled >= course?.totalQuota!) {
+          throw new Error('No hay plazas disponibles para este curso')
+        }
+        const alreadyAccepted = await queryRunner.manager.findOne(PreRegistrationEntity, {
+          where: {
+            postulant: { id: o.postulant.id},
+            state: PreRegistrationStatus.ACCEPTED
+          }
+        })
+
+        if (alreadyAccepted) {
+          throw new Error(
+            `El postulante ${o.postulant.name} ya fue aceptado en otra unidad educativa o en otro curso.`
+          );
+        }
+
         const result = await queryRunner.manager.update(
           PreRegistrationEntity,
           { id: o.id },
-          { state: PreRegistrationStatus.ACCEPTED }
+          { state: PreRegistrationStatus.ACCEPTED, criteriaPost: o.criteriaPost }
         )
 
         if (result.affected && result.affected > 0) {
@@ -356,7 +387,6 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         }
       }
 
-      // 👈 commit SOLO una vez después de todo
       await queryRunner.commitTransaction()
 
       if (count > 0) {
@@ -366,6 +396,12 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       }
     } catch (error) {
       await queryRunner.rollbackTransaction()
+      if(error instanceof QueryFailedError) {
+        const pgError: any = error;
+        if(pgError.code === '23505' && pgError.constraint === 'unique_postulant_accepted') {
+          throw new Error('El postulante ya fue sorteado en otra unidad educativa')
+        }
+      }
       throw error
     } finally {
       await queryRunner.release()

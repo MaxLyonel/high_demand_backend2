@@ -31,6 +31,7 @@ import { PdfServiceImpl } from "./infrastructure/adapters/secondary/services/pdf
 import { PreRegistrationBrotherEntity } from "./infrastructure/adapters/secondary/persistence/entities/pre-registration-brother.entity";
 import { PreRegistrationLocationEntity } from "./infrastructure/adapters/secondary/persistence/entities/pre-registration-location.entity";
 import { OperationsProgrammingModule } from "../operations-programming/operations-programming.module";
+import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand-course.entity";
 
 
 
@@ -84,7 +85,8 @@ import { OperationsProgrammingModule } from "../operations-programming/operation
       RepresentativeEntity,
       PostulantEntity,
       LevelEntity,
-      HistoryPreRegistrationEntity
+      HistoryPreRegistrationEntity,
+      HighDemandRegistrationCourseEntity
     ], 'alta_demanda')
   ]
 })

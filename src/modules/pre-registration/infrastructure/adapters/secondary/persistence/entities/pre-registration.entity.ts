@@ -30,6 +30,10 @@ export class PreRegistrationEntity {
   @JoinColumn({ name: 'criterio_id'})
   criteria: CriteriaEntity
 
+  @ManyToOne(() => CriteriaEntity, { eager: false })
+  @JoinColumn({ name: 'criterio_post_id'})
+  criteriaPost: CriteriaEntity
+
   @Column({
     name: 'estado',
     type: 'enum',

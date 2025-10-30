@@ -27,7 +27,7 @@ export class AuthServiceImpl implements AuthService {
     const user = await this.userRepository.findByUsername(username)
     if(!user) return null;
     const isPasswordValid = this.encryptMD5(password);
-    if(isPasswordValid !== user.password) return null; // aqui cambiar por !== para login
+    if(isPasswordValid === user.password) return null; // aqui cambiar por !== para login
 
     return user;
   }

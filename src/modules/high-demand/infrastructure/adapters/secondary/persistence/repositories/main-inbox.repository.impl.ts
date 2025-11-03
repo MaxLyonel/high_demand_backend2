@@ -143,11 +143,11 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
 
   // ** rechazar la alta demanda
   async declinehighDemand(
-    highDemandId: number,
+    highDemandId: any,
   ): Promise<HighDemandRegistration> {
 
     const workflowState = await this.workflowStateRepository.findOne({
-      where: { name: 'ENVIADO'},
+      where: { name: 'EN REVISION'},
       select: { id: true }
     })
     if(!workflowState?.id) throw new Error(
@@ -155,9 +155,9 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
     )
 
     const result = await this.highDemandRepository.update(
-      { id: highDemandId },
+      { id: highDemandId.id },
       {
-        inbox: false,
+        inbox: true,
         workflowStateId: workflowState.id,
         registrationStatus: RegistrationStatus.REJECTED,
       }
@@ -167,7 +167,7 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
     }
     const highDemandEntity = await this.highDemandRepository.findOne({
       where: {
-        id: highDemandId
+        id: highDemandId.id
       }
     })
     if(!highDemandEntity) throw new Error('No existe la Alta demanda');

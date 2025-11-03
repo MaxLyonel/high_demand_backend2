@@ -186,7 +186,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const { highDemand, courses } = obj
+      const { highDemand, courses, currentRole } = obj
       const existingCourses = await queryRunner.manager.find(
         this.highDemandCourseRepository.target,
         {
@@ -251,7 +251,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
         registrationStatus: highDemand!.registrationStatus,
         userId: highDemand!.userId,
         rolId: highDemand!.rolId,
-        observation: ''
+        observation: `Modificado por el ${currentRole?.role?.id === 9 ? 'Director' : 'Distrital'}`
       }
       await queryRunner.manager.insert(
         this.historyRepository.target,

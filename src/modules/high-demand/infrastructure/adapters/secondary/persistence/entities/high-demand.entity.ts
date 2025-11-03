@@ -35,6 +35,9 @@ export class HighDemandRegistrationEntity {
   @Column({ name: 'bandeja_estado'})
   inbox: boolean
 
+  @Column({ name: 'cite'})
+  cite: string
+
   @Column({ name: 'operativo_id'})
   operativeId: number
 

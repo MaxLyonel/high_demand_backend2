@@ -33,8 +33,8 @@ export class MainInboxController {
   @Post('derive')
   async deriveHighDemand(@Body() body: any) {
     try {
-      const { highDemandIds, rolId, observation } = body
-      const result = await this.mainInboxService.deriveHighDemands(highDemandIds, rolId, observation)
+      const { highDemandIds, rolId, cite } = body
+      const result = await this.mainInboxService.deriveHighDemands(highDemandIds, rolId, cite)
       return {
         status: 'success',
         message: '¡Derivación exitosa!',

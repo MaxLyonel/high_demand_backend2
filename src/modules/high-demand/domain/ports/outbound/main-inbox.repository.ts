@@ -5,7 +5,7 @@ export abstract class MainInboxRepository {
   // ** recibir altas demandas en la bandeja **
   abstract receiveHighDemands(highDemandIds: number[]): Promise<HighDemandRegistration[]>;
   // ** derivar altas demandas **
-  abstract deriveHighDemands(highDemandIds: number[], rolId: number): Promise<HighDemandRegistration[]>;
+  abstract deriveHighDemands(highDemandIds: number[], rolId: number, cite: string): Promise<HighDemandRegistration[]>;
   // ** devolver una alta demanda **
   abstract returnHighDemands(highDemandId: number, rolId: number): Promise<HighDemandRegistration>;
 

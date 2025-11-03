@@ -51,7 +51,8 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
   // ** derivar las altas demandas **
   async deriveHighDemands(
     highDemandIds: number[],
-    rolId: number
+    rolId: number,
+    cite: string
   ): Promise<HighDemandRegistration[]> {
     const workflowState = await this.workflowStateRepository.findOne({
       where: { name: 'ENVIADO' },
@@ -62,7 +63,7 @@ export class MainInboxRepositoryImpl implements MainInboxRepository {
     )
     const result = await this.highDemandRepository.update(
       { id: In(highDemandIds) },
-      { inbox: false, workflowStateId: workflowState.id, rolId: rolId }
+      { inbox: false, workflowStateId: workflowState.id, rolId: rolId, cite: cite }
     )
     if(result.affected && result.affected <= 0) {
       throw new Error('No se realizó la derivación')

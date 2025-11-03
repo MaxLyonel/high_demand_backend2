@@ -44,8 +44,8 @@ export class MainInboxImpl implements MainInboxService {
   }
 
   // ** Derivar alta demanda **
-  async deriveHighDemands(highDemandIds: number[], rolId: number, observation: string | null): Promise<HighDemandRegistration[]> {
-    const highDemands = await this.mainInboxRepository.deriveHighDemands(highDemandIds, rolId)
+  async deriveHighDemands(highDemandIds: number[], rolId: number, cite: string): Promise<HighDemandRegistration[]> {
+    const highDemands = await this.mainInboxRepository.deriveHighDemands(highDemandIds, rolId, cite)
     for(let highDemand of highDemands){
       const newHistory = {
         highDemandRegistrationId: highDemand.id,
@@ -53,7 +53,7 @@ export class MainInboxImpl implements MainInboxService {
         registrationStatus: highDemand.registrationStatus,
         userId: highDemand.userId,
         rolId: highDemand.rolId,
-        observation: observation
+        observation: ''
       }
       this.historyRepository.updatedHistory(newHistory)
     }

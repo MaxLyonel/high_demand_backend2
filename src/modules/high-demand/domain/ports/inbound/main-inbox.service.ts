@@ -5,7 +5,7 @@ import { HighDemandRegistration } from "@high-demand/domain/models/high-demand-r
 
 export abstract class MainInboxService {
   abstract receiveHighDemands(highDemandIds: number[], userId: number): Promise<HighDemandRegistration[]>;
-  abstract deriveHighDemands(highDemandIds: number[], rolId: number, observation?: string | null): Promise<HighDemandRegistration[]>;
+  abstract deriveHighDemands(highDemandIds: number[], rolId: number, cite: string): Promise<HighDemandRegistration[]>;
   abstract returnHighDemand(highDemandId: number, rolId: number, observation?: string | null): Promise<HighDemandRegistration>;
   abstract approveHighDemand(obj: any): Promise<any>;
   abstract declineHighDemand(highDemandId: number, observation?: string | null): Promise<any>;

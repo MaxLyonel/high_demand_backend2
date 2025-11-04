@@ -14,9 +14,9 @@ import { Global, Module } from "@nestjs/common";
           DIRECTOR_ROLE: 9,
           DISTRICT_ROLE: 37,
           DEPARTMENT_ROLE: 38,
-          VER_ROLE: 48,
-          POSTULANT_ROLE: 49,
-          ADMIN_ROLE: 50
+          VER_ROLE: 4100,
+          POSTULANT_ROLE: 4100,
+          ADMIN_ROLE: 4000
         }
       }
     }

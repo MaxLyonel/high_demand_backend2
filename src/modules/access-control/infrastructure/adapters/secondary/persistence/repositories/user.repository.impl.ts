@@ -26,7 +26,7 @@ export class UserRepositoryImpl implements UserRepository {
 
   async findByUsername(username: string): Promise<User | null> {
     const { ROLES } = this.constanst
-    const { DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE } = ROLES
+    const { DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, ADMIN_ROLE } = ROLES
     const userEntity = await this.userRepository
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.userRoles", "userRol")
@@ -35,7 +35,7 @@ export class UserRepositoryImpl implements UserRepository {
       .leftJoinAndSelect("userRol.placeType", "placeType")
       .leftJoinAndSelect("placeType.parent", "parentPlace")
       .where("user.username = :username", { username })
-      .andWhere("role.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, 50] })
+      .andWhere("role.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, ADMIN_ROLE] })
       .andWhere("userRol.esactivo = true")
       .getOne();
 
@@ -59,13 +59,13 @@ export class UserRepositoryImpl implements UserRepository {
 
   async findById(id: number): Promise<User | null> {
     const { ROLES } = this.constanst
-    const { DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE } = ROLES
+    const { DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, ADMIN_ROLE } = ROLES
     const userEntity = await this.userRepository
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.userRoles", "userRol")
       .leftJoinAndSelect("userRol.role", "role")
       .where("user.id = :id", { id })
-      .andWhere("role.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, 50] })
+      .andWhere("role.id IN (:...ids)", { ids: [DIRECTOR_ROLE, DISTRICT_ROLE, DEPARTMENT_ROLE, VER_ROLE, ADMIN_ROLE] })
       .andWhere("userRol.esactivo = true")
       .getOne();
 

@@ -3,6 +3,7 @@ import { OperationsProgrammingRepository } from "src/modules/operations-programm
 import { PermissionsGateway } from "./websocket.permissions.gateway";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { envs } from '../../../../../../infrastructure/config/envs';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class PermissionWatcherService {
@@ -19,17 +20,19 @@ export class PermissionWatcherService {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async checkPermissionStatus() {
-    const { ROLES } = this.constants
-    const now = new Date();
-    const currentGestion = now.getFullYear();
-    const operative = await this.operativeRepo.getOperative(currentGestion);
+    const { ROLES } = this.constants;
+
+    const operative = await this.operativeRepo.getOperative(DateTime.now().setZone('America/La_Paz').year);
     if (!operative) return;
 
+    // Convertimos todos los timestamps sin zona a hora Bolivia
     const permissions = [
-      { roleId: ROLES.DIRECTOR_ROLE, start: operative.datePosUEIni, end: operative.datePosUEEnd },
-      { roleId: ROLES.DISTRICT_ROLE, start: operative.dateRevDisIni, end: operative.dateRevDisEnd },
-      { roleId: ROLES.DEPARTMENT_ROLE, start: operative.dateRevDepIni, end: operative.dateRevDepEnd },
+      { roleId: ROLES.DIRECTOR_ROLE, start: DateTime.fromJSDate(operative.datePosUEIni, { zone: 'America/La_Paz' }), end: DateTime.fromJSDate(operative.datePosUEEnd, { zone: 'America/La_Paz' }) },
+      { roleId: ROLES.DISTRICT_ROLE, start: DateTime.fromJSDate(operative.dateRevDisIni, { zone: 'America/La_Paz' }), end: DateTime.fromJSDate(operative.dateRevDisEnd, { zone: 'America/La_Paz' }) },
+      { roleId: ROLES.DEPARTMENT_ROLE, start: DateTime.fromJSDate(operative.dateRevDepIni, { zone: 'America/La_Paz' }), end: DateTime.fromJSDate(operative.dateRevDepEnd, { zone: 'America/La_Paz' }) },
     ];
+
+    const now = DateTime.now().setZone('America/La_Paz');
 
     for (const { roleId, start, end } of permissions) {
       const previousState = this.notifiedStates.get(roleId);
@@ -49,11 +52,15 @@ export class PermissionWatcherService {
       }
     }
 
-    const isActive = now >= operative.dateOpeIni && now <= operative.dateOpeEnd;
+    // Operativo general
+    const operativeStart = DateTime.fromJSDate(operative.dateOpeIni, { zone: 'America/La_Paz' });
+    const operativeEnd = DateTime.fromJSDate(operative.dateOpeEnd, { zone: 'America/La_Paz' });
+    const isActive = now >= operativeStart && now <= operativeEnd;
+
     this.gateway.notifyCurrentOperation({
       active: envs.mode === 'development' ? true : isActive,
-      start: operative.dateOpeIni,
-      end: operative.dateOpeEnd
-    })
+      start: operativeStart.toJSDate(),
+      end: operativeEnd.toJSDate()
+    });
   }
 }

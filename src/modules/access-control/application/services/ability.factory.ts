@@ -7,6 +7,7 @@ import { PermissionRepository } from "../../domain/ports/outbound/permission.rep
 import { OperationsProgrammingRepository } from "src/modules/operations-programming/domain/ports/outbound/operations-programming.repository";
 import { PermissionsGateway } from "@access-control/infrastructure/adapters/secondary/services/websocket.permissions.gateway";
 import { envs } from "@infrastructure-general/config"
+import { DateTime } from 'luxon';
 
 type Subjects = any | 'all'
 
@@ -54,7 +55,7 @@ export class AbilityFactory {
       if (!perm.action || !perm.subject) return;
 
       if(this.isPermissionExpired(roleId, currentOperative, perm)) {
-        console.log("permiso expirado! para rolId:", roleId)
+        // console.log("permiso expirado! para rolId:", roleId)
         return;
       }
 
@@ -93,44 +94,54 @@ export class AbilityFactory {
     });
   }
 
-  private isPermissionExpired(roleId: any, operative: any, perm?:any): boolean {
-
-    console.log(envs.mode)
+  private isPermissionExpired(roleId: any, operative: any, perm?: any): boolean {
     if(envs.mode === 'development') {
-      return false; // los permisos nunca expiran
+      return false;
     }
 
-    const { ROLES } = this.constants
-    const now = new Date();
+    const { ROLES } = this.constants;
+
+    const now = DateTime.now().setZone('America/La_Paz');
 
     if(perm?.action?.name === 'read' || perm?.action?.name === 'manage')
       return false;
 
-    // console.log("Tiempo actual: ", now)
-    // console.log("Operativo: ", operative)
     let expired = false;
+
+    // Convertimos los timestamps de la base a hora Bolivia
+    const datePosUEIni = operative?.datePosUEIni ? DateTime.fromJSDate(operative.datePosUEIni, { zone: 'America/La_Paz' }) : null;
+    const datePosUEEnd = operative?.datePosUEEnd ? DateTime.fromJSDate(operative.datePosUEEnd, { zone: 'America/La_Paz' }) : null;
+    const dateRevDisIni = operative?.dateRevDisIni ? DateTime.fromJSDate(operative.dateRevDisIni, { zone: 'America/La_Paz' }) : null;
+    const dateRevDisEnd = operative?.dateRevDisEnd ? DateTime.fromJSDate(operative.dateRevDisEnd, { zone: 'America/La_Paz' }) : null;
+    const dateRevDepIni = operative?.dateRevDepIni ? DateTime.fromJSDate(operative.dateRevDepIni, { zone: 'America/La_Paz' }) : null;
+    const dateRevDepEnd = operative?.dateRevDepEnd ? DateTime.fromJSDate(operative.dateRevDepEnd, { zone: 'America/La_Paz' }) : null;
+
     switch(roleId) {
       case ROLES.DIRECTOR_ROLE:
-        // console.log("1",now < operative.datePosUEIni, operative.datePosUEIni)
-        // console.log("2",now > operative.datePosUEEnd, operative.datePosUEEnd)
-        // console.log("Resultado final: ", now < operative.datePosUEIni || now > operative.datePosUEEnd)
-        expired = now < operative.datePosUEIni || now > operative.datePosUEEnd;
+        if (datePosUEIni && datePosUEEnd) {
+          expired = now < datePosUEIni || now > datePosUEEnd;
+        } else {
+          expired = true;
+        }
         break;
       case ROLES.DISTRICT_ROLE:
-        expired = now < operative.dateRevDisIni || now > operative.dateRevDisEnd;
+        if(dateRevDisIni && dateRevDisEnd) {
+          expired = now < dateRevDisIni || now > dateRevDisEnd;
+        } else {
+          expired = true
+        }
         break;
       case ROLES.DEPARTMENT_ROLE:
-        expired = now < operative.dateRevDepIni || now > operative.dateRevDepEnd;
+        if(dateRevDepIni && dateRevDepEnd) {
+          expired = now < dateRevDepIni || now > dateRevDepEnd;
+        } else {
+          expired = true
+        }
         break;
       default:
         expired = false;
         break;
     }
-    // if(expired) {
-    //   console.log("no ingresa aca")
-    //   this.permissionGateway.notifyPermissionExpired(roleId);
-    // }
     return expired;
-
   }
 }

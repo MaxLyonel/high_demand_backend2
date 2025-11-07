@@ -36,7 +36,7 @@ export class DistrictReportImpl implements DistrictReportService {
         const tableData = formData[i];
 
         // Calcular altura EXACTA de esta tabla específica
-        const tableHeight = this.calculateTableHeight(formData.length);
+        const tableHeight = this.calculateTableHeight(tableData.courses.length);
 
         // Verificar si la tabla cabe en la página actual
         if (currentY + tableHeight >= PAGE_HEIGHT - BOTTOM_MARGIN) {

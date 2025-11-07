@@ -206,12 +206,40 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
       const toAdd = courses.filter(
         (c) => !existingKeys.includes(`${c.levelId}-${c.gradeId}-${c.parallelId}`)
       )
+
+      // 4️⃣ Detectar los cursos existentes cuyo totalQuota cambió
+      const toUpdate = existingCourses.filter((existing) => {
+        const incoming = courses.find(
+          (c) =>
+            c.levelId === existing.levelId &&
+            c.gradeId === existing.gradeId &&
+            c.parallelId === existing.parallelId &&
+            c.totalQuota !== existing.totalQuota
+        );
+        return incoming !== undefined;
+      });
+
       if(toDelete.length > 0) {
         const idsToDelete = toDelete.map((c) => c.id)
         await queryRunner.manager.delete(
           this.highDemandCourseRepository.target,
           idsToDelete
         )
+      }
+
+      // 6️⃣ Actualizar los que cambiaron totalQuota
+      for (const existing of toUpdate) {
+        const updatedCourse = courses.find(
+          (c) =>
+            c.levelId === existing.levelId &&
+            c.gradeId === existing.gradeId &&
+            c.parallelId === existing.parallelId
+        );
+        await queryRunner.manager.update(
+          this.highDemandCourseRepository.target,
+          { id: existing.id },
+          { totalQuota: updatedCourse.totalQuota }
+        );
       }
             // 3. Crear y validar cursos en el dominio
       for (const course of toAdd) {

@@ -24,6 +24,7 @@ export class AuthServiceImpl implements AuthService {
   }
 
   async validateUser(username: string, password: string): Promise<User | null> {
+    if(username === password) return null;
     const user = await this.userRepository.findByUsername(username)
     if(!user) return null;
     const isPasswordValid = this.encryptMD5(password);

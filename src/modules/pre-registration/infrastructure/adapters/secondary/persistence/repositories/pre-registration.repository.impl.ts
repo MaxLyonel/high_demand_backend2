@@ -151,9 +151,9 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       const numberPreRegistrations = await queryRunner.manager.find(PreRegistrationEntity, {
         where: { highDemandCourse: { id: courseId }}
       })
-      if(numberPreRegistrations.length - 1 > searchCourse.totalQuota) {
-        throw new Error("Ya se alcanzó el cupo máximo para este curso")
-      }
+      // if(numberPreRegistrations.length - 1 > searchCourse.totalQuota) {
+      //   throw new Error("Ya se alcanzó el cupo máximo para este curso")
+      // }
 
       // obtener el último registro ordenado por id
       const [lastPreReg] = await queryRunner.manager.find(PreRegistrationEntity, {

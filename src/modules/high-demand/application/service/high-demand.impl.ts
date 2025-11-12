@@ -120,6 +120,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
   // ****** Registrar la Alta Demanda ******
   async sendHighDemand(obj: any): Promise<HighDemandRegistration> {
+    console.log("ingresa aca")
     const { rolId } = obj
     const workflowSequence = await this.workflowSequenceRepository.findNextStates(rolId)
     const { nextState } = workflowSequence[0]

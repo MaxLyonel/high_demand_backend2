@@ -51,13 +51,13 @@ export class HighDemandRegistration {
     }
 
     // Regla negocio: Una unidad educativa no puede estar doblemente registrada en una misma gestión
-    const alreadyRegistered = existingRegistrations.some(
-      (reg) => reg.educationalInstitutionId === educationalInstitutionId && reg.operativeId === operativeId
-    );
+    // const alreadyRegistered = existingRegistrations.some(
+    //   (reg) => reg.educationalInstitutionId === educationalInstitutionId && reg.operativeId === operativeId
+    // );
 
-    if(alreadyRegistered) {
-      throw new Error('La unidad educativa ya está registrada como alta demanda en esta gestión')
-    }
+    // if(alreadyRegistered) {
+    //   throw new Error('La unidad educativa ya está registrada como alta demanda en esta gestión')
+    // }
 
 
     return new HighDemandRegistration(

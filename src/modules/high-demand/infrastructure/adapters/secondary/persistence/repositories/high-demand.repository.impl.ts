@@ -71,7 +71,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
       // 1. Guardar la entidad principal sin los cursos aún
       const { courses, educationalInstitutionId } = obj;
 
-      let highDemand = await queryRunner.manager.findOne(
+      let highDemand:any = await queryRunner.manager.findOne(
         this.highDemandRepository.target,
         {
           where: { educationalInstitutionId }
@@ -80,18 +80,29 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
       // para el historico
       const { rolId } = obj
       const workflowSequence = await this.workflowSequenceRepository.findNextStates(rolId)
-      const { nextState } = workflowSequence[0]
-      obj.rolId = nextState
+
+      if(rolId !== this.constants.ROLES.VER_ROLE) {
+        const { nextState } = workflowSequence[0]
+        obj.rolId = nextState
+      }
       obj.workflowStateId = 1
       obj.inbox = false
 
-      if(!highDemand) {
-
+      if(rolId === this.constants.ROLES.VER_ROLE) {
         const highDemandToSave = { ...obj, courses: undefined };
         highDemand = await queryRunner.manager.save(
           this.highDemandRepository.target,
-          highDemandToSave
+            highDemandToSave
         )
+      } else {
+        if(!highDemand) {
+
+          const highDemandToSave = { ...obj, courses: undefined };
+          highDemand = await queryRunner.manager.save(
+            this.highDemandRepository.target,
+            highDemandToSave
+          )
+        }
       }
 
       // 2. Traer cursos existentes persistidos para esta inscripción
@@ -166,6 +177,7 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
         rolId: highDemand!.rolId,
         observation: ''
       }
+      console.log("history: ",newHistory)
       await queryRunner.manager.insert(
         this.historyRepository.target,
         newHistory

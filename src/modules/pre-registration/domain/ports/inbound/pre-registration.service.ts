@@ -14,6 +14,6 @@ export abstract class PreRegistrationService {
   abstract lotterySelection(preRegistrationId: number): Promise<any>;
   abstract getPostulantsDrawn(): Promise<any>;
 
-  abstract obtainPreRegistrationInformation(postulantId: number): Promise<any>;
+  abstract obtainPreRegistrationInformation(preRegistrationId: number): Promise<any>;
   abstract getPreRegistration(postulantId: number): Promise<any>
 }

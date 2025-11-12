@@ -503,10 +503,11 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     return preRegistrations
   }
 
-  async getPreRegistrationInfo(postulantId: number): Promise<any> {
+  async getPreRegistrationInfo(preRegistrationId: number): Promise<any> {
     try {
     const prereg = await this.preRegistrationRepository.findOne({
-      where: { postulant: { id: postulantId } },
+      where: { id: preRegistrationId },
+      // where: { postulant: { id: postulantId } },
       relations: [
         'postulant',
         'criteria',

@@ -190,13 +190,13 @@ export class PreRegistrationController {
   }
 
   @Public()
-  @Get('print/:postulantId')
+  @Get('print/:preRegistrationId')
   async printPreRegistration(
-    @Param('postulantId', ParseIntPipe) postulanId: number,
+    @Param('preRegistrationId', ParseIntPipe) preRegistrationId: number,
     @Res() res: Response
   ) {
     try {
-      const response = await this.getPreRegistrationInfo(postulanId)
+      const response = await this.getPreRegistrationInfo(preRegistrationId)
       await this.pdfService.generateRegistrationForm(response.data, res)
     } catch(error) {
       if(!res.headersSent) {

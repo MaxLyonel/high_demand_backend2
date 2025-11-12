@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { PreRegistrationService } from "@pre-registration/domain/ports/inbound/pre-registration.service";
 import { PreRegistrationRepository } from "@pre-registration/domain/ports/outbound/pre-registration.repository";
 import { OperationsProgrammingService } from "src/modules/operations-programming/domain/ports/inbound/operations-programming.service";
@@ -10,6 +10,7 @@ import { OperationsProgrammingService } from "src/modules/operations-programming
 export class PreRegistrationServiceImpl implements PreRegistrationService {
 
   constructor(
+    @Inject('APP_CONSTANTS') private constants,
     private readonly preRegistrationRepository: PreRegistrationRepository,
     private readonly operativeService: OperationsProgrammingService
   ) {}
@@ -59,9 +60,10 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     return result
   }
 
-  async obtainPreRegistrationInformation(postulantId: number): Promise<any> {
-    const preRegistration = await this.preRegistrationRepository.getPreRegistrationInfo(postulantId)
-    const operative = await this.operativeService.getRegisterOperative(2025);
+  async obtainPreRegistrationInformation(preRegistrationId: number): Promise<any> {
+    const preRegistration = await this.preRegistrationRepository.getPreRegistrationInfo(preRegistrationId)
+    const { CURRENT_YEAR } = this.constants
+    const operative = await this.operativeService.getRegisterOperative(CURRENT_YEAR);
     const result = {
       ...preRegistration,
       ...operative

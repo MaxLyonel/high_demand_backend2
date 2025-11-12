@@ -61,6 +61,8 @@ export class PdfServiceImpl implements PdfService {
     const imageHeight = 65;
     const imageX = imgX;
     const imageY = imgY;
+    console.log("data lottery: ", data.dateLotteryIni, data.dateLotteryEnd)
+    console.log("data lottery: ", this.getDay(data.dateLotteryIni), this.getDay(data.dateLotteryEnd))
 
     doc.image(imagePath, imageX, imageY, {
       width: imageWidth,
@@ -379,7 +381,7 @@ export class PdfServiceImpl implements PdfService {
 
   private getDay(fechaISO: string): number {
     const fecha = new Date(fechaISO);
-    const day = fecha.getUTCDay(); // Usa UTC porque tu fecha tiene la 'Z'
+    const day = fecha.getUTCDate(); // 🔹 Esto devuelve 26, 28, etc.
     return day;
   }
 }

@@ -180,7 +180,7 @@ export class PdfServiceImpl implements PdfService {
   }
 
   private generateSummaryData(doc: PDFKit.PDFDocument, data:any) {
-    const { institution, registration, postulant, representative } = data
+    const { institution, registration, postulant, representative, registrationLocationDwelling } = data
     // Datos de la unidad educativa
     this.generateSectionSubTitle(doc, 'DATOS DE LA UNIDAD EDUCATIVA A LA QUE POSTULA', 50, 600)
     this.generateField(doc, 'DEPARTAMENTO:', institution?.department, 50, 160, 615, 180)
@@ -197,7 +197,7 @@ export class PdfServiceImpl implements PdfService {
     this.generateField(doc, 'Apellido Materno:', postulant?.mothersLastName, 350, 405, 630, 155)
     this.generateField(doc, 'Nombre(s):', postulant?.name, 350, 405, 645, 155)
     this.generateField(doc, 'Cedula de Identidad:', postulant?.identityCard, 350, 405, 660, 155)
-    this.generateField(doc, 'Domicilio:', 'VILLA EL CARMEN, PEDRO PADILLA', 350, 405, 675, 155)
+    this.generateField(doc, 'Domicilio:', registrationLocationDwelling?.zoneVilla, 350, 405, 675, 155)
     // firmas
     this.drawSolidLine(doc, 355, 730, 445, 730)
     doc.fontSize(5).fillColor('#000000').text('Firma del padre/madre o tutor(a)', 365, 733)

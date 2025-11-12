@@ -49,8 +49,17 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
     const existingRegistrations = await this.highDemandRepository.findInscriptions(obj)
 
-    obj.registrationStatus = RegistrationStatus.REGISTER
-    obj.rolId = firstWorkflowState.currentState
+
+    if(obj.rolId === this.constants.ROLES.VER_ROLE) {
+      obj.rolId = this.constants.ROLES.VER_ROLE
+      obj.registrationStatus =RegistrationStatus.APPROVED
+    } else {
+      obj.registrationStatus =RegistrationStatus.REGISTER
+      obj.rolId = firstWorkflowState.currentState
+    }
+
+    // obj.registrationStatus = RegistrationStatus.REGISTER
+    // obj.rolId = firstWorkflowState.currentState
     obj.workflowStateId = 2 //TODO
     obj.workflowId = workflow.id
     obj.inbox = false
@@ -76,15 +85,27 @@ export class HighDemandRegistrationImpl implements HighDemandService {
 
     const saved = await this.highDemandRepository.saveHighDemandRegistration(domain)
 
-    // const newHistory = {
-    //   highDemandRegistrationId: saved.id,
-    //   workflowStateId: saved.workflowStateId,
-    //   registrationStatus: saved.registrationStatus,
-    //   userId: saved.userId,
-    //   rolId: saved.rolId,
-    //   observation: ''
-    // }
-    // this.historyRepository.updatedHistory(newHistory)
+    if(obj.rolId === this.constants.ROLES.VER_ROLE) {
+      const newHistory = {
+        highDemandRegistrationId: saved.id,
+        workflowStateId: saved.workflowStateId,
+        registrationStatus: saved.registrationStatus,
+        userId: saved.userId,
+        rolId: saved.rolId,
+        observation: 'Postulación aprovada por el Técnico del Viceministerio de Educación Regular'
+      }
+      this.historyRepository.updatedHistory(newHistory)
+    } else {
+      const newHistory = {
+        highDemandRegistrationId: saved.id,
+        workflowStateId: saved.workflowStateId,
+        registrationStatus: saved.registrationStatus,
+        userId: saved.userId,
+        rolId: saved.rolId,
+        observation: ''
+      }
+      this.historyRepository.updatedHistory(newHistory)
+    }
     return saved
   }
 
@@ -142,6 +163,67 @@ export class HighDemandRegistrationImpl implements HighDemandService {
   async getHighDemandRegistration(educationalInstitutionId: number): Promise<HighDemandRegistration | null> {
     const highDemand = await this.highDemandRepository.findByInstitutionId(educationalInstitutionId)
     return highDemand
+  }
+
+  async gethighDemandForVER(institutionId: number): Promise<any> {
+    let message = ''
+    const highDemand = await this.highDemandRepository.findByInstitutionIdWithDeletedAt(institutionId)
+    if(!highDemand) {
+      message = 'No se encontró la postulación de la unida educativa. ¿Postular UE como omisión?'
+      return {
+        canCreate: true,
+        highDemand: null,
+        message
+      }
+    }
+    if(highDemand.registrationStatus === RegistrationStatus.APPROVED) {
+      message = 'La postulación de la unidad educativa ya fue aprovada'
+      return {
+        canCreate: false,
+        highDemand,
+        message
+      }
+    }
+    if(highDemand.registrationStatus === RegistrationStatus.CANCELED) {
+      message = 'La postulación de la unidad educativa fue anulada por el director'
+      return {
+        canCreate: true,
+        highDemand: null,
+        message
+      }
+    }
+    if(highDemand.rolId == 37 && highDemand.workflowStateId == 1) {
+      message = 'La postulación de la unidad educativa no fue recepcionada por el Distrital'
+      return {
+        canCreate: true,
+        highDemand,
+        message
+      }
+    }
+    if(highDemand.rolId == 37 && highDemand.workflowStateId == 2) {
+      message = 'La postulación de la unidad educativa fue recepcionada pero no derivada'
+      return {
+        canCreate: true,
+        highDemand,
+        message
+      }
+    }
+    if(highDemand.rolId == 850 && highDemand.workflowStateId == 1) {
+      message = 'La postulación de la unidad educativa no fue recepcionada por el Departamental'
+      return {
+        canCreate: true,
+        highDemand,
+        message
+      }
+    }
+    if(highDemand.rolId == 850 && highDemand.workflowStateId == 2) {
+      message = 'La postulación de la unidad educativa no fue aprobada por el departamental'
+      return {
+        canCreate: true,
+        highDemand,
+        message
+      }
+    }
   }
 
   // ****** Listar Altas Demandas Aprobadas *****

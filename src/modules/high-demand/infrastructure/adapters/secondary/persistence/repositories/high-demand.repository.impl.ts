@@ -345,10 +345,34 @@ export class HighDemandRepositoryImpl implements HighDemandRepository {
           educationalInstitutionId: educationalInstitutionId,
           operativeId: operative.id,
         },
-        withDeleted: true
+        order: {
+          createdAt: 'DESC'
+        }
       });
     if (!highDemandRegistrationEntity) return null;
     return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity!);
+  }
+
+  async findByInstitutionIdWithDeletedAt(institutionId: number): Promise<any | null> {
+    const { CURRENT_YEAR } = this.constants
+    const operative = await this.operativeRepository.findOne({
+      where: { gestionId: CURRENT_YEAR },
+      select: { id: true}
+    })
+    if(!operative) throw new Error("Períodos no definidos. Por favor contactese con el administrador")
+    const highDemandRegistrationEntity =
+      await this.highDemandRepository.findOne({
+        where: {
+          educationalInstitutionId: institutionId,
+          operativeId: operative.id
+        },
+        order: {
+          createdAt: 'DESC'
+        },
+        withDeleted: true
+      })
+    if(!highDemandRegistrationEntity) return null;
+    return HighDemandRegistrationEntity.toDomain(highDemandRegistrationEntity!)
   }
 
   async findById(id: number): Promise<HighDemandRegistration | null> {

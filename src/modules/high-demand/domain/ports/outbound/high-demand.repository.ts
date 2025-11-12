@@ -15,6 +15,7 @@ export abstract class HighDemandRepository {
   abstract findById(id: number): Promise<HighDemandRegistration | null>;
   abstract findInscriptions(obj: HighDemandRegistration): Promise<HighDemandRegistration[]>;
   abstract findByInstitutionId(educationalInstitutionId: number): Promise<HighDemandRegistration | null>;
+  abstract findByInstitutionIdWithDeletedAt(institutionId: number): Promise<any | null>;
   abstract updateWorkflowStatus(obj: CreateHistoryDto): Promise<HighDemandRegistration>;
 
   abstract searchFather(placeTypeId: number): Promise<any>;

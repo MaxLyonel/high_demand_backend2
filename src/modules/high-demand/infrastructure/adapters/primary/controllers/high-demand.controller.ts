@@ -92,6 +92,24 @@ export class HighDemandController {
     return this.highDemandService.getHighDemandRegistration(id)
   }
 
+  @Get(':id/by-institution-exceptional')
+  async getHighDemandByInstitutionException(@Param('id') id: number) {
+    try {
+      const result = await this.highDemandService.gethighDemandForVER(id)
+      return result
+      // return {
+      //   status: 'success',
+      //   message: 'Institucion educativa excepcional obtenidas exitosamente',
+      //   data: result
+      // }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener institución excepcional'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Post('udpate-state-worfkflow')
   updateStateWorkflow(@Body() body: CreateHistoryDto) {
     return this.highDemandService.modifyWorkflowStatus(body)

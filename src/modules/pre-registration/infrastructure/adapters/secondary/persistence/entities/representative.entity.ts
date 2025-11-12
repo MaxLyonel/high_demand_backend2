@@ -33,6 +33,9 @@ export class RepresentativeEntity {
   @Column({ name: 'celular'})
   cellphone: string
 
+  @Column({ name: 'direccion'})
+  address: string
+
   @ManyToOne(() => RelationshipEntity, { eager: false })
   @JoinColumn({ name: 'parentesco_tipo_id'})
   relationshipType: RelationshipEntity

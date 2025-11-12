@@ -3,6 +3,7 @@ import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service"
 import { Response } from "express";
 import * as PDFDocument from 'pdfkit'
 import * as QRCode from 'qrcode'
+import { Criteria } from '../../../../../domain/models/criteria.model';
 
 
 
@@ -13,6 +14,7 @@ export class PdfServiceImpl implements PdfService {
   async generateRegistrationForm(formData: any, res: Response): Promise<void> {
     try {
       const doc = new PDFDocument({ margin: 1 })
+      const { registration } = formData
       res.setHeader('Content-Type', 'application/pdf')
       res.setHeader('Content-Disposition', 'inline; filename=alta.pdf')
       doc.pipe(res);
@@ -21,6 +23,10 @@ export class PdfServiceImpl implements PdfService {
       this.generateSchoolData(doc, formData);
       this.generateParentData(doc, formData);
       this.generateRegistrationData(doc, formData);
+      // if(registration?.criteria?.id === 1) {
+      // } else if(registration?.criteria?.id === 2) {
+      // } else {
+      // }
       this.generateSiblingsData(doc, formData);
       this.generateAddressData(doc, formData);
       this.generateWorkAddressTutor(doc, formData);
@@ -83,8 +89,8 @@ export class PdfServiceImpl implements PdfService {
     const { institution } = data
     this.generateSectionTitle(doc, 'I. DATOS DE LA UNIDAD EDUCATIVA A LA QUE POSTULA', 100);
     this.generateField(doc, 'NOMBRE DE LA UNIDAD EDUCATIVA:', `${institution?.id} - ${institution?.name}`, 55, 180, 112, 380);
-    this.generateField(doc, 'TURNO DE LA UNIDAD EDUCATIVA:', institution?.shift, 55, 180, 124);
-    this.generateField(doc, 'DEPENDENCIA DE LA UNIDAD EDUCATIVA:', institution?.dependency, 305, 430, 124, 130);
+    // this.generateField(doc, 'TURNO DE LA UNIDAD EDUCATIVA:', institution?.shift, 55, 180, 124);
+    this.generateField(doc, 'DEPENDENCIA DE LA UNIDAD EDUCATIVA:', institution?.dependency, 55, 180, 124, 380);
     this.generateField(doc, 'DEPARTAMENTO:', institution?.department , 55, 120, 136, 50);
     this.generateField(doc, 'DISTRITO EDUCATIVO:', institution?.district, 180, 250, 136, 90);
     this.generateField(doc, 'ZONA/BARRIO/VILLA:', institution?.area, 350, 415, 136, 145);
@@ -98,7 +104,7 @@ export class PdfServiceImpl implements PdfService {
     this.generateField(doc, 'Apellido Materno:', representative?.mothersLastName, 55, 175, 178);
     this.generateField(doc, 'Nombre(s):', representative?.name, 55, 175, 190);
     this.generateField(doc, 'N° de cédula de identidad:', representative?.identityCard, 55, 175, 202);
-    this.generateField(doc, 'Dirección actual de su residencia:', representative?.parentAddress, 55, 175, 214);
+    this.generateField(doc, 'Dirección actual de su residencia:', representative?.address, 55, 175, 214);
     this.generateField(doc, 'En caso de tutor(a) ¿Cuál es el parentesco?:', representative?.relation, 55, 175, 226);
 
     // Datos del estudiante
@@ -186,11 +192,11 @@ export class PdfServiceImpl implements PdfService {
     this.generateField(doc, 'DEPARTAMENTO:', institution?.department, 50, 160, 615, 180)
     this.generateField(doc, 'DISTRITO EDUCATIVO:', institution?.district, 50, 160, 630, 180)
     this.generateField(doc, 'UNIDAD EDUCATIVA:', `${institution?.id} - ${institution?.name}`, 50, 160, 645, 180)
-    this.generateField(doc, 'TURNO:', institution?.shift, 50, 160, 660, 180)
-    this.generateField(doc, 'ZONA / BARRIO / VILLA', institution?.area, 50, 160, 675, 180)
-    this.generateField(doc, 'NIVEL DE EDUCACIÓN:', registration?.course?.level, 50, 160, 690, 180)
-    this.generateField(doc, 'AÑO DE ESCOLARIDAD:', registration?.course.grade, 50, 160, 705, 180)
-    this.generateField(doc, 'N° DE CONTACTO:', representative?.cellPhone, 50, 160, 720, 180)
+    // this.generateField(doc, 'TURNO:', institution?.shift, 50, 160, 660, 180)
+    this.generateField(doc, 'ZONA / BARRIO / VILLA', institution?.area, 50, 160, 660, 180)
+    this.generateField(doc, 'NIVEL DE EDUCACIÓN:', registration?.course?.level, 50, 160, 675, 180)
+    this.generateField(doc, 'AÑO DE ESCOLARIDAD:', registration?.course.grade, 50, 160, 690, 180)
+    this.generateField(doc, 'N° DE CONTACTO:', representative?.cellPhone, 50, 160, 705, 180)
     // Datos del estudiante
     this.generateSectionSubTitle(doc, 'DATOS DEL ESTUDIANTE', 350, 600)
     this.generateField(doc, 'Apellido Paterno:', postulant?.lastName, 350, 405, 615, 155)

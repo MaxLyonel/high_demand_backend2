@@ -112,7 +112,8 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         nationality: guardian.nationality,
         dateBirth: guardian.dateBirth,
         relationshipType: guardian.relationship,
-        cellphone: guardian.cellphone
+        cellphone: guardian.cellphone,
+        address: guardian.address
       })
 
       // *************** Guardando la PREINSCRIPCION ***************
@@ -583,7 +584,8 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         name: prereg.representative?.name,
         identityCard: prereg.representative.identityCard,
         relation: prereg.representative?.relationshipType?.name,
-        cellPhone: prereg.representative?.cellphone
+        cellPhone: prereg.representative?.cellphone,
+        address: prereg.representative?.address
       },
       registration: {
         criteria: {

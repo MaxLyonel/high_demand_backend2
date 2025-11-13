@@ -575,7 +575,8 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         birthDate: prereg.postulant.dateBirth,
         placeBirth: prereg.postulant.placeBirth,
         gender: prereg.postulant.gender,
-        age: now - new Date(prereg.postulant.dateBirth).getFullYear(),
+        // age: now - new Date(prereg.postulant.dateBirth).getFullYear(),
+        age: this.calculateAge(prereg.postulant.dateBirth),
         months: this.getAgeWithMonths(prereg.postulant.dateBirth),
       },
       representative: {
@@ -634,6 +635,18 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     }
 
     return months
+  }
+
+  calculateAge(dateBirth: string | Date): number {
+    const birthDate = new Date(dateBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+    return age;
   }
 
 }

@@ -32,6 +32,24 @@ export class PreRegistrationController {
     }
   }
 
+  @Public()
+  @Post('update')
+  async updatePreRegistration(@Body() body: any) {
+    try {
+      const result = await this.preRegistrationService.updatePreRegistration(body)
+      return {
+        status: 'success',
+        message: 'Pre inscripción actualizado exitosamente',
+        data: result
+      }
+    } catch (error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al actualizar la pre inscripción'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   @Post('invalidate')
   async invalidatePreRegistration(@Body() body: any) {
     try {

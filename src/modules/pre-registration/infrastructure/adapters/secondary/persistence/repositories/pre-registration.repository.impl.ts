@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PreRegistrationRepository } from "@pre-registration/domain/ports/outbound/pre-registration.repository";
-import { PreRegistrationEntity } from "../entities/pre-registration.entity";
+import { PreRegistrationEntity } from '../entities/pre-registration.entity';
 import { DataSource, In, QueryFailedError, Repository } from "typeorm";
 import { RepresentativeEntity } from "../entities/representative.entity";
 import { PostulantEntity } from "../entities/postulant.entity";
@@ -234,6 +234,127 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
 
       return newPreRegistration
 
+    } catch(error) {
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  async updatePreRegistration(obj: any): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+    try {
+      const {
+        justification,
+        postulantResidence,
+        guardianWork,
+        postulantSiblings,
+        preInscriptionId,
+        addressTutor,
+      } = obj
+
+      const preRegis = await queryRunner.manager.findOne(
+        PreRegistrationEntity,
+        { where: { id: preInscriptionId }
+      });
+      console.log("preRegis", preRegis?.isUpdated === true)
+      if(preRegis?.isUpdated === true) {
+        console.log("ingresa aca?")
+        throw new Error("Solo tenía una oportunidad. Ya realizó la actualización de su formulario de preinscripción")
+      }
+
+      await queryRunner.manager.softDelete(
+        PreRegistrationBrotherEntity,
+        { preRegistration: { id: preInscriptionId } }
+      );
+      await queryRunner.manager.softDelete(
+        PreRegistrationLocationEntity,
+        { preRegistration: { id: preInscriptionId } }
+      );
+
+      const preRegistatrationUpdated = await queryRunner.manager.update(
+        PreRegistrationEntity,
+        { id: preInscriptionId },
+        { criteria: { id: justification }}
+      )
+
+      const { BROTHER_JUSTIFICATION, HOUSING_JUSTIFICATION, WORKPLACE_JUSTIFICATION, ROLES } = this.constants
+      if(justification === BROTHER_JUSTIFICATION) {
+        for(let sibling of postulantSiblings) {
+          const preRegistrationBrother = await queryRunner.manager.save(PreRegistrationBrotherEntity, {
+            codeRude: sibling.codeRude,
+            preRegistration: { id: preInscriptionId }
+          })
+        }
+      }
+      if(justification === HOUSING_JUSTIFICATION) {
+        const preRegistrationLocation = await queryRunner.manager.save(PreRegistrationLocationEntity, {
+          preRegistration: { id: preInscriptionId },
+          avenueStreetNro: postulantResidence.address,
+          zoneVilla: postulantResidence.area,
+          telephone: postulantResidence.telephone,
+          municipality: postulantResidence.municipality,
+          type: LocationType.DWELLING
+        })
+      }
+      if(justification === WORKPLACE_JUSTIFICATION) {
+        const preRegistrationLocation = await queryRunner.manager.save(PreRegistrationLocationEntity, {
+          preRegistration: { id: preInscriptionId },
+          avenueStreetNro: guardianWork.addressJob,
+          zoneVilla: guardianWork.area,
+          telephone: guardianWork.phoneJob,
+          municipality: guardianWork.municipality,
+          nameWorkPlace: guardianWork.placeName,
+          type: LocationType.WORK_PLACE
+        })
+      }
+
+      const pre = await queryRunner.manager.findOne(
+        PreRegistrationEntity,
+        {
+          where: { id: preInscriptionId },
+          relations: ['representative']
+        }
+      );
+      const representative = pre?.representative;
+
+      if(addressTutor !== '' && addressTutor !== null) {
+        if(representative) {
+          const updateAddress = await queryRunner.manager.update(
+            RepresentativeEntity,
+            { id:  representative.id },
+            { address: addressTutor }
+          );
+        }
+      }
+
+      // ***** Guardando HISTORICO ******
+      const history = {
+        preRegistration: { id: preInscriptionId },
+        rol: { id: ROLES.POSTULANT_ROLE },
+        state: PreRegistrationStatus.REGISTER,
+        observation: 'Actualizado por el padre de familia',
+      }
+
+      const newHistory = await queryRunner.manager.insert(HistoryPreRegistrationEntity, history)
+      let statusUpdated = false
+      if (newHistory.identifiers.length > 0) {
+        statusUpdated = true
+        await queryRunner.manager.update(
+          PreRegistrationEntity,
+          { id: preInscriptionId },
+          { isUpdated: true }
+        )
+        await queryRunner.commitTransaction()
+      } else {
+        throw new Error("Historial no registrado")
+      }
+      return {
+        statusUpdated,
+      }
     } catch(error) {
       await queryRunner.rollbackTransaction()
       throw error

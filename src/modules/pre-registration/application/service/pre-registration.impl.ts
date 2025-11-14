@@ -20,6 +20,11 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     return result
   }
 
+  async updatePreRegistration(obj: any): Promise<any> {
+    const result = await this.preRegistrationRepository.updatePreRegistration(obj)
+    return result
+  }
+
   async invalidatePreRegistration(obj: any): Promise<any> {
     const result = await this.preRegistrationRepository.invalidatePreRegistration(obj)
     return result

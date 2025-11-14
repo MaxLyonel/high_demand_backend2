@@ -361,7 +361,7 @@ export class PdfServiceImpl implements PdfService {
 
   private formatDateTime(isoString: string, withoutTime: boolean): string {
     if (!isoString) return '';
-    const date = new Date(isoString);
+    const date = new Date(new Date(isoString).getTime() - 4 * 60 * 60 * 1000);
 
     const day = date.getDate();
     const month = date.toLocaleString('es-ES', { month: 'long' });
@@ -369,14 +369,14 @@ export class PdfServiceImpl implements PdfService {
 
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
-
     const ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12;
-    if (hours === 0) hours = 12;
+    hours = hours % 12 || 12;
 
-    if(withoutTime) {
+    if (withoutTime) {
       return `${day} de ${month} de ${year}`;
-    } else return `${day} de ${month} de ${year}, ${hours}:${minutes} ${ampm}`;
+    } else {
+      return `${day} de ${month} de ${year}, ${hours}:${minutes} ${ampm}`;
+    }
   }
 
   private getDay(fechaISO: string): number {

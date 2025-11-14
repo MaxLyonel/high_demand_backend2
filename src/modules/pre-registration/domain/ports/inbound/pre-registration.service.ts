@@ -3,6 +3,7 @@
 
 export abstract class PreRegistrationService {
   abstract savePreRegistration(obj: any): Promise<any>;
+  abstract updatePreRegistration(obj: any): Promise<any>;
   abstract invalidatePreRegistration(obj: any): Promise<any>;
   abstract validatePreRegistration(obj: any): Promise<any>;
   abstract acceptPreRegistrations(obj: any): Promise<any>;

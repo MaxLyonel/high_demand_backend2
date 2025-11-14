@@ -53,6 +53,9 @@ export class PreRegistrationEntity {
   @DeleteDateColumn({ name: 'eliminado_en', type: 'timestamp'})
   deletedAt?: Date;
 
+  @Column({ name: 'actualizado'})
+  isUpdated: boolean
+
   static toDomain(entity: PreRegistrationEntity): PreRegistrationModel {
     return new PreRegistrationModel(
       entity.id,

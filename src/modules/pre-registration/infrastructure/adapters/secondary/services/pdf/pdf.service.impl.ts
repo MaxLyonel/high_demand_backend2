@@ -143,7 +143,7 @@ export class PdfServiceImpl implements PdfService {
       .text('DIBUJE EL CROQUIS DE UBICACIÓN DEL TRABAJO ACTUAL DEL PADRE,', 100, 490)
       .text('MADRE Y/O TUTOR EN EL REVERSO DE LA HOJA', 120, 500)
 
-    this.generateField(doc, 'Fecha y hora:', this.formatDateTime(data.createdAt || '', false), 55, 100, 512, 200)
+    this.generateField(doc, 'Fecha y hora:', this.formatDateTime2(data.createdAt || '', false), 55, 100, 512, 200)
     // firmas
     this.drawSolidLine(doc, 325, 485, 425, 485)
     doc.fontSize(5).fillColor('#000000').text('Firma del padre/madre o tutor(a)', 335, 486)
@@ -214,7 +214,7 @@ export class PdfServiceImpl implements PdfService {
     doc.fontSize(5).fillColor('#000000').text('Sello y firma del director(a) distrital educativo y/o', 463, 733)
     doc.fontSize(5).fillColor('#000000').text('unidad educativa', 480, 738)
 
-    this.generateField(doc, 'Fecha y hora:', this.formatDateTime(data.createdAt || '', false), 55, 100, 735, 200)
+    this.generateField(doc, 'Fecha y hora:', this.formatDateTime2(data.createdAt || '', false), 55, 100, 735, 200)
   }
 
   // Helpers
@@ -359,29 +359,80 @@ export class PdfServiceImpl implements PdfService {
       .undash();
   }
 
+  // private formatDateTime(isoString: string, withoutTime: boolean): string {
+  //   if (!isoString) return '';
+  //   const date = new Date(new Date(isoString).getTime() - 4 * 60 * 60 * 1000);
+
+  //   const day = date.getDate();
+  //   const month = date.toLocaleString('es-ES', { month: 'long' });
+  //   const year = date.getFullYear();
+
+  //   let hours = date.getHours();
+  //   const minutes = date.getMinutes().toString().padStart(2, '0');
+  //   const ampm = hours >= 12 ? 'pm' : 'am';
+  //   hours = hours % 12 || 12;
+
+  //   if (withoutTime) {
+  //     return `${day} de ${month} de ${year}`;
+  //   } else {
+  //     return `${day} de ${month} de ${year}, ${hours}:${minutes} ${ampm}`;
+  //   }
+  // }
+
   private formatDateTime(isoString: string, withoutTime: boolean): string {
     if (!isoString) return '';
-    const date = new Date(new Date(isoString).getTime() - 4 * 60 * 60 * 1000);
+
+    const date = this.toBoliviaTime(isoString);
 
     const day = date.getDate();
     const month = date.toLocaleString('es-ES', { month: 'long' });
     const year = date.getFullYear();
+
+    if (withoutTime) {
+      return `${day} de ${month} de ${year}`;
+    }
 
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12 || 12;
 
+    return `${day} de ${month} de ${year}, ${hours}:${minutes} ${ampm}`;
+  }
+
+  // private getDay(fechaISO: string): number {
+  //   const fecha = new Date(fechaISO);
+  //   const day = fecha.getUTCDate(); // 🔹 Esto devuelve 26, 28, etc.
+  //   return day;
+  // }
+
+  private getDay(fechaISO: string): number {
+    const fecha = this.toBoliviaTime(fechaISO);
+    return fecha.getDate();
+  }
+
+  private toBoliviaTime(dateInput: string | Date): Date {
+    const date = new Date(dateInput);
+    // Obtener UTC
+    const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+    // Convertir a UTC-4 (Bolivia)
+    return new Date(utc - (4 * 60 * 60 * 1000));
+  }
+
+  private formatDateTime2(isoString: string, withoutTime: boolean): string {
+    if (!isoString) return '';
+    const date = new Date(new Date(isoString).getTime() - 4 * 60 * 60 * 1000);
+    const day = date.getDate();
+    const month = date.toLocaleString('es-ES', { month: 'long' });
+    const year = date.getFullYear();
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12 || 12;
     if (withoutTime) {
       return `${day} de ${month} de ${year}`;
     } else {
       return `${day} de ${month} de ${year}, ${hours}:${minutes} ${ampm}`;
     }
-  }
-
-  private getDay(fechaISO: string): number {
-    const fecha = new Date(fechaISO);
-    const day = fecha.getUTCDate(); // 🔹 Esto devuelve 26, 28, etc.
-    return day;
   }
 }

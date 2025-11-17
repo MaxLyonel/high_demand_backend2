@@ -180,7 +180,7 @@ export class HighDemandRegistrationImpl implements HighDemandService {
     if(highDemand.registrationStatus === RegistrationStatus.APPROVED) {
       message = 'La postulación de la unidad educativa ya fue aprovada'
       return {
-        canCreate: false,
+        canCreate: true,
         highDemand,
         message
       }

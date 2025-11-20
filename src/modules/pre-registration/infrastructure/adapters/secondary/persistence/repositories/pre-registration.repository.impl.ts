@@ -546,7 +546,8 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         'representative.relationshipType',
         'postulant',
         'criteria'
-      ]
+      ],
+      order: { id: 'DESC'}
     })
     return preRegistrations
   }

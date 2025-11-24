@@ -123,6 +123,22 @@ export class HistoryRepositoryImpl implements HistoryRepository {
           }
         })
         break;
+      case ROLES.VER_ROLE:
+      case ROLES.ADMIN_ROLE:
+        filtered = await this._historyRepository.find({
+          withDeleted: true,
+          relations: [
+            'highDemandRegistration.educationalInstitution',
+            'highDemandRegistration.placeDistrict',
+            'user',
+            'workflowState',
+            'rol'
+          ],
+          order: {
+            id: 'DESC'
+          }
+        })
+        break;
     }
 
     return filtered.map(entity => {

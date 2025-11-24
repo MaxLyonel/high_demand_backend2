@@ -106,9 +106,9 @@ export class DistrictReportImpl implements DistrictReportService {
     imgX: number,
     imgY: number
   ) {
-    const imagePath = './fonts/logo.jpg';
-    const imageWidth = 65;
-    const imageHeight = 65;
+    const imagePath = './fonts/logo.png';
+    const imageWidth = 55;
+    const imageHeight = 55;
     const imageX = imgX;
     const imageY = imgY;
 

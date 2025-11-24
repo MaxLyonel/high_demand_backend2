@@ -56,9 +56,9 @@ export class PdfServiceImpl implements PdfService {
     yQr: number
   ) {
     // Encabezado
-    const imagePath = './fonts/logo.jpg'
-    const imageWidth = 65;
-    const imageHeight = 65;
+    const imagePath = './fonts/logo.png'
+    const imageWidth = 55;
+    const imageHeight = 55;
     const imageX = imgX;
     const imageY = imgY;
     console.log("data lottery: ", data.dateLotteryIni, data.dateLotteryEnd)

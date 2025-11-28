@@ -8,12 +8,16 @@ import { AppModule } from './app.module';
 import { TypenameInterceptor } from '@access-control/infrastructure/adapters/primary/interceptors/typename.interceptor';
 import { RequestContextInterceptor } from '@infrastructure-general/register-logs/request-content.interceptor';
 import { RequestContextService } from '@infrastructure-general/register-logs/request-context.service';
+import { json, urlencoded } from 'express';
 
 require('module-alias/register');
 
 async function bootstrap() {
   const logger = new Logger(' ========== BACKEND ALTA DEMANDA ========= ')
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  app.use(json({ limit: '100mb' }));
+  app.use(urlencoded({ limit: '100mb', extended: true }));
 
   // Configuración para validación con dtos
   app.useGlobalPipes(

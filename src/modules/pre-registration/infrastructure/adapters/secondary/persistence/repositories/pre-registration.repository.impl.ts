@@ -460,7 +460,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         const enrolled = await queryRunner.manager.count(PreRegistrationEntity, {
           where: { highDemandCourse: { id: course.id }, state: PreRegistrationStatus.ACCEPTED }
         })
-        if(enrolled >= course?.totalQuota!) {
+        if(enrolled > course?.totalQuota!) {
           throw new Error('No hay plazas disponibles para este curso')
         }
         const alreadyAccepted = await queryRunner.manager.findOne(PreRegistrationEntity, {

@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PreRegistrationRepository } from "@pre-registration/domain/ports/outbound/pre-registration.repository";
 import { PreRegistrationEntity } from '../entities/pre-registration.entity';
-import { DataSource, In, QueryFailedError, Repository } from "typeorm";
+import { DataSource, In, IsNull, QueryFailedError, Repository } from "typeorm";
 import { RepresentativeEntity } from "../entities/representative.entity";
 import { PostulantEntity } from "../entities/postulant.entity";
 import { PreRegistrationStatus } from "@pre-registration/domain/enums/pre-registration-status.enum";
@@ -448,6 +448,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       const updated: any[] = []
 
       for (let o of obj) {
+        // aqui encuentro las plazas totales registradas en la postulacion
         const course = await this.highDemandCourseRepository.findOne({
           where: {
             highDemandRegistrationId: o.highDemandCourse.highDemandRegistrationId,
@@ -457,11 +458,18 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
           }
         })
         if(!course) throw new Error('No existe el curso a registrar')
+
         const enrolled = await queryRunner.manager.count(PreRegistrationEntity, {
-          where: { highDemandCourse: { id: course.id }, state: PreRegistrationStatus.ACCEPTED }
+          where: {
+            highDemandCourse: { id: course.id },
+            state: PreRegistrationStatus.ACCEPTED,
+            parallelSelectedId: o.selectedParallel.id // eso me habre la puerta a que se agregue mas plazas de las que se debe
+          }
         })
+        console.log("enrolled: ", enrolled)
+        console.log("course: ", course?.totalQuota)
         if(enrolled > course?.totalQuota!) {
-          throw new Error('No hay plazas disponibles para este curso')
+          throw new Error(`No hay plazas disponibles para el curso ${course?.parallel?.name}`)
         }
         const alreadyAccepted = await queryRunner.manager.findOne(PreRegistrationEntity, {
           where: {
@@ -479,7 +487,10 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
         const result = await queryRunner.manager.update(
           PreRegistrationEntity,
           { id: o.id },
-          { state: PreRegistrationStatus.ACCEPTED, criteriaPost: o.criteriaPost }
+          { state: PreRegistrationStatus.ACCEPTED,
+            criteriaPost: o.criteriaPost,
+            parallelSelectedId: o.selectedParallel.id
+          }
         )
 
         if (result.affected && result.affected > 0) {
@@ -493,7 +504,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
             preRegistration: { id: o.id },
             rol: { id: ROLES.DIRECTOR_ROLE },
             state: preRegistration!.state,
-            observation: ''
+            observation: `${o.selectedParallel?.id}`
           }
 
           const newHistory = await queryRunner.manager.insert(

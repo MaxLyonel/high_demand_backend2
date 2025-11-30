@@ -44,6 +44,9 @@ export class PreRegistrationEntity {
   @Column({ name: 'codigo'})
   code: string
 
+  @Column({ name: 'paralelo_seleccionado_id'})
+  parallelSelectedId: number;
+
   @CreateDateColumn({ name: 'creado_en', type: 'timestamp'})
   createdAt: Date;
 

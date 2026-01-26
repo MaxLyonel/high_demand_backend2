@@ -448,29 +448,7 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
       const updated: any[] = []
 
       for (let o of obj) {
-        // aqui encuentro las plazas totales registradas en la postulacion
-        const course = await this.highDemandCourseRepository.findOne({
-          where: {
-            highDemandRegistrationId: o.highDemandCourse.highDemandRegistrationId,
-            levelId: o.highDemandCourse.level.id,
-            gradeId: o.highDemandCourse.grade.id,
-            parallelId: o.selectedParallel.id
-          }
-        })
-        if(!course) throw new Error('No existe el curso a registrar')
-
-        const enrolled = await queryRunner.manager.count(PreRegistrationEntity, {
-          where: {
-            highDemandCourse: { id: course.id },
-            state: PreRegistrationStatus.ACCEPTED,
-            parallelSelectedId: o.selectedParallel.id // eso me habre la puerta a que se agregue mas plazas de las que se debe
-          }
-        })
-        console.log("enrolled: ", enrolled)
-        console.log("course: ", course?.totalQuota)
-        if(enrolled > course?.totalQuota!) {
-          throw new Error(`No hay plazas disponibles para el curso ${course?.parallel?.name}`)
-        }
+        // Verificamos si ya fue aceptado
         const alreadyAccepted = await queryRunner.manager.findOne(PreRegistrationEntity, {
           where: {
             postulant: { id: o.postulant.id},
@@ -483,13 +461,40 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
             `El postulante ${o.postulant.name} ya fue aceptado en otra unidad educativa o en otro curso.`
           );
         }
+        // aqui encuentro las plazas totales registradas en la postulacion
+        const course = await this.highDemandCourseRepository.findOne({
+          where: {
+            highDemandRegistrationId: o.highDemandCourse.highDemandRegistrationId,
+            levelId: o.highDemandCourse.level.id,
+            gradeId: o.highDemandCourse.grade.id,
+            parallelId: o.selectedParallel.id
+          },
+          relations: ['level', 'grade', 'parallel']
+        })
+        if(!course) throw new Error('No existe el curso a registrar')
+        if(obj.length > course?.totalQuota!) {
+          throw new Error(`La cantidad de estudiantes seleccionados sobrepasa el cupo del curso`)
+        }
+
+        const enrolled = await queryRunner.manager.count(PreRegistrationEntity, {
+          where: {
+            highDemandCourse: { id: course.id },
+            state: PreRegistrationStatus.ACCEPTED,
+            parallelSelectedId: o.selectedParallel.id // eso me habre la puerta a que se agregue mas plazas de las que se debe
+          }
+        })
+        if(enrolled >= course?.totalQuota!) {
+          throw new Error(`No hay plazas disponibles para el curso ${course?.level?.name} ${course?.grade?.name} - ${course?.parallel?.name}`)
+        }
 
         const result = await queryRunner.manager.update(
           PreRegistrationEntity,
           { id: o.id },
-          { state: PreRegistrationStatus.ACCEPTED,
+          {
+            state: PreRegistrationStatus.ACCEPTED,
             criteriaPost: o.criteriaPost,
-            parallelSelectedId: o.selectedParallel.id
+            parallelSelectedId: o.selectedParallel.id,
+            highDemandCourse: { id: o.selectedParallel.courseId }
           }
         )
 

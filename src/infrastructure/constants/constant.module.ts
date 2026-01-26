@@ -6,7 +6,7 @@ import { Global, Module } from "@nestjs/common";
     {
       provide: 'APP_CONSTANTS',
       useValue: {
-        CURRENT_YEAR: new Date().getFullYear(),
+        CURRENT_YEAR: new Date().getFullYear() - 1, //TODO luego cambiar esto
         BROTHER_JUSTIFICATION: 1,
         HOUSING_JUSTIFICATION: 2,
         WORKPLACE_JUSTIFICATION: 3,

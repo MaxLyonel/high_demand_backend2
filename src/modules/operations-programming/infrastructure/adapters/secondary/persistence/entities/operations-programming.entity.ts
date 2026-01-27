@@ -42,6 +42,9 @@ export class OperativeEntity {
   @Column({ name: 'gestion_id'})
   gestionId: number
 
+  @Column({ name: 'es_activo'})
+  isActive: boolean
+
 
   static toDomain(entity: OperativeEntity): Operative {
     return new Operative(

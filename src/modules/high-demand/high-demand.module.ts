@@ -69,6 +69,11 @@ import { DepartmentReportImpl } from "./infrastructure/adapters/secondary/servic
 import { AbilityFactory } from "@access-control/application/services/ability.factory";
 import { AuthModule } from "@access-control/auth.module";
 import { AddInfoMiddleware } from "./infrastructure/adapters/primary/middleware/add-info.middleware";
+import { EducationalInstitutionConsolidateEntity } from "./infrastructure/adapters/secondary/persistence/entities/educational-institution-consolidate.entity";
+import { EducationalInstitutionConsolidationService } from "./domain/ports/inbound/educational-institution-consolidation.service";
+import { EducationalInstitutionConsolidationImpl } from "./application/service/educational-institution-consolidation.impl";
+import { EducationalInstitutionConsolidationRepositoryImpl } from "./infrastructure/adapters/secondary/persistence/repositories/educational-institution-consolidation.impl";
+import { EducationalInstitutionConsolidationRepository } from "./domain/ports/outbound/educational-institution-consolidation.repository";
 
 
 
@@ -165,6 +170,14 @@ import { AddInfoMiddleware } from "./infrastructure/adapters/primary/middleware/
     {
       provide: MainInboxService,
       useClass: MainInboxImpl
+    },
+    {
+      provide: EducationalInstitutionConsolidationService,
+      useClass: EducationalInstitutionConsolidationImpl
+    },
+    {
+      provide: EducationalInstitutionConsolidationRepository,
+      useClass: EducationalInstitutionConsolidationRepositoryImpl
     }
   ],
   imports: [
@@ -184,6 +197,7 @@ import { AddInfoMiddleware } from "./infrastructure/adapters/primary/middleware/
         WorkflowEntity,
         WorkflowSequenceEntity,
         WorkflowStateEntity,
+        EducationalInstitutionConsolidateEntity
       ], 'alta_demanda'),
     OperationsProgrammingModule,
     AuthModule

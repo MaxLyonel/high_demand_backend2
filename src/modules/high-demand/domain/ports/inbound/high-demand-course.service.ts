@@ -6,4 +6,5 @@ export abstract class HighDemandCourseService {
   abstract changeHighDemandCourseQuota(courseId: number, quota: number): Promise<any>;
   abstract deleteCourse(courseId: number): Promise<HighDemandRegistrationCourse>;
   abstract getCourse(highDemandRegistrationId: number): Promise<HighDemandCourseDtoReponse[]>;
+  abstract getQuota(courseId: number): Promise<number>;
 }

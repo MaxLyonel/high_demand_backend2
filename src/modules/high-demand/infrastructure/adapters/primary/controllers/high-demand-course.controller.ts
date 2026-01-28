@@ -58,4 +58,23 @@ export class HighDemandCourseController {
     return this.highDemandCourseService.getCourse(highDemandId)
   }
 
+  @Get(':id/quota')
+  async getQuota(
+    @Param('id', ParseIntPipe) id: number
+  ) {
+    try {
+      const result = await this.highDemandCourseService.getQuota(id)
+      return {
+        status: 'success',
+        message: 'Cupo obtenido exitosamente',
+        data: result
+      }
+    } catch (error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener el cupo del curso',
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

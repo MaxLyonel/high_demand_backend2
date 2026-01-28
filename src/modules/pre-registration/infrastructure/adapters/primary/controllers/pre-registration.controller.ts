@@ -227,4 +227,21 @@ export class PreRegistrationController {
       }
     }
   }
+
+  @Get('number-accepted-remaining/:courseId')
+  async getNumberOfAccepted(@Param('courseId', ParseIntPipe) courseId: number) {
+    try {
+      const accepted = await this.preRegistrationService.getCounts(courseId)
+      return {
+        status: 'success',
+        message: 'Número de aceptados obtenido exitosamente',
+        data: accepted
+      }
+    } catch(error) {
+      throw new HttpException({
+        status: 'error',
+        message: error.message || 'Error al obtener el número de aceptados'
+      }, HttpStatus.BAD_REQUEST)
+    }
+  }
 }

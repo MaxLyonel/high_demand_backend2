@@ -8,4 +8,5 @@ export abstract class HighDemandCourseRepository {
   abstract saveHighDemandCourse(highDemandRegistrationId: number, obj: Array<Omit<HighDemandRegistrationCourse, 'id' | 'highDemandRegistrationId'>>): Promise<HighDemandRegistrationCourse[]>;
   abstract modifyQuota(highDemandCourseId: number, newQuota: number): Promise<HighDemandRegistrationCourse>;
   abstract deleteCourse(highDemandCourseId: number): Promise<HighDemandRegistrationCourse>;
+  abstract getTotalQuota(courseId: number): Promise<number | null>;
 }

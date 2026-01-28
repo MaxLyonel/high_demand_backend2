@@ -118,4 +118,11 @@ export class HighDemandCourseRepositoryImpl implements HighDemandCourseRepositor
     }));
   }
 
+  async getTotalQuota(courseId: number): Promise<number | null> {
+    const course = await this.highDemandRegistrationCourseEntity.findOne({
+      where: { id: courseId }
+    });
+    return course ? course.totalQuota : null;
+  }
+
 }

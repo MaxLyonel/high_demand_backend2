@@ -41,4 +41,10 @@ export class HighDemanCourseImpl implements HighDemandCourseService {
     return courses
   }
 
+  async getQuota(courseId: number): Promise<number> {
+    const quota = await this.highDemanCourseRepository.getTotalQuota(courseId)
+    if(!quota) throw new Error('Curso no encontrado');
+    return quota
+  }
+
 }

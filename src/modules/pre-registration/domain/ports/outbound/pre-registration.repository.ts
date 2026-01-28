@@ -16,4 +16,5 @@ export abstract class PreRegistrationRepository {
   abstract getApplicantsAcceptedStatus(): Promise<any>;
 
   abstract getPreRegistrationInfo(preRegistrationId: number): Promise<any>;
+  abstract getCounts(courseId: number): Promise<any>;
 }

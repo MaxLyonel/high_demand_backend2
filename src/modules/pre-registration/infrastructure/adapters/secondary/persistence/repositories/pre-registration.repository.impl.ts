@@ -787,4 +787,23 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     return age;
   }
 
+  async getCounts(courseId: number): Promise<any> {
+    const course = await this.highDemandCourseRepository.findOne({
+      where: { id: courseId }
+    })
+    if(!course) throw new Error("Curso no encontrado para obtener su cupo total")
+
+    const count = await this.preRegistrationRepository.count({
+      where: {
+        highDemandCourse: { id: courseId },
+        state: PreRegistrationStatus.ACCEPTED
+      }
+    })
+    return {
+      totalQuota: course.totalQuota,
+      accepted: count,
+      remaining: Math.max(course.totalQuota - count, 0)
+    }
+  }
+
 }

@@ -80,4 +80,9 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
     const info = await this.preRegistrationRepository.getPreRegistrationInfo(postulantId)
     return info
   }
+
+  async getCounts(courseId: number): Promise<number> {
+    const accepted = await this.preRegistrationRepository.getCounts(courseId)
+    return accepted
+  }
 }

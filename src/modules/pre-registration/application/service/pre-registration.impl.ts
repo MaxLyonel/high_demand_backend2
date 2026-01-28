@@ -12,7 +12,7 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
   constructor(
     @Inject('APP_CONSTANTS') private constants,
     private readonly preRegistrationRepository: PreRegistrationRepository,
-    private readonly operativeService: OperationsProgrammingService
+    private readonly operativeService: OperationsProgrammingService,
   ) {}
 
   async savePreRegistration(obj: any): Promise<any> {
@@ -84,5 +84,10 @@ export class PreRegistrationServiceImpl implements PreRegistrationService {
   async getCounts(courseId: number): Promise<number> {
     const accepted = await this.preRegistrationRepository.getCounts(courseId)
     return accepted
+  }
+
+  async getPreRegistrations(sie: number): Promise<any> {
+    const result = await this.preRegistrationRepository.getPreRegistrations(sie)
+    return result
   }
 }

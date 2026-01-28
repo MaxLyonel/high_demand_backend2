@@ -66,7 +66,8 @@ export class EducationalInstitutionConsolidationRepositoryImpl implements Educat
     const existing = await this.educationalInstitutionConsolidate.findOne({
       where: {
         educationalInstitution: { id: sie },
-        operative: { id: currentOperation.id }
+        operative: { id: currentOperation.id },
+        consolidate: true
       }
     })
     return existing?.consolidate ?? false;

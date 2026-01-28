@@ -2,6 +2,7 @@ import { Public } from "@access-control/infrastructure/adapters/primary/decorato
 import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Res } from "@nestjs/common";
 import { PreRegistrationService } from "@pre-registration/domain/ports/inbound/pre-registration.service";
 import { PdfService } from "@pre-registration/domain/ports/outbound/pdf.service";
+import { ReportConsolidationService } from "@pre-registration/domain/ports/outbound/report-consolidation.service";
 import { Response } from "express";
 
 
@@ -11,7 +12,8 @@ export class PreRegistrationController {
 
   constructor(
     private readonly preRegistrationService: PreRegistrationService,
-    private readonly pdfService: PdfService
+    private readonly pdfService: PdfService,
+    private readonly reportConsolidationService: ReportConsolidationService
   ) {}
 
   @Public()
@@ -244,4 +246,37 @@ export class PreRegistrationController {
       }, HttpStatus.BAD_REQUEST)
     }
   }
+
+
+  @Get('download-report-consolidate/:sie')
+  async downloadReportConsolidate(
+    @Param('sie', ParseIntPipe) sie: number,
+    @Res() res: Response
+  ) {
+    try {
+      const response = await this.preRegistrationService.getPreRegistrations(sie)
+      const buffer = await this.reportConsolidationService.consolidateReports(response)
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="reporte_sorteados_hermanos.xlsx"'
+      )
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="Reporte_Postulantes.xlsx"'
+      );
+      res.setHeader('Content-Length', buffer.length);
+
+      res.end(buffer);
+    } catch(error) {
+      if(!res.headersSent) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          status: 'error',
+          message: error.message || 'Error al descargar excel'
+        })
+      } else {
+        console.error('Error después de enviar headers Excel')
+      }
+    }
+  }
+
 }

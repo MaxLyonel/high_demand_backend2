@@ -19,4 +19,6 @@ export abstract class PreRegistrationService {
   abstract getPreRegistration(postulantId: number): Promise<any>
 
   abstract getCounts(courseId: number): Promise<number>;
+
+  abstract getPreRegistrations(sie: number): Promise<any>;
 }

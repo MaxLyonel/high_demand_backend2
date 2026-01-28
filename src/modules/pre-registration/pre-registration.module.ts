@@ -32,6 +32,8 @@ import { PreRegistrationBrotherEntity } from "./infrastructure/adapters/secondar
 import { PreRegistrationLocationEntity } from "./infrastructure/adapters/secondary/persistence/entities/pre-registration-location.entity";
 import { OperationsProgrammingModule } from "../operations-programming/operations-programming.module";
 import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/adapters/secondary/persistence/entities/high-demand-course.entity";
+import { ReportConsolidateServiceImpl } from "./infrastructure/adapters/secondary/services/excel/report-consolidate.service.impl";
+import { ReportConsolidationService } from "./domain/ports/outbound/report-consolidation.service";
 
 
 
@@ -69,6 +71,10 @@ import { HighDemandRegistrationCourseEntity } from "@high-demand/infrastructure/
     {
       provide: PdfService,
       useClass: PdfServiceImpl
+    },
+    {
+      provide: ReportConsolidationService,
+      useClass: ReportConsolidateServiceImpl
     }
   ],
   imports : [

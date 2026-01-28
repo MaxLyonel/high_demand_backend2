@@ -806,4 +806,34 @@ export class PreRegistrationRepositoryImpl implements PreRegistrationRepository 
     }
   }
 
+  async getPreRegistrations(sie: number): Promise<any> {
+    const preRegistrations = await this.highDemandCourseRepository.query(
+      `
+        SELECT
+          pi2.codigo,
+          p.carnet_identidad,
+          p.paterno,
+          p.materno,
+          p.nombre,
+          pi2.estado,
+          c.nombre,
+          nt.nivel,
+          gt.grado,
+          pt.paralelo
+        FROM alta_demanda.pre_inscripcion pi2
+        JOIN alta_demanda.alta_demanda_curso adc ON adc.id = pi2.alta_demanda_curso_id
+        JOIN alta_demanda.postulante p ON p.id = pi2.postulante_id
+        JOIN alta_demanda.criterio c ON c.id = pi2.criterio_post_id
+        JOIN alta_demanda.inscripcion_alta_demanda iad ON iad.id = adc.inscripcion_alta_demanda_id
+        JOIN nivel_tipo nt ON nt.id = adc.nivel_id
+        JOIN grado_tipo gt ON gt.id = adc.grado_id
+        JOIN paralelo_tipo pt ON pt.id = adc.paralelo_id
+        WHERE pi2.estado = 'ACEPTADO'
+        AND iad.institucion_educativa_id = $1
+        ORDER BY p.paterno, p.materno, p.nombre
+      `, [sie]
+    )
+    return preRegistrations
+  }
+
 }
